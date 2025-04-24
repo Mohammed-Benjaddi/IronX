@@ -1,0 +1,98 @@
+# Webserver Configuration File
+# Format: TOML (Tom's Obvious Minimal Language)
+
+# ======================
+# GLOBAL CONFIGURATION
+# ======================
+[global]
+# Requirement: "Set the maximum allowed size for client request bodies."
+# Explanation: Maximum upload size in bytes (1MB default)
+max_body_size = 1048576
+
+# Requirement: "Set up default error pages."
+# Explanation: Maps HTTP error codes to custom error pages
+[default_error_pages]
+400 = "/errors/400.html" # Bad Request
+403 = "/errors/403.html" # Forbidden
+404 = "/errors/404.html" # Not Found
+500 = "/errors/500.html" # Internal Server Error
+503 = "/errors/503.html" # Service Unavailable
+
+# ======================
+# SERVER DEFINITIONS
+# ======================
+
+# Requirement: "The first server for a host:port will be the default for this host:port"
+# Explanation: This is the default server for 0.0.0.0:8080 (no server_names needed)
+[[servers]]
+# Requirement: "Choose the port and host of each 'server'."
+host = "0.0.0.0" # Listen on all available network interfaces
+port = [8080, 4242, 1923] # Listen on port 8080
+# Requirement: "Set up the server_names or not."
+# Explanation: Optional list of domain names this server responds to
+hostnames = ["example.com", "www.example.com"]
+
+# ======================
+# ROUTE CONFIGURATIONS
+# ======================
+
+# Requirement: "Define a directory or file where the requested file should be located"
+# Explanation: Root directory for static files
+[[servers.routes]]
+path = "/"
+root = "/var/www/html"  	# Base directory for files
+index = "index.html"		# Requirement: "Set a default file  to serve when the request is for a directory"
+methods = ["GET", "HEAD"] 	# Requirement: "Define a list of accepted HTTP methods"
+autoindex = false 			# Requirement: "Enable or disable directory listing"
+
+# Requirement: "Execute CGI based on certain file extension"
+# /cgi route is set to handle requests with the HTTP mo
+
+[[servers.routes]]
+path = "/cgi-bin"
+root = "/var/www/cgi-bin"
+methods = ["GET", "POST"]
+extensions = [".php"]
+interpreter = "/usr/bin/php-cgi"
+
+[[servers.routes]]
+path = "/uploads"
+root = "/var/www/uploads"
+methods = ["POST"]
+upload_dir = "/var/www/uploads/tmp"
+
+[[servers.routes]]
+path = "/old-site"
+redirect = "https://new.example.com"
+methods = ["GET"]
+
+# ======================
+# SECOND SERVER DEFINITIONS (demonstrates virtual hosting)
+# ======================
+[[servers]]
+host = "0.0.0.0"
+port = 8080
+# Requirement: "The first server for a host:port will be the default..."
+# Explanation: This server only handles requests with these hostnames
+hostnames = ["api.example.com", "beta.example.com"]
+
+[[servers.routes]]
+path = "/"
+root = "/var/www/api"
+index = "api.php"
+methods = ["GET", "POST", "DELETE"]
+
+[[servers.routes]]
+path = "/cgi"
+root = "/var/www/cgi-bin"
+methods = ["GET", "POST"]
+extensions = [".php", ".py"]
+interpreter = "/usr/bin/php-cgi"
+# ======================
+# CGI-SPECIFIC NOTES
+# ======================
+# These requirements are handled implicitly by the server implementation:
+# - "For chunked requests, your server needs to unchunk them"
+# - "If no content_length is returned from the CGI, EOF will mark the end"
+# - "Use the full path as PATH_INFO"
+# - "The CGI should be run in the correct directory for relative path file access"

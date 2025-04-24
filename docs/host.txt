@@ -1,0 +1,8 @@
+Is the host value in a webserver always 0.0.0.0
+
+usually 0,0,0,0 binds to all interfaces
+    - server listens on all available network interfaces
+    - Accessible from any network address local of remote
+    depenging on firewall rules
+    i:e ==  127.0.0.1 Accept connections onyl from localhost
+            192,168.1.100 Bind only to specific network interface
