@@ -7,6 +7,7 @@
 // #include <cstdint>
 #include <iostream>
 #include <stdint.h>
+#include <stdexcept>
 
 //? CGI settings
 class CGIConfig {

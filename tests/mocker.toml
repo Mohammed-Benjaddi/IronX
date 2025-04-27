@@ -45,11 +45,3 @@ methods = ["GET", "POST", "DELETE"]
 path = "/cgi-bin"
 root = "/var/www/cgi-bin"
 methods = ["GET", "POST"]
-
-
-
-
-
-
-
-

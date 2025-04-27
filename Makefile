@@ -1,3 +1,4 @@
+
 # WebServer Makefile - Final Working Version
 # -----------------------------------------
 
@@ -12,15 +13,23 @@ NAME     := webserv
 # Directory structure
 SRC_DIR  := srcs
 VAL_DIR  := $(SRC_DIR)/validation
+REQ_DIR  := $(SRC_DIR)/request
+RESP_DIR := $(SRC_DIR)/response
 OBJ_DIR  := obj
 
 # Source files (verify these paths match your actual files)
 MAIN_SRC := webserv.cpp
-CLASS_SRCS := $(wildcard $(VAL_DIR)/*.cpp)
+CLASS_SRCS := $(wildcard $(VAL_DIR)/*.cpp) \
+             $(wildcard $(REQ_DIR)/*.cpp) \
+             $(wildcard $(RESP_DIR)/*.cpp)
 
 # Object files
-OBJS     := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(MAIN_SRC)) \
-            $(patsubst $(VAL_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(CLASS_SRCS))
+MAIN_OBJ  := $(OBJ_DIR)/webserv.o
+VAL_OBJS  := $(patsubst $(VAL_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(wildcard $(VAL_DIR)/*.cpp))
+REQ_OBJS  := $(patsubst $(REQ_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(wildcard $(REQ_DIR)/*.cpp))
+RESP_OBJS := $(patsubst $(RESP_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(wildcard $(RESP_DIR)/*.cpp))
+
+OBJS     := $(MAIN_OBJ) $(VAL_OBJS) $(REQ_OBJS) $(RESP_OBJS)
 
 # Main build rule
 all: $(NAME)
@@ -36,6 +45,19 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 
 $(OBJ_DIR)/%.o: $(VAL_DIR)/%.cpp | $(OBJ_DIR)
+	@echo "🔨 Compiling $<..."
+	@$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
+
+$(OBJ_DIR)/%.o: $(REQ_DIR)/%.cpp | $(OBJ_DIR)
+	@echo "🔨 Compiling $<..."
+	@$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
+
+$(OBJ_DIR)/%.o: $(RESP_DIR)/%.cpp | $(OBJ_DIR)
+	@echo "🔨 Compiling $<..."
+	@$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
+
+# Special rule for compiling webserv.cpp
+$(OBJ_DIR)/webserv.o: webserv.cpp | $(OBJ_DIR)
 	@echo "🔨 Compiling $<..."
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 

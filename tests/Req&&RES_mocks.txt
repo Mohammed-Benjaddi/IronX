@@ -1,0 +1,28 @@
+📨 request_mock.txt (the incoming request)
+    It should contain a full raw HTTP request — as if a real client had sent it over the socket.
+
+    Meaning: request line, headers, optional body in correct HTTP format.
+
+    Example content:
+
+        GET /index.html HTTP/1.1
+        Host: localhost:8080
+        User-Agent: PostmanRuntime/7.32.3
+        Accept: */*
+
+        <blank line here>
+        (optional body if it's a POST)
+
+
+📦 response_mock.txt (the outgoing response)
+
+    It should contain a full raw HTTP response, meaning:
+        Status line (HTTP/1.1 200 OK)
+        Headers (Content-Type, Content-Length, etc.)
+        Blank line
+        Binary body (even garbage bytes are fine)
+
+If you are testing with a big file (like an image or PDF),
+the body after headers can be huge — that's totally fine.
+
+Key point: it must be ready to write directly to send() on the socket without building anything more.
