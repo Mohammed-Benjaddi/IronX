@@ -49,8 +49,8 @@ void printConfig(const WebServerConfig& config) {
         // Print routes
         std::cout << "=== Routes ===\n";
         const std::map<std::string, Route>& routes = cluster.getRoutes();
-        for (std::map<std::string, Route>::const_iterator route_it = routes.begin(); 
-             route_it != routes.end(); ++route_it) {
+        for (std::map<std::string, Route>::const_iterator route_it = routes.begin();
+            route_it != routes.end(); ++route_it) {
             const Route& route = route_it->second;
             std::cout << "  Route (" << route_it->first << "):\n";
             std::cout << "    Root Directory: " << route.getRootDir() << "\n";
