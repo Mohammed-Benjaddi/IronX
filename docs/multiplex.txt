@@ -1,0 +1,26 @@
+📄 Dynamic Upload: Uploaded files saved only after complete transfer.
+
+🚀 Non-blocking: Transfers are parallel and non-blocking.
+
+🏠 Virtual Hosting: Different domains/ports are treated independently.
+
+🔥 CGI Handling: Execute server-side scripts based on extension.
+
+📂 Dynamic Folder Creation: New folders created on finished uploads/downloads.
+
+🧪 Mock Testing: Simulate real HTTP traffic during development using raw files.
+
+🔒 Request Validation: Requests validated against allowed methods and max body size.
+
+Classes :
+    - ServerLauncher:
+    Managing and initializing a server of server instances
+    handles incoming requests in a disributed or load 
+    balancer manner
+
+
+
+Architecture:
+    -> Each IP, PPORT pair needs its own socket
+    socket binds to a unique (host, port) pair
+    
