@@ -12,7 +12,6 @@ int main() {
 
     //! Load Configuration
     mocker(config);
-    printConfig(config);
 
     ServerLauncher launcher;
     try {
