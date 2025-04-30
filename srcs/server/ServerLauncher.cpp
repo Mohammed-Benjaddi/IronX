@@ -22,8 +22,11 @@ void	ServerLauncher::launch(const WebServerConfig &config) {
 			const std::vector<uint16_t> ports = cluster.getPorts();
 			ServerSocket server_socket(host, ports.at(j));
 			sockets.push_back(server_socket);
-			this->_sockets = sockets;
 		}
 	}
-	while(1);
+	this->_sockets = sockets;
 }
+
+const	std::vector<ServerSocket>&	ServerLauncher::getSockets() {
+	return this->_sockets;
+};

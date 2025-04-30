@@ -2,6 +2,7 @@
 #include "headers/NetworkActions.hpp"
 #include "headers/HTTPRequest.hpp"
 #include "headers/ServerLauncher.hpp"
+#include "headers/Multiplexer.hpp"
 #include "mocker.hpp"
 
 int main() {
@@ -13,12 +14,13 @@ int main() {
     //! Load Configuration
     mocker(config);
 
-    ServerLauncher launcher;
+    ServerLauncher  launcher;
     try {
             launcher.launch(config);
-            //? const std::vector<Listener>& listeners = launcher.getListeners();
+            Multiplexer     mux(launcher.getSockets());
+            mux.run();
     } catch (const std::exception &e) {
-        std::cerr << "Error Launching Server: " << e.what() << std::endl;
+            std::cerr << "Error Launching Server: " << e.what() << std::endl;
     }
 
     return (0);

@@ -1,4 +1,5 @@
 #pragma once
+
 #include "WebServerConfig.hpp"
 #include "NetworkActions.hpp"
 #include "ServerSocket.hpp"
@@ -10,5 +11,5 @@ class   ServerLauncher {
         ServerLauncher();
         ~ServerLauncher(); 
         void launch(const WebServerConfig &);
-        // const std::vector<Listener>& getListeners() const;
+        const std::vector<ServerSocket>&	getSockets();
 };
