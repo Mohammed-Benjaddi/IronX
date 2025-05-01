@@ -32,6 +32,8 @@ port = [8080, 4242, 1923] # Listen on port 8080
 # Explanation: Optional list of domain names this server responds to
 hostnames = ["example.com", "www.example.com"]
 
+# root = www
+
 # ======================
 # ROUTE CONFIGURATIONS
 # ======================
@@ -40,7 +42,7 @@ hostnames = ["example.com", "www.example.com"]
 # Explanation: Root directory for static files
 [[servers.routes]]
 path = "/"
-root = "/var/www/html"  	# Base directory for files
+root = "/var/www/html/"  	# Base directory for files
 index = "index.html"		# Requirement: "Set a default file  to serve when the request is for a directory"
 methods = ["GET", "HEAD"] 	# Requirement: "Define a list of accepted HTTP methods"
 autoindex = false 			# Requirement: "Enable or disable directory listing"

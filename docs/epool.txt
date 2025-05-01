@@ -82,3 +82,24 @@ once we have an fd thats ready
         - is this fd one of my listening server sockets (new client connection)
         - or is this fd an existing client
         
+        
+========================
+
+
+New connections knowck on server socket
+
+code does accept by creating a new fd for that client
+
+so :
+    - Only server sockets receive new connections
+    -  Once accepted we get a new client fd which is seperate from the serve socket
+    
+    - After accepting the client we registered a new fd with epoll
+    Epoll Both watches
+        - server listening sockets
+        - Active client sockets
+        
+When epoll_wait marks an fd ready
+- Is this fd one of my server sockets : must be a new incoming conneciton
+- Is this fd not one of my server sockets : must be an already accepted client
+        

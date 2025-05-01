@@ -38,23 +38,37 @@ void	Multiplexer::run() {
     const int MAX_EVENTS = 10;
     struct epoll_event events[MAX_EVENTS];
     while (true) {
-        int num_events = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
-        if (num_events == -1)
-            throw std::runtime_error("epoll_wait failed");
-        for (int i = 0; i < num_events; ++i) {
-            int fd = events[i].data.fd;
-            /* ( refer to epoll.txt ) */
-            if (is_server_socket(fd)) {
-                handle_new_connection(fd);
-            } //else {
-            //     handle_client_event(fd);
-            // }
-        }
-    }
+		int num_events = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
+		if (num_events == -1)
+    		throw std::runtime_error("epoll_wait failed");
+		for (int i = 0; i < num_events; ++i) {
+    		int fd = events[i].data.fd;
+            uint32_t event_flags = events[i].events;
+    		/* ( refer to epoll.txt ) */
+    		if (is_server_socket(fd)) {
+        		handle_new_connection(fd);
+    		} else {
+        		std::cout << "Client event on fd: " << fd << std::endl;
+        		handle_client_event(fd, event_flags);
+    		}
+		}
+	}
+	
 }
 
-void    Multiplexer::handle_client_event(int fd) {
-    (void)fd;
+void	Multiplexer::handle_client_event(int fd, uint32_t event) {
+	//? Fetch Connection object
+	Connection &conn = activeConnections.at(fd);
+
+	try {
+        if (event & EPOLLIN)
+		    conn.handleRead();
+        if (event &EPOLLOUT)
+		    conn.handleWrite();
+	} catch (std::exception &e) {
+		std::cerr << "Client with fd :" << fd << "had a critical event: " << e.what() << std::endl;
+        Multiplexer::close_connection(fd);
+	}
 }
 
 void    Multiplexer::handle_new_connection(int server_fd) {
@@ -66,27 +80,48 @@ void    Multiplexer::handle_new_connection(int server_fd) {
         server_fd,
         (struct sockaddr*)&client_addr,
         &client_len
-
     );
 
     if (client_fd == -1) {
         std::cerr << "Accept Failed !" << std::endl;
-        close(client_fd);
         throw std::runtime_error("Failed to accept connection from client");
     }
 
     //* Set client fd to non blocking
     int flags = fcntl(client_fd, F_GETFL, 0);
-    fcntl(client_fd, F_SETFL, flags | O_NONBLOCK);
+    if (flags == -1 || fcntl(client_fd, F_SETFL, flags | O_NONBLOCK) == -1) {
+        close(client_fd);
+        throw std::runtime_error("Failed to set client socket to non-blocking (Action Closed Client Fd)");
+    }
 
     struct epoll_event ev;
-    ev.events = EPOLLIN | EPOLLET;
+    ev.events = EPOLLIN;
     ev.data.fd = client_fd;
     if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, client_fd, &ev) == -1) {
         std::cerr << "epoll_ctl client_fd" << std::endl;
-        throw std::runtime_error("Failed to add client fd to epoll");
+        close(client_fd);
+        throw std::runtime_error("Failed to add client fd to epoll (Action Closed Client Fd)");
     }
     activeConnections[client_fd] = Connection(client_fd);
     std::cout << "Accepted new client: fd = " << client_fd << std::endl;
+}
 
+void    Multiplexer::close_connection(int fd) {
+    epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL);
+    close(fd);
+    activeConnections.erase(fd);
+}
+
+//!			Multiplexer Exceptions
+
+const char* Multiplexer::ClientDisconnectedException::what() const throw() {
+    return "Client disconnected from socket";
+}
+
+const char* Multiplexer::RecvFailureException::what() const throw() {
+    return "recv() failed for client socket";
+}
+
+const char* Multiplexer::SendFailureException::what() const throw() {
+    return "send() failed for client socket";
 }

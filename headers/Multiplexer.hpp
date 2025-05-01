@@ -20,7 +20,22 @@ class   Multiplexer {
         void    run();
         void    poll_create();
         void    fds_register();
-        bool    is_server_socket(int fd);
-        void    handle_new_connection(int fd);
-        void    handle_client_event(int fd);
+        bool    is_server_socket(int);
+        void    handle_new_connection(int);
+        void    handle_client_event(int, uint32_t);
+        void    close_connection(int);
+        class ClientDisconnectedException : public std::exception {
+            public:
+                const char* what() const throw();
+        };
+
+        class RecvFailureException : public std::exception {
+            public:
+                const char* what() const throw();
+        };
+
+        class SendFailureException : public std::exception {
+            public:
+                const char* what() const throw();
+        };
 };
