@@ -9,18 +9,29 @@ void	Multiplexer::poll_create() {
     }
 }
 
+void    Multiplexer::register_fd(int fd, uint32_t events) {
+    struct epoll_event ev;
+    ev.events = events;
+    ev.data.fd = fd;
+    if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, fd, &ev) == -1) {
+        std::cerr << "epoll_ctl failed" << std::endl;
+        throw std::runtime_error("Failed to add fd to epoll");
+    }
+}
+
 void	Multiplexer::fds_register() {
     //* for each ServerSocket (listen)
     for (size_t i = 0; i < serverSockets.size(); ++i) {
-        struct epoll_event ev;
-        ev.events = EPOLLIN;
-        ev.data.fd = serverSockets.at(i).getFd();
-        /* For each socket add it to epoll using controller api */
-        if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, serverSockets.at(i).getFd(), &ev) == -1) {
-            std::cerr << "epoll_ctl failed" << std::endl;
-            throw std::runtime_error("Failed to add server socket to epoll");
-        }
+        register_fd(serverSockets.at(i).getFd(), EPOLLIN | EPOLLRDHUP);
     }
+}
+
+int    Multiplexer::wait_for_epoll(struct epoll_event *events, int max_events) {
+    int num_events = epoll_wait(epoll_fd, events, max_events, -1);
+    if (num_events == -1) {
+        throw std::runtime_error("epoll_wait failed");
+    }
+    return num_events;
 }
 
 bool    Multiplexer::is_server_socket(int fd) {
@@ -31,6 +42,18 @@ bool    Multiplexer::is_server_socket(int fd) {
     return false;
 }
 
+void    Multiplexer::dispatch_event(const struct epoll_event &event) {
+    int fd = event.data.fd;
+    uint32_t event_flags = event.events;
+
+    if (is_server_socket(fd)) {
+        handle_new_connection(fd);
+    } else {
+        handle_client_event(fd, event_flags);
+        std::cout << "Client event on fd: " << fd << std::endl;
+    }
+}
+
 void	Multiplexer::run() {
     this->poll_create();
     this->fds_register();
@@ -38,23 +61,13 @@ void	Multiplexer::run() {
     const int MAX_EVENTS = 10;
     struct epoll_event events[MAX_EVENTS];
     while (true) {
-		int num_events = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
-		if (num_events == -1)
-    		throw std::runtime_error("epoll_wait failed");
+		int num_events = wait_for_epoll(events, MAX_EVENTS);
 		for (int i = 0; i < num_events; ++i) {
-    		int fd = events[i].data.fd;
-            uint32_t event_flags = events[i].events;
-    		/* ( refer to epoll.txt ) */
-    		if (is_server_socket(fd)) {
-        		handle_new_connection(fd);
-    		} else {
-        		std::cout << "Client event on fd: " << fd << std::endl;
-        		handle_client_event(fd, event_flags);
-    		}
+		    dispatch_event(events[i]);
 		}
 	}
-	
 }
+
 
 void	Multiplexer::handle_client_event(int fd, uint32_t event) {
 	//? Fetch Connection object

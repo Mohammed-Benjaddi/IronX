@@ -20,6 +20,9 @@ class   Multiplexer {
         void    run();
         void    poll_create();
         void    fds_register();
+        void    register_fd(int, uint32_t);
+        int     wait_for_epoll(struct epoll_event*, int);
+        void    dispatch_event(const struct epoll_event &);
         bool    is_server_socket(int);
         void    handle_new_connection(int);
         void    handle_client_event(int, uint32_t);
