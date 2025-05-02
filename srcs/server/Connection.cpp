@@ -2,16 +2,10 @@
 #include "../../headers/Multiplexer.hpp"
 
 Connection::Connection()
-    : _fd(-1), _readBuffer(""), _writeBuffer(""), _closed(false) {
-    this->_fd = -1;
-    this->_closed = true;
-}
+    : _fd(-1), _readBuffer(""), _writeBuffer(""), _closed(false) {}
 
-Connection::Connection(int fd)
-    : _fd(fd), _readBuffer(""), _writeBuffer(""), _closed(false) {
-    this->_fd = fd;
-    this->_closed = false;
-}
+Connection::Connection(int fd, int epoll_fd)
+    : _fd(fd), _epoll_fd(epoll_fd), _readBuffer(""), _writeBuffer(""), _closed(false) {}
 
 std::string& Connection::getReadBuffer() {
     return this->_readBuffer;
@@ -44,12 +38,22 @@ void Connection::handleRead() {
             break;
         }
     }
-    std::cout << "Read buffer: " << _readBuffer << std::endl; 
+    std::cout << "Read buffer: " << _readBuffer << std::endl;
+    
+    // std::string response = "HTTP/1.1 200 OK\r\nContent-Length: 17\r\n\r\nHello from server!";
+    // _writeBuffer.append(response);
+    
+    //? build new epoll event modufying existing one
+    struct epoll_event ev;
+    ev.events = EPOLLIN | EPOLLRDHUP | EPOLLOUT;
+    ev.data.fd = _fd;
+    epoll_ctl(_epoll_fd, EPOLL_CTL_MOD, _fd, &ev);
+    
 }
 
 
 void Connection::handleWrite() {
-    std::string response = "Hey this is multiplexer speaking, im still in development\n";
+    std::string response = "HTTP/1.1 200 OK\r\nContent-Length: 17\r\n\r\nHello from server!";
     _writeBuffer.append(response);
     while (!_writeBuffer.empty()) {
         ssize_t bytes_sent = send(
@@ -60,19 +64,15 @@ void Connection::handleWrite() {
 
         if (bytes_sent > 0) {
             _writeBuffer.erase(0, bytes_sent);
-        }
-        else {
+        } else {
             // On non-blocking socket, -1 likely means "can't send more now"
-            break;
+            return ;
         }
     }
-    std::cout << "Write buffer: " << _writeBuffer << std::endl;
-    //? If everything is sent, disable EPOLLOUT
-    // if (_writeBuffer.empty()) {
-    //     // Call epoll_ctl to modify events to only EPOLLIN now
-    //     struct epoll_event ev;
-    //     ev.events = EPOLLIN;  // only listen for read now
-    //     ev.data.fd = _fd;
-    //     epoll_ctl(epoll_fd, EPOLL_CTL_MOD, _fd, &ev);
-    // }
+    //? If we reach here, it means the write buffer is empty
+        //? We can modify the epoll event to only listen for read events
+    struct epoll_event ev;
+    ev.events = EPOLLIN | EPOLLRDHUP;
+    ev.data.fd = _fd;
+    epoll_ctl(_epoll_fd, EPOLL_CTL_MOD, _fd, &ev);
 }
