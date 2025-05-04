@@ -15,7 +15,12 @@ int main() {
 
     //! Load Configuration
     mocker(config);
-    printConfig(config);
+    // printConfig(config);
+
+    std::fstream file("./tests/mock_req2.txt");
+    
+    
+    HTTPRequest request(file, config, 0);
 
     // ? Khay Simo Starts reading from the file raw data the process the HTTP Request
         // HTTPRequest req = HTTPRequest::from_file(test_file);

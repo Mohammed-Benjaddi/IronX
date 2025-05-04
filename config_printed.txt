@@ -1,0 +1,59 @@
+=== Global Settings ===
+Max Body Size: 1048576 bytes
+
+=== Error Pages ===
+400: /errors/400.html
+403: /errors/403.html
+404: /errors/404.html
+500: /errors/500.html
+503: /errors/503.html
+
+=== Cluster #1 ===
+Host: 0.0.0.0
+Ports: [8080, 4242, 1923]
+Hostnames: [example.com, www.example.com]
+
+=== Routes ===
+  Route (/):
+    Root Directory: /home/simo/cursus/webserv/www/html
+    Allowed Methods: [GET, HEAD]
+    Autoindex: on
+
+  Route (/cgi-bin):
+    Root Directory: home/simo/cursus/webserv/www/new-site
+    Index Files: [indx.html]
+    Allowed Methods: [GET, POST]
+    Autoindex: off
+    CGI Configuration:
+      Extensions: [.php]
+      Interpreter: /usr/bin/php-cgi
+
+  Route (/old-site):
+    Root Directory: home/simo/cursus/webserv/www
+    Allowed Methods: [GET]
+    Autoindex: off
+    Redirect: /new-site
+
+  Route (/uploads):
+    Root Directory: /var/www/uploads
+    Allowed Methods: [POST]
+    Autoindex: off
+    Upload Directory: /var/www/uploads/tmp
+
+
+=== Cluster #2 ===
+Host: 0.0.0.0
+Ports: [8080]
+Hostnames: [api.example.com, beta.example.com]
+
+=== Routes ===
+  Route (/):
+    Root Directory: /var/www/api
+    Index Files: [api.php]
+    Allowed Methods: [DELETE, GET, POST]
+    Autoindex: off
+
+  Route (/cgi-bin):
+    Root Directory: /var/www/simo-test
+    Allowed Methods: [GET, POST]
+    Autoindex: off

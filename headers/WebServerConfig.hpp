@@ -82,4 +82,3 @@ class WebServerConfig {
         const std::map<int, std::string>& getErrorPages() const;
         const std::vector<Cluster>& getClusters() const;
 };
-

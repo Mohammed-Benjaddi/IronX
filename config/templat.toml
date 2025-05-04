@@ -40,7 +40,7 @@ hostnames = ["example.com", "www.example.com"]
 # Explanation: Root directory for static files
 [[servers.routes]]
 path = "/"
-root = "/var/www/html"  	# Base directory for files
+root = "/www/html"  	# Base directory for files
 index = "index.html"		# Requirement: "Set a default file  to serve when the request is for a directory"
 methods = ["GET", "HEAD"] 	# Requirement: "Define a list of accepted HTTP methods"
 autoindex = false 			# Requirement: "Enable or disable directory listing"
@@ -63,6 +63,7 @@ upload_dir = "/var/www/uploads/tmp"
 
 [[servers.routes]]
 path = "/old-site"
+root = "/www/html/index.html"
 redirect = "https://new.example.com"
 methods = ["GET"]
 

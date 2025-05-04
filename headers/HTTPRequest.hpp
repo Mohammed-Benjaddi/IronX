@@ -1,47 +1,79 @@
 #pragma once
 #include "IHTTPMessage.hpp"
+#include "WebServerConfig.hpp"
 #include <string>
 #include <vector>
-#include <unordered_map>
+#include <iostream>
 #include <map>
+#include <sstream>
+#include <algorithm>
+#include <set>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <dirent.h>
+#include "utils.hpp"
 
 class HTTPRequest : public IHTTPMessage {
     private:
+    WebServerConfig &config;
     std::string method;                 // "GET", "POST", etc.
     std::string path;                   // "/index.html"
     std::string httpVersion;            // "HTTP/1.1"
-    std::unordered_map<std::string, std::string> headers; // Key-value headers
+    std::map<std::string, std::string> headers; // Key-value headers
     std::string body;                   // Request payload (for POST/PUT)
-    // Response Attributes
-    int statusCode;                     // 200, 404, 500
-    std::string statusMessage;          // "OK", "Not Found"
-    // std::unordered_map<std::string, std::string> responseHeaders;
-    // std::string response;           // Data to send back
-    // int clientSocket;
-public:
-    // Constructors
-    HTTPRequest() {};
-    // HTTPRequest(const std::vector<uint8_t>& raw_data);
-    // HTTPRequest(const std::string& method,
-    //             const std::string& path,
-    //             const std::map<std::string, std::string>& headers,
-    //             const std::vector<uint8_t>& body);
+    std::string query;                  // Query string (if any)
+    static const std::string chars;
+    static const std::vector<char> allowedChars;
+    int clientId;
+    std::string fileContent;
+    public:
+    // HTTPRequest();
+    HTTPRequest(std::fstream &file, WebServerConfig &config, int clientId);
+    ~HTTPRequest();
 
-    // Build from file 
-    static HTTPRequest from_file(const std::string& path);
+    // Setters
+    void setMethod(const std::string& method);
+    void setPath(const std::string& path);
+    void setHTTPVersion(const std::string& version);
+    void setHeader(const std::string& key, const std::string& value);
+    void setHeaders(std::string line);
+    void setBody(const std::string& body);
+    void setQuery(const std::string& query);
+    void setFileContent(const std::string& fileContent);
 
-    // Implement virtual functions
+    // Getters
+    std::string getMethod() const;
+    std::string getPath() const;
+    std::string getHTTPVersion() const;
+    std::string getHeader(const std::string& key) const;
+    std::string getBody() const;
+    std::map<std::string, std::string> getHeaders() const;
+    std::string getHeaderValue(const std::string& key) const;
+    std::string getQuery() const;
+    std::string getFileContent() const;
+
     virtual std::vector<uint8_t> to_bytes() const;
+    int parse(std::fstream &file);
+    void find_method_uri(const std::string &line);
+    std::string findHeader(std::string key);
+    bool checkRequestURI(std::string);
+    bool URIHasUnallowedChar(std::string uri);
+    int findLocation();
+    int checkAllowedMethods();
 
-    // Request data
-    // std::string method;
-    // std::string path;
-    // std::string query;
+    void pathIsDirectory(std::map<std::string, Route> &routes, Route &route, const std::string &_path);
+    void directoryHasNoIndexFiles(Route &route);
+    void directoryHasIndexFiles(Route &route, std::vector<std::string> index_files);
 
-    // // Request processing
-    // bool parse(const std::vector<uint8_t>& raw_data);
-    // bool is_body_too_large(size_t max_size) const;
+    void pathIsFile(std::map<std::string, Route> &routes, Route &route);
+    void fileHasNoCGI(Route &route, std::string &filename);
 
-// private:
-//     void parse_query_string();
+    void autoIndexOfDirectory(Route &route);
+    std::vector<std::string> getDirectoryListing(const std::string& path, bool show_hidden);
+
+    void handleRequest();
+    void handleGet();
+    void handlePOST();
+    void handleDELETE();
+    void executeCGI();
 };
