@@ -40,6 +40,8 @@ void fileHasNoCGI(HTTPRequest &request, Route &route, std::string &file_name) {
 
     std::fstream file(("/" + route.getRootDir() + request.getPath() + file_name).c_str());
     if(!file.is_open()) {
+        request.setStatusCode(404);
+        request.setStatusMessage("Not Found");
         request.setFileContent("");
         return;
     }

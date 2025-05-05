@@ -17,16 +17,15 @@
 class HTTPRequest : public IHTTPMessage {
 private:
     WebServerConfig &config;
-    std::string method;                 // "GET", "POST", etc.
-    std::string path;                   // "/index.html"
-    std::string httpVersion;            // "HTTP/1.1"
-    std::map<std::string, std::string> headers; // Key-value headers
-    std::string body;                   // Request payload (for POST/PUT)
-    std::string query;                  // Query string (if any)
+    std::string method;
+    std::string path;
+    std::string httpVersion;
+    std::map<std::string, std::string> headers;
+    std::string body;
+    std::string query;
     int clientId;
     std::string fileContent;
 public:
-    // HTTPRequest();
     HTTPRequest(std::fstream &file, WebServerConfig &config, int clientId);
     ~HTTPRequest();
 
@@ -55,23 +54,6 @@ public:
     int getClientId() const;
 
     virtual std::vector<uint8_t> to_bytes() const;
-    // int parse(std::fstream &file);
-    // void find_method_uri(const std::string &line);
-    // std::string findHeader(std::string key);
-    // bool checkRequestURI(std::string);
-    // bool URIHasUnallowedChar(std::string uri);
-    // int findLocation();
-    // int checkAllowedMethods();
-
-    // void pathIsDirectory(std::map<std::string, Route> &routes, Route &route, const std::string &_path);
-    // void directoryHasNoIndexFiles(Route &route);
-    // void directoryHasIndexFiles(Route &route, std::vector<std::string> index_files);
-
-    // void pathIsFile(std::map<std::string, Route> &routes, Route &route);
-    // void fileHasNoCGI(Route &route, std::string &filename);
-
-    // void autoIndexOfDirectory(Route &route);
-    // std::vector<std::string> getDirectoryListing(const std::string& path, bool show_hidden);
 
     void handleRequest();
     void handleGet();
