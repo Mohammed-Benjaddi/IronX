@@ -4,7 +4,7 @@ import time
 
 SERVER_HOST = "localhost"
 SERVER_PORT = 8086
-NUM_CLIENTS = 1000  # 🔥 Adjust this number for more/less load
+NUM_CLIENTS = 100
 
 def client_task(index):
     try:

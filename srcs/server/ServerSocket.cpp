@@ -17,7 +17,12 @@ ServerSocket::ServerSocket(const std::string& ip, uint16_t port) : _fd(-1), _hos
 		this->init_listen();
 };
 
-ServerSocket::~ServerSocket() {};
+ServerSocket::~ServerSocket() {
+	// if (this->_fd != -1) {
+	// 	std::cout << "Server Socket Destroyed due to failure of one!" << std::endl;
+	// 	close(_fd);
+	// }
+};
 
 int		ServerSocket::getFd() const { return this->_fd; }
 
@@ -48,7 +53,7 @@ void	ServerSocket::non_block() {
 	}
 
 }
-
+//! to be handled ---- failure of one 
 void	ServerSocket::bind_socket() {
 //? 1. Set up address structure
 	struct sockaddr_in addr;
@@ -61,7 +66,7 @@ void	ServerSocket::bind_socket() {
 	}
 
 	addr.sin_port = htons(this->_port); // port to network byte order
-//? 2. bind socket
+	//? 2. bind socket
 	std::cout << "Attempting to bind " << this->_host << ":" << this->_port << std::endl;
 	if (bind(this->_fd, (struct sockaddr*)&addr, sizeof(addr)) == -1) {
 		close(this->getFd());
