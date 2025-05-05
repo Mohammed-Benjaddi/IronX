@@ -25,6 +25,9 @@ class   Multiplexer {
         void    dispatch_event(const struct epoll_event &);
         bool    is_server_socket(int);
         void    handle_new_connection(int);
+            int     accept_new_client(int);
+            void    make_fd_non_blocking(int);
+            void    add_fd_to_epoll(int, uint32_t);
         void    handle_client_event(int, uint32_t);
         void    close_connection(int);
         class ClientDisconnectedException : public std::exception {

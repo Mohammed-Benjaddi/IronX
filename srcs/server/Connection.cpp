@@ -40,9 +40,6 @@ void Connection::handleRead() {
     }
     std::cout << "Read buffer: " << _readBuffer << std::endl;
     
-    // std::string response = "HTTP/1.1 200 OK\r\nContent-Length: 17\r\n\r\nHello from server!";
-    // _writeBuffer.append(response);
-    
     //? build new epoll event modufying existing one
     struct epoll_event ev;
     ev.events = EPOLLIN | EPOLLRDHUP | EPOLLOUT;

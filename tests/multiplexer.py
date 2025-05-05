@@ -2,7 +2,7 @@ import socket
 
 def test_server_response():
     server_host = "localhost"
-    server_port = 8086
+    server_port = 8088
     
     try:
         print("Connecting to server...")

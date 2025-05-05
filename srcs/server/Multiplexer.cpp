@@ -9,20 +9,11 @@ void	Multiplexer::poll_create() {
     }
 }
 
-void    Multiplexer::register_fd(int fd, uint32_t events) {
-    struct epoll_event ev;
-    ev.events = events;
-    ev.data.fd = fd;
-    if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, fd, &ev) == -1) {
-        std::cerr << "epoll_ctl failed" << std::endl;
-        throw std::runtime_error("Failed to add fd to epoll");
-    }
-}
 
 void	Multiplexer::fds_register() {
     //* for each ServerSocket (listen)
     for (size_t i = 0; i < serverSockets.size(); ++i) {
-        register_fd(serverSockets.at(i).getFd(), EPOLLIN | EPOLLRDHUP);
+        add_fd_to_epoll(serverSockets.at(i).getFd(), EPOLLIN | EPOLLRDHUP);
     }
 }
 
@@ -68,6 +59,51 @@ void	Multiplexer::run() {
 	}
 }
 
+int    Multiplexer::accept_new_client(int server_fd) {
+    struct sockaddr_in client_addr;
+    socklen_t client_len = sizeof(client_addr);
+
+    //* capture clients net info into sockaddr_in
+    int client_fd = accept (
+        server_fd,
+        (struct sockaddr*)&client_addr,
+        &client_len
+    );
+
+    if (client_fd == -1) {
+        std::cerr << "Accept Failed !" << std::endl;
+        throw std::runtime_error("Failed to accept connection from client");
+    }
+    return client_fd;
+}
+
+void    Multiplexer::make_fd_non_blocking(int fd) {
+    int flags = fcntl(fd, F_GETFL, 0);
+    //* Set client fd to non blocking
+    if (flags == -1 || fcntl(fd, F_SETFL, flags | O_NONBLOCK) == -1) {
+        close(fd);
+        throw std::runtime_error("Failed to set client socket to non-blocking (Action Closed Client Fd)");
+    }
+}
+
+void    Multiplexer::add_fd_to_epoll(int fd, uint32_t events) {
+    struct epoll_event ev;
+    ev.events = events;
+    ev.data.fd = fd;
+    if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, fd, &ev) == -1) {
+        std::cerr << "epoll_ctl client_fd" << std::endl;
+        close(fd);
+        throw std::runtime_error("Failed to add client fd to epoll (Action Closed Client Fd)");
+    }
+}
+
+void    Multiplexer::handle_new_connection(int server_fd) {
+    int client_fd = accept_new_client(server_fd);
+    make_fd_non_blocking(client_fd);
+    add_fd_to_epoll(client_fd, EPOLLIN | EPOLLRDHUP | EPOLLOUT);
+    activeConnections[client_fd] = Connection(client_fd, epoll_fd);
+    std::cout << "Accepted new client: fd = " << client_fd << std::endl;
+}
 
 void	Multiplexer::handle_client_event(int fd, uint32_t event) {
 	//? Fetch Connection object
@@ -86,41 +122,6 @@ void	Multiplexer::handle_client_event(int fd, uint32_t event) {
 		std::cerr << "Client with fd " << fd << "had a critical event: " << e.what() << std::endl;
         Multiplexer::close_connection(fd);
 	}
-}
-
-void    Multiplexer::handle_new_connection(int server_fd) {
-    struct sockaddr_in client_addr;
-    socklen_t client_len = sizeof(client_addr);
-
-    //* capture clients net info into sockaddr_in
-    int client_fd = accept (
-        server_fd,
-        (struct sockaddr*)&client_addr,
-        &client_len
-    );
-
-    if (client_fd == -1) {
-        std::cerr << "Accept Failed !" << std::endl;
-        throw std::runtime_error("Failed to accept connection from client");
-    }
-
-    //* Set client fd to non blocking
-    int flags = fcntl(client_fd, F_GETFL, 0);
-    if (flags == -1 || fcntl(client_fd, F_SETFL, flags | O_NONBLOCK) == -1) {
-        close(client_fd);
-        throw std::runtime_error("Failed to set client socket to non-blocking (Action Closed Client Fd)");
-    }
-
-    struct epoll_event ev;
-    ev.events = EPOLLIN | EPOLLRDHUP;
-    ev.data.fd = client_fd;
-    if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, client_fd, &ev) == -1) {
-        std::cerr << "epoll_ctl client_fd" << std::endl;
-        close(client_fd);
-        throw std::runtime_error("Failed to add client fd to epoll (Action Closed Client Fd)");
-    }
-    activeConnections[client_fd] = Connection(client_fd, epoll_fd);
-    std::cout << "Accepted new client: fd = " << client_fd << std::endl;
 }
 
 void    Multiplexer::close_connection(int fd) {
