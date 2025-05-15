@@ -36,13 +36,18 @@ bool isDirectory(const std::string path, std::string rootDir) {
     return false;
 }
 
-bool isLocationHasCGI(Route &route) {
-    (void) route;
-    /*
-        I should check the extention of the file and return true if it has CGI
-        but if the file has CGI and the method is DELETE I should return false
-        so the 
-    */
+bool isLocationHasCGI(std::string filepath) {
+    const char* cgi_extensions[] = {".py", ".php", ".js", NULL};
+    size_t dot_pos = filepath.rfind('.');
+    if (dot_pos == std::string::npos)
+        return false;
+    std::string extension = filepath.substr(dot_pos);
+    std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
+    for (int i = 0; cgi_extensions[i] != NULL; ++i) {
+        if (extension == cgi_extensions[i]) {
+            return true;
+        }
+    }
     return false;
 }
 
@@ -109,7 +114,7 @@ void directoryHasIndexFiles(HTTPRequest &request, Route &route, std::vector<std:
         std::string path = "/" + route.getRootDir() + "/" + request.getPath() + "/" + index_files[i];
         if(isFileExist(path.c_str())) {
             std::cout << "I found the file" << std::endl;
-            if(isLocationHasCGI(route)) {
+            if(isLocationHasCGI(path)) {
                 request.executeCGI(route);
             } else {
                 // file does not have CGI
@@ -135,7 +140,7 @@ void pathIsFile(HTTPRequest &request, std::map<std::string, Route> &routes, Rout
         request.setFileContent("");
         return;
     }
-    if(isLocationHasCGI(route))
+    if(isLocationHasCGI(filePath))
         request.executeCGI(route);
     else {
         std::cout << "file has no CGI" << std::endl;
