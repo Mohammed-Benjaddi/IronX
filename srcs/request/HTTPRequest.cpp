@@ -1,7 +1,7 @@
 #include "HTTPRequest.hpp"
 
-HTTPRequest::HTTPRequest(std::fstream &file, WebServerConfig &_config, int _clientId) : IHTTPMessage(), config(_config), clientId(_clientId) {
-    parse(*this, file);
+HTTPRequest::HTTPRequest(const std::string &raw_request, WebServerConfig *_config, int _clientId) : IHTTPMessage(), config(_config), clientId(_clientId) {
+    parse(*this, raw_request);
     checkAllowedMethods(*this);
     handleRequest();
 }
@@ -49,7 +49,7 @@ void HTTPRequest::setClientId(int _clientId) {
     this->clientId = _clientId;
 }
 
-WebServerConfig &HTTPRequest::getConfig() const {
+WebServerConfig *HTTPRequest::getConfig() const {
     return config;
 }
 
@@ -126,7 +126,7 @@ void HTTPRequest::executeCGI(Route &route) {
 }
 
 void HTTPRequest::handleGet() {
-    std::map<std::string, Route> routes = config.getClusters()[clientId].getRoutes();
+    std::map<std::string, Route> routes = config->getClusters()[clientId].getRoutes();
 
     std::map<std::string, Route>::const_iterator it_route = routes.find(getPath());
     std::string pathToSearch;
@@ -160,7 +160,7 @@ void HTTPRequest::handleDELETE() {
         if location has a redirection, the one that must be deleted is the redirected location
     */
     std::cout << "DELETE method" << std::endl;
-    std::map<std::string, Route> routes = config.getClusters()[clientId].getRoutes();
+    std::map<std::string, Route> routes = config->getClusters()[clientId].getRoutes();
 
     std::map<std::string, Route>::const_iterator it_route = routes.find(getPath());
     std::cout << "* it route ---> " << getPath() << std::endl;

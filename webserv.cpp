@@ -15,15 +15,14 @@ int main() {
     mocker(config);
     // printConfig(config);
 
-    std::fstream file("./tests/delete_req.txt");
-    
-    
-    HTTPRequest request(file, config, 0);
+    // std::fstream file("./tests/delete_req.txt");    
+    // HTTPRequest request(file, config, 0);
 
     ServerLauncher  launcher;
+
     try {
             launcher.launch(config);
-            Multiplexer     mux(launcher.getSockets());
+            Multiplexer     mux(launcher.getSockets(), config);
             mux.run();
     } catch (const std::exception &e) {
             std::cerr << "Error Launching Server: " << e.what() << std::endl;

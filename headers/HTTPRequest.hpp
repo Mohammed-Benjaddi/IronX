@@ -18,7 +18,7 @@
 
 class HTTPRequest : public IHTTPMessage {
 private:
-    WebServerConfig &config;
+    WebServerConfig *config;
     std::string method;
     std::string path;
     std::string httpVersion;
@@ -28,7 +28,7 @@ private:
     int clientId;
     std::string fileContent;
 public:
-    HTTPRequest(std::fstream &file, WebServerConfig &config, int clientId);
+    HTTPRequest(const std::string &raw_request, WebServerConfig *config, int clientId);
     ~HTTPRequest();
 
     // Setters
@@ -43,7 +43,7 @@ public:
     void setClientId(int _clientId);
 
     // Getters
-    WebServerConfig &getConfig() const;
+    WebServerConfig *getConfig() const;
     std::string getMethod() const;
     std::string getPath() const;
     std::string getHTTPVersion() const;

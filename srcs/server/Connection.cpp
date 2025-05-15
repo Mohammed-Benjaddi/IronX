@@ -1,11 +1,12 @@
 #include "../../headers/Connection.hpp"
 #include "../../headers/Multiplexer.hpp"
+#include "../../headers/HTTPRequest.hpp"
 
 Connection::Connection()
-    : _fd(-1), _readBuffer(""), _writeBuffer(""), _closed(false) {}
+    : _fd(-1), _readBuffer(""), _writeBuffer(""), _closed(false), _config(NULL) {};
 
-Connection::Connection(int fd, int epoll_fd)
-    : _fd(fd), _epoll_fd(epoll_fd), _readBuffer(""), _writeBuffer(""), _closed(false) {}
+Connection::Connection(int fd, int epoll_fd, WebServerConfig* config)
+    : _fd(fd), _epoll_fd(epoll_fd), _readBuffer(""), _writeBuffer(""), _closed(false), _config(config) {};
 
 std::string& Connection::getReadBuffer() {
     return this->_readBuffer;
@@ -15,13 +16,25 @@ std::string& Connection::getWriteBuffer() {
     return this->_writeBuffer;
 }
 
+// Connection& Connection::operator=(const Connection& other) {
+//     // Check for self-assignment
+//     if (this == &other) {
+//         return *this;
+//     }
+
+//     // Perform the copy assignment
+//     // TODO: Implement the copy assignment logic here
+
+//     return *this;
+// }
+
 void Connection::handleRead() {
     //! tmp buffer - CHUNK -
     char buffer[4096];
     while (true) {
         ssize_t bytes_read = recv(
             _fd, 
-            buffer, 
+            buffer,
             sizeof(buffer), 
             0);
         
@@ -38,8 +51,14 @@ void Connection::handleRead() {
             break;
         }
     }
-    std::cout << "Read buffer: " << _readBuffer << std::endl;
-    
+
+
+    //!  Merge Point Multiplexer <-> Request Branches   */
+    HTTPRequest request(_readBuffer, _config, 0);
+
+    std::cout << "=++++++ Read buffer ++++++=\n";
+    std::cout << _readBuffer << std::endl;
+    std::cout << "=+++++++++++++++++++++=\n";
     //? build new epoll event modufying existing one
     struct epoll_event ev;
     ev.events = EPOLLIN | EPOLLRDHUP | EPOLLOUT;

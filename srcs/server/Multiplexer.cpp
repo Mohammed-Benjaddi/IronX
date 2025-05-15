@@ -101,7 +101,7 @@ void    Multiplexer::handle_new_connection(int server_fd) {
     int client_fd = accept_new_client(server_fd);
     make_fd_non_blocking(client_fd);
     add_fd_to_epoll(client_fd, EPOLLIN | EPOLLRDHUP | EPOLLOUT);
-    activeConnections[client_fd] = Connection(client_fd, epoll_fd);
+    activeConnections[client_fd] = Connection(client_fd, epoll_fd, &_config);
     std::cout << "Accepted new client: fd = " << client_fd << std::endl;
 }
 

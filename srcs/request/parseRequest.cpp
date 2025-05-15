@@ -2,7 +2,7 @@
 
 
 int checkAllowedMethods(HTTPRequest &request) {
-  const std::map<std::string, Route>& routes = request.getConfig().getClusters()[request.getClientId()].getRoutes();
+  const std::map<std::string, Route>& routes = request.getConfig()->getClusters()[request.getClientId()].getRoutes();
   std::map<std::string, Route>::const_iterator route_it = routes.find(request.getPath());
   const std::set<std::string> &allowedMethod = route_it->second.getAllowedMethods();
 
@@ -36,13 +36,12 @@ bool URIHasUnallowedChar(std::string uri) {
 }
 
 
-int parse(HTTPRequest &request, std::fstream &file) {
+int parse( HTTPRequest &request, const std::string &raw_request) {
   std::string line;
-  std::stringstream ss;
+  std::stringstream ss(raw_request);
 
-  ss << file.rdbuf();
   // 413 error code if the request body larger than client max body in config file
-  if(ss.str().length() > request.getConfig().getMaxBodySize()) {
+  if(ss.str().length() > request.getConfig()->getMaxBodySize()) {
       request.setStatusCode(413);
       request.setStatusMessage("Request Entity Too Large");
       return -1;

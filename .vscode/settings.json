@@ -58,6 +58,9 @@
         "filesystem": "cpp",
         "cstring": "cpp",
         "codecvt": "cpp",
-        "ratio": "cpp"
+        "ratio": "cpp",
+        "charconv": "cpp",
+        "chrono": "cpp",
+        "format": "cpp"
     }
 }

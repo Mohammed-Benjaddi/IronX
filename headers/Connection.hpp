@@ -1,11 +1,13 @@
 #pragma once
 
 #include <iostream>
+#include "../headers/WebServerConfig.hpp"
 
 class Connection {
     public:
         Connection();
-        Connection(int, int);
+        Connection(int, int, WebServerConfig*);
+        // Connection& operator=(const Connection& other);
         std::string&    getReadBuffer();
         std::string&    getWriteBuffer();
         void            handleRead();
@@ -17,4 +19,5 @@ class Connection {
         std::string _readBuffer;
         std::string _writeBuffer;
         bool        _closed;
+        WebServerConfig *_config;
 };

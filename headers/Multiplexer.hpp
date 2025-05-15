@@ -12,11 +12,11 @@ class   Multiplexer {
         std::map<int, Connection> activeConnections; 
     //* Listening Sockets
         std::vector<ServerSocket> serverSockets;
-
         int epoll_fd;
+        WebServerConfig& _config;
     public:
-        Multiplexer(const std::vector<ServerSocket> &socks) 
-            : serverSockets(socks), epoll_fd(-1) {}
+        Multiplexer(const std::vector<ServerSocket> &socks, WebServerConfig& config) 
+            : serverSockets(socks), epoll_fd(-1), _config(config) {};
         void    run();
         void    poll_create();
         void    fds_register();
