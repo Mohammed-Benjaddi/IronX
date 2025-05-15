@@ -30,7 +30,7 @@ methods = ["POST"]
 upload_dir = "/var/www/uploads/tmp"
 [[servers.routes]]
 path = "/old-site"
-redirect = "https://beta.example.com"
+redirect = "/new-site"
 methods = ["GET"]
 [[servers]]
 host = "0.0.0.0"

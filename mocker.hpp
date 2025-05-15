@@ -49,8 +49,8 @@ void printConfig(const WebServerConfig& config) {
         // Print routes
         std::cout << "=== Routes ===\n";
         const std::map<std::string, Route>& routes = cluster.getRoutes();
-        for (std::map<std::string, Route>::const_iterator route_it = routes.begin(); 
-             route_it != routes.end(); ++route_it) {
+        for (std::map<std::string, Route>::const_iterator route_it = routes.begin();
+            route_it != routes.end(); ++route_it) {
             const Route& route = route_it->second;
             std::cout << "  Route (" << route_it->first << "):\n";
             std::cout << "    Root Directory: " << route.getRootDir() << "\n";
@@ -125,9 +125,9 @@ void mocker(WebServerConfig &wsc) {
     server1.setHost("0.0.0.0");
     
     std::vector<uint16_t> ports1;
-    ports1.push_back(8080);
-    ports1.push_back(4242);
-    ports1.push_back(1923);
+    ports1.push_back(8088);
+    ports1.push_back(4241);
+    ports1.push_back(1924);
     server1.setPorts(ports1);
     
     std::vector<std::string> hostnames1;
@@ -140,10 +140,10 @@ void mocker(WebServerConfig &wsc) {
 
     // Route 1: /
     Route route1;
-    route1.setRootDir("/var/www/html");
+    route1.setRootDir("/home/simo/cursus/webserv/www/html");
     
     std::vector<std::string> indexFiles1;
-    indexFiles1.push_back("index.html");
+    // indexFiles1.push_back("index.html");
     route1.setIndexFiles(indexFiles1);
     
     std::set<std::string> methods1;
@@ -151,13 +151,15 @@ void mocker(WebServerConfig &wsc) {
     methods1.insert("HEAD");
     route1.setAllowedMethods(methods1);
     
-    route1.setAutoindex(false);
+    route1.setAutoindex(true);
     routes1.insert(std::make_pair("/", route1));
 
     // Route 2: /cgi-bin
     Route route2;
-    route2.setRootDir("/var/www/cgi-bin");
-    
+    route2.setRootDir("home/simo/cursus/webserv/www");
+    std::vector<std::string> _indexFiles;
+    _indexFiles.push_back("indx.html");
+    route2.setIndexFiles(_indexFiles);
     std::set<std::string> methods2;
     methods2.insert("GET");
     methods2.insert("POST");
@@ -170,7 +172,7 @@ void mocker(WebServerConfig &wsc) {
     cgi1.setInterpreter("/usr/bin/php-cgi");
     route2.setCGIConfig(cgi1);
     
-    routes1.insert(std::make_pair("/cgi-bin", route2));
+    routes1.insert(std::make_pair("/new-site", route2));
 
     // Route 3: /uploads
     Route route3;
@@ -185,22 +187,23 @@ void mocker(WebServerConfig &wsc) {
 
     // Route 4: /old-site
     Route route4;
-    route4.setRedirect("https://beta.example.com");
+    route4.setRedirect("/new-site");
     
     std::set<std::string> methods4;
     methods4.insert("GET");
     route4.setAllowedMethods(methods4);
-    
+    route4.setRootDir("home/simo/cursus/webserv/www");
+
     routes1.insert(std::make_pair("/old-site", route4));
 
     server1.setRoutes(routes1);
 
     // Create second server (cluster)
     Cluster server2;
-    server2.setHost("0.0.0.0");
+    server2.setHost("127.0.0.1");
     
     std::vector<uint16_t> ports2;
-    ports2.push_back(8080);
+    ports2.push_back(8888);
     server2.setPorts(ports2);
     
     std::vector<std::string> hostnames2;
@@ -229,7 +232,7 @@ void mocker(WebServerConfig &wsc) {
 
     // Route 2: /cgi-bin
     Route route6;
-    route6.setRootDir("/var/www/cgi-bin");
+    route6.setRootDir("/var/www/simo-test");
     
     std::set<std::string> methods6;
     methods6.insert("GET");
