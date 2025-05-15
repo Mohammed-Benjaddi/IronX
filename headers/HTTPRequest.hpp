@@ -13,6 +13,8 @@
 #include <dirent.h>
 #include "requestUtils.hpp"
 #include "parseRequest.hpp"
+#include <filesystem>
+#include <cstring>
 
 class HTTPRequest : public IHTTPMessage {
 private:
@@ -41,7 +43,7 @@ public:
     void setClientId(int _clientId);
 
     // Getters
-    WebServerConfig getConfig() const;
+    WebServerConfig &getConfig() const;
     std::string getMethod() const;
     std::string getPath() const;
     std::string getHTTPVersion() const;
@@ -60,5 +62,5 @@ public:
     void handlePOST();
     void handleDELETE();
 
-    void executeCGI();
+    void executeCGI(Route &route);
 };

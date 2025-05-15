@@ -17,7 +17,7 @@ int main() {
     mocker(config);
     // printConfig(config);
 
-    std::fstream file("./tests/mock_req2.txt");
+    std::fstream file("./tests/delete_req.txt");
     
     
     HTTPRequest request(file, config, 0);

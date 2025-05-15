@@ -49,7 +49,7 @@ void HTTPRequest::setClientId(int _clientId) {
     this->clientId = _clientId;
 }
 
-WebServerConfig HTTPRequest::getConfig() const {
+WebServerConfig &HTTPRequest::getConfig() const {
     return config;
 }
 
@@ -118,8 +118,11 @@ void HTTPRequest::handleRequest() {
         handleDELETE();
 }
 
-void HTTPRequest::executeCGI() {
-
+void HTTPRequest::executeCGI(Route &route) {
+    if(getMethod() == "DELETE") {
+        std::cout << "a file must be deleted" << std::endl;
+        deleteRequestedFile(*this, "/" + route.getRootDir() + getPath(), "");
+    }
 }
 
 void HTTPRequest::handleGet() {
@@ -134,8 +137,10 @@ void HTTPRequest::handleGet() {
         route.setAutoindex(false);
     } else
         copyToRoute(route, it_route);
-    if(isDirectory(getPath(), route.getRootDir()))
+    if(isDirExist(getPath(), route.getRootDir())) {
+        std::cout << "-------> it is a directoty" << std::endl;
         pathIsDirectory(*this, routes, route, getPath());
+    }
     else
         pathIsFile(*this, routes, route);
 }
@@ -149,6 +154,27 @@ void HTTPRequest::handleDELETE() {
     // isDirectory
     // location has CGI
     // does the directory have index files
-    std::cout << "DELETE method" << std::endl;
 
+    /*
+        **** notes ****
+        if location has a redirection, the one that must be deleted is the redirected location
+    */
+    std::cout << "DELETE method" << std::endl;
+    std::map<std::string, Route> routes = config.getClusters()[clientId].getRoutes();
+
+    std::map<std::string, Route>::const_iterator it_route = routes.find(getPath());
+    std::cout << "* it route ---> " << getPath() << std::endl;
+    std::string pathToSearch;
+    Route route;
+    if(it_route == routes.end()) {
+        route.setRootDir("home/simo/cursus/webserv/www");
+        route.setAutoindex(false);
+    } else
+        copyToRoute(route, it_route);
+    if(isDirExist(getPath(), route.getRootDir())) {
+        std::cout << "path is directory" << std::endl;
+        DELETEDirectory(*this, routes, route, getPath());
+    }
+    else
+        pathIsFile(*this, routes, route);
 }

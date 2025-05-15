@@ -6,8 +6,10 @@
 
 class HTTPRequest;
 
-bool isfileExist(const char* path);
+bool isFileExist(const char* path);
+bool isDirExist(std::string path, std::string rootDir);
 bool isDirectory(const std::string path, std::string rootDir);
+void DELETEDirectory(HTTPRequest &request, std::map<std::string, Route> &routes, Route &route, const std::string &_path);
 bool isLocationHasCGI(Route &route);
 void copyToRoute(Route &route, std::map<std::string, Route>::const_iterator &it);
 void fileHasNoCGI(HTTPRequest &request, Route &route, std::string &file_name);
@@ -17,3 +19,5 @@ std::vector<std::string> getDirectoryListing(const std::string& path, bool show_
 void pathIsDirectory(HTTPRequest &request, std::map<std::string, Route> &routes, Route &route, const std::string &_path);
 void pathIsFile(HTTPRequest &request, std::map<std::string, Route> &routes, Route &route);
 void autoIndexOfDirectory(Route &route);
+bool isDirectoryEmpty(std::string path);
+void deleteRequestedFile(HTTPRequest &request, std::string path, std::string filename);

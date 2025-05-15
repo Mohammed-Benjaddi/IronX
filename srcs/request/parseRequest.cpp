@@ -90,6 +90,8 @@ void find_method_uri(HTTPRequest &request, const std::string &line) {
       request.setQuery(uri.substr(queryPos + 1));
       request.setPath(uri.substr(0, queryPos));
   }
+  if(uri[uri.length() - 1] == '/')
+    uri = uri.substr(0, uri.length() - 1);
   request.setMethod(method);
   request.setPath(uri);
   request.setHTTPVersion(httpVersion);
