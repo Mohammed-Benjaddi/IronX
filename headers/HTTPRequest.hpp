@@ -27,6 +27,7 @@ private:
     std::string query;
     int clientId;
     std::string fileContent;
+    bool bodyFound;
 public:
     HTTPRequest(const std::string &raw_request, WebServerConfig *config, int clientId);
     ~HTTPRequest();
@@ -41,7 +42,8 @@ public:
     void setQuery(const std::string& query);
     void setFileContent(const std::string& fileContent);
     void setClientId(int _clientId);
-
+    void setBodyFound(bool b);
+    
     // Getters
     WebServerConfig *getConfig() const;
     std::string getMethod() const;
@@ -54,6 +56,8 @@ public:
     std::string getQuery() const;
     std::string getFileContent() const;
     int getClientId() const;
+    std::string getBoundary();
+    bool isBodyFound() const;
 
     virtual std::vector<uint8_t> to_bytes() const;
 

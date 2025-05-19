@@ -14,13 +14,13 @@ int checkAllowedMethods(HTTPRequest &request) {
   return 1;
 }
 
-std::string findHeader(HTTPRequest &request, std::string key) {
-  std::map<std::string, std::string> headers = request.getHeaders();
-  std::map<std::string, std::string>::const_iterator it = headers.find(key);
-  if (it != headers.end())
-    return it ->second;
-  return "";
-}
+// std::string findHeader(HTTPRequest &request, std::string key) {
+//   std::map<std::string, std::string> headers = request.getHeaders();
+//   std::map<std::string, std::string>::const_iterator it = headers.find(key);
+//   if (it != headers.end())
+//     return it ->second;
+//   return "";
+// }
 
 bool URIHasUnallowedChar(std::string uri) {
   const std::string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_-~/?#[]@!$$('*+,'=%.";
@@ -49,13 +49,15 @@ int parse( HTTPRequest &request, const std::string &raw_request) {
   std::getline(ss, line);
   find_method_uri(request, line);
   while (std::getline(ss, line) && line != "\r")
-  request.setHeaders(line);
+    request.setHeaders(line);
+  std::cout << "body ---------> " << std::endl;
+  std::cout << request.getBody() << std::endl;
   // 501 Not implemented
-  if (!findHeader(request, "Transfer-Encoding").empty() && findHeader(request, "Transfer-Encoding") != "chunked") {
-    request.setStatusCode(501);
-    request.setStatusMessage("Not Implemented");
-    return -1;
-  }
+  // if (!findHeader(request, "Transfer-Encoding").empty() && findHeader(request, "Transfer-Encoding") != "chunked") {
+  //   request.setStatusCode(501);
+  //   request.setStatusMessage("Not Implemented");
+  //   return -1;
+  // }
   return 1;
 }
 
