@@ -3,6 +3,7 @@
 
 bool isFileExist(const char* path) {
     struct stat buffer;
+    // printf("----> file to look for ---> %s\n", path);
     if (stat(path, &buffer) != 0) {
         return false;
     }
@@ -111,7 +112,12 @@ void directoryHasIndexFiles(HTTPRequest &request, Route &route, std::vector<std:
     std::cout << "index files: " << std::endl;
     for(size_t i = 0; i < index_files.size(); i++) {
         std::cout << "index file #" << i << " --> " << route.getRootDir() + "/" + request.getPath() + "/" +  index_files[i] << std::endl;
-        std::string path = "/" + route.getRootDir() + "/" + request.getPath() + "/" + index_files[i];
+        std::string path = "/" + route.getRootDir() + request.getPath() + "/" + index_files[i];
+
+        // std::cout << "route dir ----> " <<route.getRootDir()  << std::endl;
+        // std::cout << "request path ----> " << request.getPath()  << std::endl;
+        // std::cout << "index file ----> " << index_files[i] << std::endl;
+
         if(isFileExist(path.c_str())) {
             std::cout << "I found the file" << std::endl;
             if(isLocationHasCGI(path)) {
@@ -121,18 +127,21 @@ void directoryHasIndexFiles(HTTPRequest &request, Route &route, std::vector<std:
                 // should return the requested file 200 OK
                 std::string filename = "/" + index_files[i];
                 fileHasNoCGI(request, route, filename);
+                return;
             }
             break;
-        } else {
+        } else        
             std::cout << "file not found" << std::endl;
-        }
     }
+    request.setStatusCode(404);
+    request.setStatusMessage("Not Found");
 }
 
 void pathIsFile(HTTPRequest &request, std::map<std::string, Route> &routes, Route &route) {
     (void) routes;
-    std::cout << "path is file: " << route.getRootDir() << std::endl;
-    std::string filePath = ("/" + route.getRootDir() + request.getPath());
+    // std::cout << "path is file: " << route.getRootDir() << std::endl;
+    std::string filePath = (route.getRootDir() + request.getPath());
+    // std::cout << " ********** " << filePath << "***********" << std::endl;
     if(!isFileExist(filePath.c_str())) {
         std::cout << "* file not found" << std::endl;
         request.setStatusCode(404);
@@ -260,4 +269,9 @@ bool isDirectoryEmpty(std::string path) {
     }
     closedir(dir);
     return true;
+}
+
+
+void uploadFiles(HTTPRequest &request) {
+    (void) request;
 }

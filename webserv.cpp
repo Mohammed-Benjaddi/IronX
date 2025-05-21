@@ -17,10 +17,13 @@ int main() {
     mocker(config);
     // printConfig(config);
 
-    std::fstream file("./tests/post2.txt");    
+    std::fstream file("./tests/mock_req2.txt");    
     std::stringstream ss;
 
     ss << file.rdbuf();
+
+    // std::cout << "str ===> " << ss.str() << std::endl;
+
     const std::string raw_request = ss.str();
     HTTPRequest request(raw_request, &config, 0);
 

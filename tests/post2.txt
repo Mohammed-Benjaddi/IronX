@@ -21,12 +21,18 @@ Referer: http://localhost:8087/
 Accept-Encoding: gzip, deflate, br, zstd
 
 ------WebKitFormBoundary1RCrsGDY0yGTkASE
-Content-Disposition: form-data; name="file"; filename=""
-Content-Type: application/octet-stream
+Content-Disposition: form-data; name=text_field
 
-
+This is a text field value
 ------WebKitFormBoundary1RCrsGDY0yGTkASE
-Content-Disposition: form-data; name="description"
+Content-Disposition: form-data; name=file1; filename="test.txt"
+Content-Type: text/plain
 
-trying to send a file
+This is the content of test.txt file
+It has multiple lines
+------WebKitFormBoundary1RCrsGDY0yGTkASE
+Content-Disposition: form-data; name=file2; filename="image.jpg"
+Content-Type: image/jpeg
+
+xFFxD8xFFxE0 ...binary data... 
 ------WebKitFormBoundary1RCrsGDY0yGTkASE--

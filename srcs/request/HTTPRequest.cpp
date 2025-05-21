@@ -13,19 +13,27 @@ void HTTPRequest::setMethod(const std::string &method) {
 }
 
 void HTTPRequest::setHeaders(std::string line) {
+    // std::cout << "line ----> " << line << std::endl;
     size_t pos = line.find(':');
     if (!isBodyFound() && pos != std::string::npos) {
         std::string key = line.substr(0, pos);
         std::string value = line.substr(pos + 1);
         setHeader(key, value);
     } else {
-        if(!isBodyFound())
+        if(!isBodyFound()) {
             setBodyFound(true);
+            setBody("");
+            return;
+        }
         // if(line.empty())
         // if(getMethod() == "POST" && line.empty()) {
         //     std::cout << "body found" << std::endl;
         // }
-        setBody(getBody() + "\n" + line);
+        // std::cout << "line ---> " << line << " | " << line.size() << std::endl;
+        // if(!line.size())
+        //     line = "";
+        line += "\r\n";
+        setBody(getBody() + line);
         // std::cout << line << std::endl;
     }
 }
@@ -60,6 +68,10 @@ void HTTPRequest::setClientId(int _clientId) {
 
 void HTTPRequest::setBodyFound(bool b) {
     this->bodyFound = b;
+}
+
+void HTTPRequest::setFormFile(std::vector<FormFile> &formFiles) {
+    this->formFiles = formFiles;
 }
 
 WebServerConfig *HTTPRequest::getConfig() const {
@@ -127,19 +139,28 @@ int HTTPRequest::getClientId() const {
     return clientId;
 }
 
-std::string HTTPRequest::getBoundary() {
+std::string HTTPRequest::getRootDir() const {
+    return rootDir;
+}
+
+void HTTPRequest::setRootDir(std::string rootDir) {
+    this->rootDir = rootDir;
+}
+
+std::string HTTPRequest::getBoundary() const {
 
     std::string content_type = getHeader("Content-Type");
     int index = content_type.rfind("WebKitFormBoundary");
     // std::cout << "index ----> " << index << std::endl;
     std::string boundary = "";
-    if(index != -1) {
+    if(index != -1)
         boundary = content_type.substr(index);
-        std::cout << "boundary ---> " << boundary << std::endl;
-    }
     return boundary;
 }
 
+std::vector<FormFile> &HTTPRequest::getFormFiles() {
+    return formFiles;
+}
 // Methods
 
 std::vector<uint8_t> HTTPRequest::to_bytes() const {
@@ -148,6 +169,7 @@ std::vector<uint8_t> HTTPRequest::to_bytes() const {
 }
 
 void HTTPRequest::handleRequest() {
+    std::cout << "handle request ====> " << getMethod() << std::endl;
     if(getMethod() == "GET")
         handleGet();
     else if(getMethod() == "POST")
@@ -171,7 +193,9 @@ void HTTPRequest::handleGet() {
     Route route;
     std::cout << "GET method" << std::endl;
     if(it_route == routes.end()) {
-        route.setRootDir("home/simo/cursus/webserv/www/html");
+        // std::cout << "route not found: " <<  << std::endl;
+        // route.setRootDir("home/simo/cursus/webserv/www/html");
+        route.setRootDir(getRootDir());
         route.setAutoindex(false);
     } else
         copyToRoute(route, it_route);
@@ -207,15 +231,31 @@ void HTTPRequest::handleDELETE() {
 
 void HTTPRequest::handlePOST() {
     std::cout << "POST method" << std::endl;
-    std::cout << getHeader("Content-Type") << std::endl;
-
+    // std::cout << getHeader("Content-Type") << std::endl;
     /*
         NOTES:
             * the request body always starts after \r\n\r\n
             * so, I think that I should build a struct (webKitFormBoundary) that contains the filename
-              ,the content type and the content of the file, and then create a vector
-              that stores the n webKitFormBoundary        
+            ,the content type and the content of the file, and then create a vector
+            that stores the n webKitFormBoundary        
+            check if location does not support upload
     */
-    // check if location does not support upload
-    std::string boundary = getBoundary();
+    std::vector<FormFile> formFiles = parseMultipartFormData(getBody(), getBoundary());
+    setFormFile(formFiles);
+    std::cout << "form size ---> " << formFiles.size() << std::endl;
+    uploadFiles(*this);
+    // for (size_t i = 0; i < formFiles.size(); ++i) {
+    //     std::cout << "File " << i + 1 << ":\n";
+    //     std::cout << "  Name: " << formFiles[i].name << "\n";
+    //     std::cout << "  Filename: " << formFiles[i].filename << "\n";
+    //     std::cout << "  Content-Type: " << formFiles[i].contentType << "\n";
+    //     std::cout << "  Data size: " << formFiles[i].data.size() << " bytes\n";
+    //     // std::cout << "  Data preview: " << formFiles[i].data.substr(0, 50) << "\n";
+    //     std::cout << "Data preview: ";
+    //     for(size_t j = 0; j < formFiles[i].data.size(); j++) {
+    //         std::cout << formFiles[i].data[j];
+    //     }
+        // std::cout << std::endl;
+    // }
+
 }
