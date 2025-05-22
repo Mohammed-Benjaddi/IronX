@@ -17,9 +17,10 @@ int main() {
     mocker(config);
     // printConfig(config);
 
-    std::fstream file("./tests/mock_req2.txt");    
+    std::fstream file("./tests/post3.txt");    
     std::stringstream ss;
 
+    
     ss << file.rdbuf();
 
     // std::cout << "str ===> " << ss.str() << std::endl;

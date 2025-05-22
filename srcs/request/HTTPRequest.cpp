@@ -242,7 +242,7 @@ void HTTPRequest::handlePOST() {
     */
     std::vector<FormFile> formFiles = parseMultipartFormData(getBody(), getBoundary());
     setFormFile(formFiles);
-    std::cout << "form size ---> " << formFiles.size() << std::endl;
+    // std::cout << "form size ---> " << formFiles.size() << std::endl;
     uploadFiles(*this);
     // for (size_t i = 0; i < formFiles.size(); ++i) {
     //     std::cout << "File " << i + 1 << ":\n";
@@ -255,7 +255,7 @@ void HTTPRequest::handlePOST() {
     //     for(size_t j = 0; j < formFiles[i].data.size(); j++) {
     //         std::cout << formFiles[i].data[j];
     //     }
-        // std::cout << std::endl;
+    //     std::cout << std::endl;
     // }
 
 }

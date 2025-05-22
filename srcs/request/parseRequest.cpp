@@ -97,12 +97,17 @@ void find_method_uri(HTTPRequest &request, const std::string &line) {
   request.setHTTPVersion(httpVersion);
 }
 
-std::string trim_crlf(const std::string &str) {
+std::vector<char> trim_crlf(const std::string &str) {
     size_t end = str.size();
+    std::vector<char> vec;
     while (end > 0 && (str[end - 1] == '\r' || str[end - 1] == '\n')) {
         --end;
     }
-    return str.substr(0, end);
+    for(size_t i = 0; i < end; i++) {
+      vec.push_back(str[i]);
+    }
+    // return str.substr(0, end);
+    return vec;
 }
 
 std::vector<FormFile> parseMultipartFormData(const std::string &body, const std::string &boundary) {
@@ -134,7 +139,7 @@ std::vector<FormFile> parseMultipartFormData(const std::string &body, const std:
         end = body.find(delimiter, pos);
         if (end == std::string::npos) break;
 
-        std::string content = trim_crlf(body.substr(pos, end - pos));
+        std::vector<char> content = trim_crlf(body.substr(pos, end - pos));
 
         // std::cout << "content: " << content << " | header: " << header << std::endl;
 
@@ -147,7 +152,7 @@ std::vector<FormFile> parseMultipartFormData(const std::string &body, const std:
         // 
         while (std::getline(headerStream, line)) {
             if (line.find("Content-Disposition:") != std::string::npos) {
-              std::cout << "line ----> " << line << std::endl;
+              // std::cout << "line ----> " << line << std::endl;
                 size_t namePos = line.find("name=\"");
                 if (namePos != std::string::npos) {
                     namePos += 6;
@@ -161,7 +166,7 @@ std::vector<FormFile> parseMultipartFormData(const std::string &body, const std:
                     file.filename = line.substr(filenamePos, endFilename - filenamePos);
                     isFile = true;
                 } else {
-                  std::cout << "----------------> else executed" << std::endl;
+                  // std::cout << "----------------> else executed" << std::endl;
                 }
             } else if (line.find("Content-Type:") != std::string::npos) {
                 size_t typePos = line.find(":");
@@ -174,6 +179,10 @@ std::vector<FormFile> parseMultipartFormData(const std::string &body, const std:
         }
 
         if (isFile) {
+            // file.data.push_back((char)0xFF);
+            // file.data.push_back((char)0xD8);
+            // file.data.push_back((char)0xFF);
+            // file.data.push_back((char)0xE0);
             for(size_t i = 0; i < content.size(); i++)
                 file.data.push_back(content[i]);
             files.push_back(file);
