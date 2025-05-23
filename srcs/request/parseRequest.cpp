@@ -49,15 +49,20 @@ int parse( HTTPRequest &request, const std::string &raw_request) {
       request.setRootDir("");
 
   // 413 error code if the request body larger than client max body in config file
-  if(ss.str().length() > request.getConfig()->getMaxBodySize()) {
-      request.setStatusCode(413);
-      request.setStatusMessage("Request Entity Too Large");
-      return -1;
-  }
+  // if(ss.str().length() > request.getConfig()->getMaxBodySize()) {
+  //     request.setStatusCode(413);
+  //     request.setStatusMessage("Request Entity Too Large");
+  //     return -1;
+  // }
   std::getline(ss, line);
   find_method_uri(request, line);
-  while (std::getline(ss, line))
+  while (std::getline(ss, line)) {
+    // std::cout << "waaaaaaaaaaaaaaaa3" << std::endl;
+    // std::cout << "---> " << line << std::endl;
+    // if(line.empty())
+    //   break;
     request.setHeaders(line);
+  }
   return 1;
 }
 
@@ -79,6 +84,7 @@ bool checkRequestURI(HTTPRequest &request, std::string uri) {
 
 void find_method_uri(HTTPRequest &request, const std::string &line) {
   std::stringstream sstream(line);
+  std::cout << "line ===> " << line << std::endl;
   std::string method, uri, httpVersion;
   sstream >> method >> uri >> httpVersion;
   if(!checkRequestURI(request, uri)) {
@@ -115,16 +121,21 @@ std::vector<FormFile> parseMultipartFormData(const std::string &body, const std:
     // std::cout << body << std::endl;
     // std::cout << "-----------------------------------------" << std::endl;
 
-    std::cout << "boundary: " << boundary << std::endl;
+    // std::cout << "boundary: " << boundary << std::endl;
 
     std::vector<FormFile> files;
-    std::string delimiter = "--" + boundary;
+    // std::cout << "boundary: " << boundary << std::endl;
+    std::string delimiter = "------" + boundary;
     size_t pos = 0;
     size_t end = 0;
 
+    // std::cout << "body ==> " << body << std::endl;
+
     while ((pos = body.find(delimiter, pos)) != std::string::npos) {
+      std::cout << "***** here" << std::endl;
+
         pos += delimiter.length();
-        if (body.substr(pos, 2) == "--") break;
+        if (body.substr(pos, 2) == "------") break;
         if (body[pos] == '\r') ++pos;
         if (body[pos] == '\n') ++pos;
 

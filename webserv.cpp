@@ -17,9 +17,10 @@ int main() {
     mocker(config);
     // printConfig(config);
 
-    std::fstream file("./tests/post3.txt");    
+    std::fstream file("./pdf_test1.txt"); 
+    if(!file)
+        return 0;
     std::stringstream ss;
-
     
     ss << file.rdbuf();
 

@@ -13,28 +13,21 @@ void HTTPRequest::setMethod(const std::string &method) {
 }
 
 void HTTPRequest::setHeaders(std::string line) {
-    // std::cout << "line ----> " << line << std::endl;
     size_t pos = line.find(':');
-    if (!isBodyFound() && pos != std::string::npos) {
+    if (!isBodyFound() && pos == std::string::npos) {
+        // if(!isBodyFound()) {
+        setBodyFound(true);
+        setBody("");
+            return;
+        // }
+    } else if (!isBodyFound() && pos != std::string::npos) {
         std::string key = line.substr(0, pos);
         std::string value = line.substr(pos + 1);
         setHeader(key, value);
     } else {
-        if(!isBodyFound()) {
-            setBodyFound(true);
-            setBody("");
-            return;
-        }
-        // if(line.empty())
-        // if(getMethod() == "POST" && line.empty()) {
-        //     std::cout << "body found" << std::endl;
-        // }
-        // std::cout << "line ---> " << line << " | " << line.size() << std::endl;
-        // if(!line.size())
-        //     line = "";
         line += "\r\n";
         setBody(getBody() + line);
-        // std::cout << line << std::endl;
+        // std::cout << "line ----> " << line << std::endl;    
     }
 }
 
@@ -240,6 +233,7 @@ void HTTPRequest::handlePOST() {
             that stores the n webKitFormBoundary        
             check if location does not support upload
     */
+    // std::vector<FormFile> formFiles = parseMultipartFormData(getBody(), getBoundary());
     std::vector<FormFile> formFiles = parseMultipartFormData(getBody(), getBoundary());
     setFormFile(formFiles);
     // std::cout << "form size ---> " << formFiles.size() << std::endl;

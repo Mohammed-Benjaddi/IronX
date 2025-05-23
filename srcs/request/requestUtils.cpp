@@ -288,24 +288,26 @@ void uploadFiles(HTTPRequest &request) {
     std::cout << "name: " << files[0].name << std::endl;
 
     // for(size_t i = 0; i <; i++)
-    for(size_t i = 0; i < files[0].data.size(); i++)
+    // std::ifstream file("./tests/body.txt", std::ios::binary);
+    // if(!file)
+    //     return;
+
+    // file.seekg(0, std::ios::end);
+    // std::string data(file.tellg(), '\0');
+    // file.seekg(0, std::ios::beg);
+    // file.read(&data[0], data.size());
+
+    // std::cout << std::hex << (0xFF & data[0]) << " " << (0xFF & data[1]) << "\n";
+    
+    for(size_t i = 0; i < 50; i++)
         std::cout << files[0].data[i];
     std::cout << std::endl;
 
-    std::ofstream file("bear.jpeg", std::ios::out | std::ios::binary);
-    // file.write(&files[0].data[0], files[0].data.size());
-    
-    std::string c;
-    for(size_t i = 0; i < files[0].data.size(); i++)
-        c.push_back(files[0].data[i]);
+    std::ofstream file(files[0].filename.c_str(), std::ios::binary);
 
+    file.write(&files[0].data[0], files[0].data.size());
+    
     std::cout << std::hex << (0xFF & files[0].data[0]) << " " << (0xFF & files[0].data[1]) << "\n";
 
-    std::stringstream ss(c);
-
-    file << ss;
-
-        // std::cout << files[0].data[i];
-    
-    file.close();
+    // file.close();
 }
