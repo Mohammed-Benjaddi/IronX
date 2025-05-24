@@ -25,6 +25,10 @@ void HTTPRequest::setHeaders(std::string line) {
         std::string value = line.substr(pos + 1);
         setHeader(key, value);
     } else {
+        // if(!line.length()) {
+        //     exit(0);
+        // }
+        // std::cout << "line =====> " << line.length() << std::endl;
         line += "\r\n";
         setBody(getBody() + line);
         // std::cout << "line ----> " << line << std::endl;    
@@ -148,7 +152,7 @@ std::string HTTPRequest::getBoundary() const {
     std::string boundary = "";
     if(index != -1)
         boundary = content_type.substr(index);
-    return boundary;
+    return trim(boundary);
 }
 
 std::vector<FormFile> &HTTPRequest::getFormFiles() {
@@ -236,6 +240,10 @@ void HTTPRequest::handlePOST() {
     // std::vector<FormFile> formFiles = parseMultipartFormData(getBody(), getBoundary());
     std::vector<FormFile> formFiles = parseMultipartFormData(getBody(), getBoundary());
     setFormFile(formFiles);
+
+    if(getFormFiles().empty()) {
+        std::cout << "no form files" << std::endl;
+    }
     // std::cout << "form size ---> " << formFiles.size() << std::endl;
     uploadFiles(*this);
     // for (size_t i = 0; i < formFiles.size(); ++i) {

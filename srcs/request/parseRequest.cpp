@@ -116,39 +116,77 @@ std::vector<char> trim_crlf(const std::string &str) {
     return vec;
 }
 
+std::string trim(const std::string& str) {
+    std::string::size_type start = 0;
+    while (start < str.size() && std::isspace(static_cast<unsigned char>(str[start]))) {
+      ++start;
+    }
+    std::string::size_type end = str.size();
+    while (end > start && std::isspace(static_cast<unsigned char>(str[end - 1]))) {
+        --end;
+    }
+    return str.substr(start, end - start);
+}
+
+
 std::vector<FormFile> parseMultipartFormData(const std::string &body, const std::string &boundary) {
     // std::cout << "-----------------------------------------" << std::endl;
     // std::cout << body << std::endl;
     // std::cout << "-----------------------------------------" << std::endl;
 
     // std::cout << "boundary: " << boundary << std::endl;
-
     std::vector<FormFile> files;
-    // std::cout << "boundary: " << boundary << std::endl;
+    // std::cout << "body: " << body << std::endl;
     std::string delimiter = "------" + boundary;
+    // std::cout << "boundary end: " << boundary[boundary.length() - 1] << std::endl;
     size_t pos = 0;
     size_t end = 0;
 
-    // std::cout << "body ==> " << body << std::endl;
+    // std::cout << "delimiter ==> " << delimiter << std::endl;
 
     while ((pos = body.find(delimiter, pos)) != std::string::npos) {
-      std::cout << "***** here" << std::endl;
+      // std::cout << "***** here" << std::endl;
 
         pos += delimiter.length();
-        if (body.substr(pos, 2) == "------") break;
+        if (body.substr(pos, 2) == "--") break;
         if (body[pos] == '\r') ++pos;
         if (body[pos] == '\n') ++pos;
 
-        end = body.find("\r\n\r\n", pos);
+        // std::cout << "pos: " << body.substr(43) << std::endl;
+        // end = body.find("\r\n\r\n", pos);
+        end = body.find("\r\n\r", pos);
         if (end == std::string::npos) break;
-
-        // std::cout << "here ----------------->" << std::endl; 
-
+        std::cout << "-------------------------------------------------------------------------------------------------" << std::endl;
+        // if (end == std::string::npos) end = body.length();
+        
         std::string header = body.substr(pos, end - pos);
         pos = end + 4;
 
+        std::cout << "header ----> " << header << std::endl;
+        std::cout << " | pos ---> " << pos  << std::endl;
+        std::cout << "delimiter ====> " << delimiter << std::endl;
+
+
+        // std::cout << body.substr(140) << std::endl;
         end = body.find(delimiter, pos);
+        // end = body.find("------WebKitFormBoundary1RCrsGDY0yGTkASE", pos);
+
+        // std::cout << std::string("------WebKitFormBoundary1RCrsGDY0yGTkASE").length() << std::endl;
+        // std::cout << delimiter.length() << std::endl;
+
+        
+
+        // if("------WebKitFormBoundary1RCrsGDY0yGTkASE" == delimiter)
+          // std::cout << "+++++++ equal" << std::endl;
+        // std::cout << "clear ==> " << end << std::endl;
         if (end == std::string::npos) break;
+        // if (end == std::string::npos) end = body.length();
+        std::cout << "============================================================================" << std::endl;
+        // std::cout << "body ===> " << body.length() << "| pos ===> " << pos << std::endl;
+        std::cout << "============================================================================" << std::endl;
+
+
+        // std::cout << "header ====> " << header << std::endl; 
 
         std::vector<char> content = trim_crlf(body.substr(pos, end - pos));
 
@@ -159,7 +197,6 @@ std::vector<FormFile> parseMultipartFormData(const std::string &body, const std:
         FormFile file;
         bool isFile = false;
         
-        // std::cout << "here -----------------> " << header << std::endl; 
         // 
         while (std::getline(headerStream, line)) {
             if (line.find("Content-Disposition:") != std::string::npos) {
@@ -189,14 +226,18 @@ std::vector<FormFile> parseMultipartFormData(const std::string &body, const std:
             }
         }
 
+        std::cout << "here +++++++++++++++++++++++++++++++++++++++++" << std::endl;
+
         if (isFile) {
-            // file.data.push_back((char)0xFF);
-            // file.data.push_back((char)0xD8);
-            // file.data.push_back((char)0xFF);
-            // file.data.push_back((char)0xE0);
-            for(size_t i = 0; i < content.size(); i++)
-                file.data.push_back(content[i]);
-            files.push_back(file);
+          // std::cout << "file" << std::endl;
+          // exit(0);
+          // file.data.push_back((char)0xFF);
+          // file.data.push_back((char)0xD8);
+          // file.data.push_back((char)0xFF);
+          // file.data.push_back((char)0xE0);
+          for(size_t i = 0; i < content.size(); i++)
+              file.data.push_back(content[i]);
+          files.push_back(file);
         }
 
         pos = end;

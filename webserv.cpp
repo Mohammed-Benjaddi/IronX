@@ -17,11 +17,13 @@ int main() {
     mocker(config);
     // printConfig(config);
 
-    std::fstream file("./pdf_test1.txt"); 
-    if(!file)
+    std::fstream file("./tests/video_mp4.txt"); 
+    if(!file) {
+        std::cout << "file not found" << std::endl;
         return 0;
+    }
     std::stringstream ss;
-    
+
     ss << file.rdbuf();
 
     // std::cout << "str ===> " << ss.str() << std::endl;

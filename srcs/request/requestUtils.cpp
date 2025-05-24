@@ -286,19 +286,6 @@ void uploadFiles(HTTPRequest &request) {
     std::cout << "content type: " << files[0].contentType << std::endl;
     std::cout << "filename: " << files[0].filename << std::endl;
     std::cout << "name: " << files[0].name << std::endl;
-
-    // for(size_t i = 0; i <; i++)
-    // std::ifstream file("./tests/body.txt", std::ios::binary);
-    // if(!file)
-    //     return;
-
-    // file.seekg(0, std::ios::end);
-    // std::string data(file.tellg(), '\0');
-    // file.seekg(0, std::ios::beg);
-    // file.read(&data[0], data.size());
-
-    // std::cout << std::hex << (0xFF & data[0]) << " " << (0xFF & data[1]) << "\n";
-    
     for(size_t i = 0; i < 50; i++)
         std::cout << files[0].data[i];
     std::cout << std::endl;
