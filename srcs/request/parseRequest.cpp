@@ -4,13 +4,28 @@
 int checkAllowedMethods(HTTPRequest &request) {
   const std::map<std::string, Route>& routes = request.getConfig()->getClusters()[request.getClientId()].getRoutes();
   std::map<std::string, Route>::const_iterator route_it = routes.find(request.getPath());
-  const std::set<std::string> &allowedMethod = route_it->second.getAllowedMethods();
+  if(route_it != routes.end()) {
+    const std::set<std::string> &allowedMethod  = route_it->second.getAllowedMethods();
 
-  if(allowedMethod.find(request.getMethod()) == allowedMethod.end()) {
-      request.setStatusCode(405);
-      request.setStatusMessage("Method Not Allowed");
-      return -1;
+    std::set<std::string>::iterator it = allowedMethod.begin();
+
+    while(it != allowedMethod.end()) {
+      std::cout << "===> " << *it->begin() << std::endl;
+      it++;
+    }
+
+    if(allowedMethod.find(request.getMethod()) == allowedMethod.end()) {
+        request.setStatusCode(405);
+        request.setStatusMessage("Method Not Allowed");
+        return -1;
+    }
+  } else {
+    std::cout << "+++ location not found" << std::endl;
+    request.setStatusCode(404);
+    request.setStatusMessage("Not Found");
+    return -1;
   }
+
   return 1;
 }
 
@@ -57,10 +72,6 @@ int parse( HTTPRequest &request, const std::string &raw_request) {
   std::getline(ss, line);
   find_method_uri(request, line);
   while (std::getline(ss, line)) {
-    // std::cout << "waaaaaaaaaaaaaaaa3" << std::endl;
-    // std::cout << "---> " << line << std::endl;
-    // if(line.empty())
-    //   break;
     request.setHeaders(line);
   }
   return 1;

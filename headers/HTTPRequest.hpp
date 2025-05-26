@@ -37,6 +37,7 @@ private:
     bool bodyFound;
     std::string rootDir;
     std::vector<FormFile> formFiles;
+    std::string fileExtension;
 
 public:
     HTTPRequest(const std::string &raw_request, WebServerConfig *config, int clientId);
@@ -55,6 +56,7 @@ public:
     void setBodyFound(bool b);
     void setFormFile(std::vector<FormFile>& formFiles);
     void setRootDir(std::string rootDor);
+    void setFileExtension(const std::string& path);
     
     // Getters
     WebServerConfig *getConfig() const;
@@ -72,8 +74,10 @@ public:
     std::string getRootDir() const;
     bool isBodyFound() const;
     std::vector<FormFile> &getFormFiles();
+    std::string getFileExtension();
 
     virtual std::vector<uint8_t> to_bytes() const;
+
 
     void handleRequest();
     void handleGet();

@@ -2,6 +2,7 @@
 
 HTTPRequest::HTTPRequest(const std::string &raw_request, WebServerConfig *_config, int _clientId) : IHTTPMessage(), config(_config), clientId(_clientId) {
     parse(*this, raw_request);
+    // std::cout << "-------------------------------> " <<  << std::endl;
     checkAllowedMethods(*this);
     handleRequest();
 }
@@ -165,8 +166,27 @@ std::vector<uint8_t> HTTPRequest::to_bytes() const {
     return bytes;
 }
 
+void HTTPRequest::setFileExtension(const std::string& path) {
+    size_t slashPos = path.find_last_of("/\\");
+    std::string filename = (slashPos == std::string::npos) ? path : path.substr(slashPos + 1);
+
+    size_t dotPos = filename.find_last_of('.');
+    if (dotPos == std::string::npos || dotPos == filename.length() - 1) {
+        fileExtension = "";
+        return;
+    }
+
+    // std::cout << "**** " << filename.substr(dotPos + 1) << std::endl;
+    fileExtension = filename.substr(dotPos + 1);
+}
+
+std::string HTTPRequest::getFileExtension() {
+    return fileExtension;
+}
+
 void HTTPRequest::handleRequest() {
-    std::cout << "handle request ====> " << getMethod() << std::endl;
+    setFileExtension(getPath());
+    std::cout << "file ===> " << getFileExtension() << std::endl;
     if(getMethod() == "GET")
         handleGet();
     else if(getMethod() == "POST")
@@ -228,15 +248,8 @@ void HTTPRequest::handleDELETE() {
 
 void HTTPRequest::handlePOST() {
     std::cout << "POST method" << std::endl;
-    // std::cout << getHeader("Content-Type") << std::endl;
-    /*
-        NOTES:
-            * the request body always starts after \r\n\r\n
-            * so, I think that I should build a struct (webKitFormBoundary) that contains the filename
-            ,the content type and the content of the file, and then create a vector
-            that stores the n webKitFormBoundary        
-            check if location does not support upload
-    */
+    //! remove this later;
+    exit(0);
     // std::vector<FormFile> formFiles = parseMultipartFormData(getBody(), getBoundary());
     std::vector<FormFile> formFiles = parseMultipartFormData(getBody(), getBoundary());
     setFormFile(formFiles);

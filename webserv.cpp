@@ -17,7 +17,7 @@ int main() {
     mocker(config);
     // printConfig(config);
 
-    std::fstream file("./tests/video_mp4.txt"); 
+    std::fstream file("./tests/test_js.txt"); 
     if(!file) {
         std::cout << "file not found" << std::endl;
         return 0;

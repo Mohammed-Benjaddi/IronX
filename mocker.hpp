@@ -149,8 +149,10 @@ void mocker(WebServerConfig &wsc) {
     std::set<std::string> methods1;
     methods1.insert("GET");
     methods1.insert("HEAD");
-    route1.setAllowedMethods(methods1);
     
+    route1.setAllowedMethods(methods1);
+
+
     route1.setAutoindex(true);
     routes1.insert(std::make_pair("/", route1));
 

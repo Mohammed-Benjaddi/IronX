@@ -55,6 +55,13 @@ bool isLocationHasCGI(std::string filepath) {
 void copyToRoute(Route &route, std::map<std::string, Route>::const_iterator &it) {
     route.setRootDir(it->second.getRootDir());
     route.setIndexFiles(it->second.getIndexFiles());
+
+    std::set<std::string>::iterator iter = it->second.getAllowedMethods().begin();
+    while(iter != it->second.getAllowedMethods().end()) {
+        std::cout << "method ----> " << *iter << std::endl;
+        iter++;
+    }
+
     route.setAllowedMethods(it->second.getAllowedMethods());
     route.setAutoindex(it->second.isAutoindex());
     route.setRedirect(it->second.getRedirect());
@@ -126,6 +133,7 @@ void directoryHasIndexFiles(HTTPRequest &request, Route &route, std::vector<std:
                 // file does not have CGI
                 // should return the requested file 200 OK
                 std::string filename = "/" + index_files[i];
+                request.setFileExtension(filename);
                 fileHasNoCGI(request, route, filename);
                 return;
             }
@@ -296,5 +304,5 @@ void uploadFiles(HTTPRequest &request) {
     
     std::cout << std::hex << (0xFF & files[0].data[0]) << " " << (0xFF & files[0].data[1]) << "\n";
 
-    // file.close();
+    file.close();
 }
