@@ -106,7 +106,8 @@ void printConfig(const WebServerConfig& config) {
 }
 
 
-
+#include <cstdlib>  // for rand() and srand()
+#include <ctime> 
 void mocker(WebServerConfig &wsc) {
     // Set global max body size
     wsc.setMaxBodySize(1048576);  // 1MB
@@ -123,13 +124,16 @@ void mocker(WebServerConfig &wsc) {
     // Create first server (cluster)
     Cluster server1;
     server1.setHost("0.0.0.0");
-
+    
     std::vector<uint16_t> ports1;
-    ports1.push_back(8088);
-    ports1.push_back(4241);
-    ports1.push_back(1924);
+    std::srand(std::time(0));
+    //  int randomPort = 1024 + std::rand() % (65536 - 1024);
+    int randomPort = 8080;
+    ports1.push_back(randomPort);
+    // ports1.push_back(4241);
+    // ports1.push_back(1924);
     server1.setPorts(ports1);
-
+    
     std::vector<std::string> hostnames1;
     hostnames1.push_back("example.com");
     hostnames1.push_back("www.example.com");
@@ -140,28 +144,24 @@ void mocker(WebServerConfig &wsc) {
 
     // Route 1: /
     Route route1;
-    route1.setRootDir("/home/simo/cursus/webserv/www/html");
-
+    route1.setRootDir("/home/nab/Desktop/webserve-42/www");
+    
     std::vector<std::string> indexFiles1;
-    // indexFiles1.push_back("index.html");
+    indexFiles1.push_back("index.html");
     route1.setIndexFiles(indexFiles1);
-
+    
     std::set<std::string> methods1;
     methods1.insert("GET");
     methods1.insert("HEAD");
-
     route1.setAllowedMethods(methods1);
-    std::vector<std::string> _indexFiles1;
-    _indexFiles1.push_back("index.html");
-    route1.setIndexFiles(_indexFiles1);
     route1.setAutoindex(true);
     routes1.insert(std::make_pair("/", route1));
 
     // Route 2: /cgi-bin
     Route route2;
-    route2.setRootDir("home/simo/cursus/webserv/www");
+    route2.setRootDir("home/nab/Desktop/webserve-42/www");
     std::vector<std::string> _indexFiles;
-    _indexFiles.push_back("index.html");
+    _indexFiles.push_back("indx.html");
     route2.setIndexFiles(_indexFiles);
     std::set<std::string> methods2;
     methods2.insert("GET");
@@ -195,7 +195,7 @@ void mocker(WebServerConfig &wsc) {
     std::set<std::string> methods4;
     methods4.insert("GET");
     route4.setAllowedMethods(methods4);
-    route4.setRootDir("home/simo/cursus/webserv/www");
+    route4.setRootDir("home/nab/Desktop/webserve-42/www");
 
     routes1.insert(std::make_pair("/old-site", route4));
 

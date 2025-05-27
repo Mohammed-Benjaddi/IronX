@@ -208,6 +208,16 @@ void HTTPRequest::handleGet() {
 
     std::map<std::string, Route>::const_iterator it_route = routes.find(getPath());
     std::string pathToSearch;
+
+    Route route;
+
+    std::cout << "GET method" << std::endl;
+    if (it_route == routes.end()) {
+        route.setRootDir("home/nab/Desktop/webserve-42/www");
+        route.setAutoindex(false);
+    } else
+        copyToRoute(route, it_route);
+    if (isDirExist(getPath(), route.getRootDir())) {
     Route route;
     std::cout << "GET method: " << getPath() << std::endl;
     if(it_route == routes.end()) {

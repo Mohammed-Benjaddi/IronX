@@ -93,33 +93,36 @@ void    Multiplexer::add_fd_to_epoll(int fd, uint32_t events) {
     if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, fd, &ev) == -1) {
         std::cerr << "epoll_ctl client_fd" << std::endl;
         close(fd);
-        throw std::runtime_error("Failed to add client fd to epoll (Action Closed Client Fd)");
+        throw std::runtime_error("Failed to add client fd to epoll (Action; Closed Client Fd)");
     }
 }
 
 void    Multiplexer::handle_new_connection(int server_fd) {
     int client_fd = accept_new_client(server_fd);
     make_fd_non_blocking(client_fd);
-    add_fd_to_epoll(client_fd, EPOLLIN | EPOLLRDHUP | EPOLLOUT);
+    add_fd_to_epoll(client_fd, EPOLLIN /*| EPOLLRDHUP | EPOLLOUT*/);
     activeConnections[client_fd] = Connection(client_fd, epoll_fd, &_config);
-    std::cout << "Accepted new client: fd = " << client_fd << std::endl;
+    // std::cout << "Accepted new client: fd = " << client_fd << std::endl;
 }
 
 void	Multiplexer::handle_client_event(int fd, uint32_t event) {
 	//? Fetch Connection object
-    
 	try {
         //! Diconnection Detection
 	    if (event & (EPOLLERR | EPOLLHUP | EPOLLRDHUP)) {
             throw Multiplexer::ClientDisconnectedException();
 	    }
         Connection &conn = activeConnections.at(fd);
+        //! TO CHANGE
         if (event & EPOLLIN)
-		    conn.handleRead();
+        conn.handleRead();
         if (event &EPOLLOUT)
-		    conn.handleWrite();
+        conn.handleWrite();
+        // if (conn.isClosed())
+        // epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL);
+        
 	} catch (std::exception &e) {
-		std::cerr << "Client with fd " << fd << "had a critical event: " << e.what() << std::endl;
+        std::cerr << "Client with fd " << fd << "had a critical event: " << e.what() << std::endl;
         Multiplexer::close_connection(fd);
 	}
 }
