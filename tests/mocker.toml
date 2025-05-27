@@ -1,0 +1,47 @@
+[global]
+max_body_size = 1048576
+[default_error_pages]
+400 = "/errors/400.html" 
+403 = "/errors/403.html" 
+404 = "/errors/404.html" 
+500 = "/errors/500.html" 
+503 = "/errors/503.html" 
+[[servers]]
+host = "0.0.0.0" 
+port = [8080, 4242, 1923] 
+hostnames = ["example.com", "www.example.com"]
+[[servers.routes]]
+path = "/"
+root = "/var/www/html"  	
+index = "index.html"		
+methods = ["GET", "HEAD"] 	
+autoindex = false 			
+[[servers.routes]]
+path = "/cgi-bin"
+root = "/var/www/cgi-bin"
+methods = ["GET", "POST"]
+extensions = [".php"]
+interpreter = "/usr/bin/php-cgi"
+
+[[servers.routes]]
+path = "/uploads"
+root = "/var/www/uploads"
+methods = ["POST"]
+upload_dir = "/var/www/uploads/tmp"
+[[servers.routes]]
+path = "/old-site"
+redirect = "/new-site"
+methods = ["GET"]
+[[servers]]
+host = "0.0.0.0"
+port = 8080
+hostnames = ["api.example.com", "beta.example.com"]
+[[servers.routes]]
+path = "/"
+root = "/var/www/api"
+index = "api.php"
+methods = ["GET", "POST", "DELETE"]
+[[servers.routes]]
+path = "/cgi-bin"
+root = "/var/www/cgi-bin"
+methods = ["GET", "POST"]

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>WebServ: Liberty Error</title>
+  <title>404: Page Not Found</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @import url('https://fonts.cdnfonts.com/css/pricedown');
@@ -27,19 +27,26 @@
     }
 
     .content {
-    font-size: 6rem;
+      font-size: 5rem;
       position: relative;
       z-index: 1;
       text-align: center;
-      margin-top: 30%;
+      margin-top: 25%;
     }
 
     h1 {
       font-family: 'Pricedown Bl', sans-serif;
-      color: #fff;
-      text-shadow: 3px 3px 0 #000, 5px 5px 0 #000;
+      color: #ff4c4c;
+      text-shadow: 3px 3px 0 #000, 6px 6px 0 #000;
       margin-bottom: 2rem;
       animation: flicker 2.5s infinite;
+    }
+
+    p {
+      font-size: 2rem;
+      font-weight: bold;
+      margin-bottom: 3rem;
+      color: #eee;
     }
 
     .gta-btn {
@@ -62,18 +69,6 @@
       box-shadow: 0 0 15px #ff4040, inset 0 0 10px #000;
     }
 
-    .image-frame {
-      border: 3px solid #444;
-      box-shadow: 0 0 10px #111;
-      transition: transform 0.4s ease;
-      filter: grayscale(70%) brightness(0.85);
-    }
-
-    .image-frame:hover {
-      transform: scale(1.04) rotate(-1deg);
-      filter: grayscale(30%) brightness(1.1);
-    }
-
     @keyframes flicker {
       0%, 18%, 22%, 25%, 55%, 100% {
         opacity: 1;
@@ -89,18 +84,13 @@
   <div class="overlay"></div>
 
   <div class="content">
-    <h1>🚧 WEBSERV </h1>
+    <h1>404: NOT FOUND</h1>
+    <p>Looks like you took a wrong turn in Liberty City...</p>
 
-    <!-- <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-      <img src="https://cdn.intra.42.fr/users/22ad347ba537c6e9280cd6b1bbdb4063/ael-maaz.jpg" alt="Gang 1" class="w-full h-48 object-cover image-frame" />
-      <img src="https://cdn.intra.42.fr/users/1f9bef1830faef4b351858e05266fb47/nhayoun.jpg" alt="Gang 2" class="w-full h-48 object-cover image-frame" />
-      <img src="https://cdn.intra.42.fr/users/1f85e4da99676341d0b2703f2cd5f5b2/mben-jad.jpg" alt="Gang 3" class="w-full h-48 object-cover image-frame" />
-    </div> -->
-
-    <div class="flex flex-col md:flex-row gap-6 justify-center ">
-      <button class="gta-btn">🚨 GET STUFF</button>
-      <button class="gta-btn">💾 POST JOB</button>
-      <button class="gta-btn">💣 DELETE EVIDENCE</button>
+    <div class="flex flex-col md:flex-row gap-6 justify-center">
+      <a href="/" class="gta-btn">🏠 RETURN HOME</a>
+      <a href="/missions" class="gta-btn">📜 CHECK MISSIONS</a>
+      <a href="/help" class="gta-btn">🧠 GET HELP</a>
     </div>
   </div>
 

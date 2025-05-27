@@ -1,0 +1,48 @@
+1. Global Configuration:
+    max_body_size: Mandatory
+    Sets the maximum allowed size for client request bodies.
+    The default is 1MB (1048576 bytes).
+
+default_error_pages: Optional
+    Specifies custom error pages for different HTTP error codes (e.g., 400, 404, 500).
+    You can choose to configure this or rely on the default error handling by the server.
+
+2. Server Definitions:
+    host: Mandatory
+    Specifies the IP address or hostname where the server listens. In your case, "0.0.0.0" means it listens on all available network interfaces.
+
+    port: Mandatory
+    Specifies the ports on which the server listens. This is required to define where the server will be accessible.
+
+    hostnames: Optional
+    Defines specific hostnames that the server will respond to. If not provided, the server will respond to all incoming requests on the specified host and port.
+
+3. Route Configurations:
+    path: Mandatory
+    Specifies the route or URL path that this configuration applies to. Every route must have a path to define where it will handle requests.
+    
+    root: Mandatory
+    Defines the root directory for serving files or where the script resides. It's required for static content.
+
+    methods: Mandatory
+    Specifies the HTTP methods (e.g., GET, POST, HEAD) that are allowed for this route. At least one method should be specified.
+
+    index: Optional
+    Defines the default file to serve when the user accesses a directory (e.g., index.html). This is optional; you can omit it if not required.
+
+    autoindex: Optional
+    If set to true, this enables automatic directory listing if no index file is found. It's optional.
+
+    redirect: Optional
+    Specifies a URL to redirect requests to another location. You should include this only when you need to redirect traffic (e.g., from old-site to new-site).
+
+4. CGI Configuration:
+    extensions: Optional
+    Defines the file extensions that should be treated as CGI scripts (e.g., .php, .py). This is only required when you want to execute CGI scripts for specific extensions.
+
+    interpreter: Optional
+    Specifies the CGI interpreter (e.g., /usr/bin/php-cgi) for processing the script. This is required if you're handling CGI scripts.
+
+5. File Uploads:
+    upload_dir: Optional
+    Specifies the directory where uploaded files should be stored. This is required only if you want to enable file uploads for specific routes (e.g., /uploads).

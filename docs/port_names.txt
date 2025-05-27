@@ -1,0 +1,21 @@
+When using commands like lsof, netstat, or ss, 
+you might notice that some ports display as names 
+(e.g., http, webmin) instead of numbers (e.g., 80, 10000). 
+Here’s why—and how to control it.
+
+Your system translates well-known port numbers into service names using:
+/etc/services – A file that maps ports to names 
+(e.g., 80 = http, 10000 = webmin).
+
+Why Some Ports Show Numbers
+
+Common ports (e.g., 80, 443, 22) usually show names.
+
+Uncommon ports (e.g., 10001, 12345) 
+show numbers because they aren’t in /etc/services.
+
+//! use -P (for lsof) or -n (for netstat/ss) to disable name resolution
+
+Find Why a Port Has a Name
+
+grep <port> /etc/services 
