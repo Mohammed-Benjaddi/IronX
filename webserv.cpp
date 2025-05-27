@@ -10,38 +10,37 @@
 int main() {
     WebServerConfig config;
 
-    const std::string request_test_file = "./tests/request_mock.txt";
-    const std::string response_test_file = "./tests/response_mock.txt";
+    // const std::string request_test_file = "./tests/request_mock.txt";
+    // const std::string response_test_file = "./tests/response_mock.txt";
 
     //! Load Configuration
     mocker(config);
     // printConfig(config);
 
-    std::fstream file("./tests/mock_req2.txt"); 
-    if(!file) {
-        std::cout << "file not found" << std::endl;
-        return 0;
-    }
-    std::stringstream ss;
+    // std::fstream file("./tests/mock_req2.txt"); 
+    // if(!file) {
+    //     std::cout << "file not found" << std::endl;
+    //     return 0;
+    // }
+    // std::stringstream ss;
 
-    ss << file.rdbuf();
+    // ss << file.rdbuf();
 
     // std::cout << "str ===> " << ss.str() << std::endl;
 
-    const std::string raw_request = ss.str();
-    HTTPRequest request(raw_request, &config, 0);
+    // const std::string raw_request = ss.str();
 
-//     ServerLauncher  launcher;
+    ServerLauncher  launcher;
 
-//     try {
-//             launcher.launch(config);
-//             Multiplexer     mux(launcher.getSockets(), config);
-//             mux.run();
-//     } catch (const std::exception &e) {
-//             std::cerr << "Error Launching Server: " << e.what() << std::endl;
-//     }
+    try {
+            launcher.launch(config);
+            Multiplexer     mux(launcher.getSockets(), config);
+            mux.run();
+    } catch (const std::exception &e) {
+            std::cerr << "Error Launching Server: " << e.what() << std::endl;
+    }
 
-//     return (0);
+    return (0);
 }
 
 

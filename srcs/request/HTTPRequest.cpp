@@ -187,8 +187,15 @@ std::string HTTPRequest::getFileExtension() {
 void HTTPRequest::handleRequest() {
     setFileExtension(getPath());
     std::cout << "file ===> " << getFileExtension() << std::endl;
-    if(getMethod() == "GET")
+    if(getMethod() == "GET") {
         handleGet();
+        std::cout << "full path ===> " << getRootDir() + getPath() << std::endl;
+        if (getPath() == "/") {
+            std::cout << "path is root" << std::endl;
+            setPath("index.html");
+        }
+        HTTPResponse response(getHeader("Connection"), getRootDir() + getPath());
+    }
     else if(getMethod() == "POST")
         handlePOST();
     else if(getMethod() == "DELETE")

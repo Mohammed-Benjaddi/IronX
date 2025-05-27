@@ -26,9 +26,12 @@ typedef struct sFormFile {
     std::vector<char> data;
 } FormFile;
 
+
 class HTTPRequest : public IHTTPMessage {
 private:
     WebServerConfig *config;
+    HTTPResponse *response;
+    FileStreamer *streamer;
     std::string method;
     std::string path;
     std::string httpVersion;
@@ -75,7 +78,6 @@ public:
     std::string getFileContent() const;
     int getClientId() const;
     std::string getRootDir() const;
-    
 
     std::string getBoundary() const;
     bool isBodyFound() const;
