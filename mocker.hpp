@@ -123,13 +123,13 @@ void mocker(WebServerConfig &wsc) {
     // Create first server (cluster)
     Cluster server1;
     server1.setHost("0.0.0.0");
-    
+
     std::vector<uint16_t> ports1;
     ports1.push_back(8088);
     ports1.push_back(4241);
     ports1.push_back(1924);
     server1.setPorts(ports1);
-    
+
     std::vector<std::string> hostnames1;
     hostnames1.push_back("example.com");
     hostnames1.push_back("www.example.com");
@@ -141,18 +141,19 @@ void mocker(WebServerConfig &wsc) {
     // Route 1: /
     Route route1;
     route1.setRootDir("/home/simo/cursus/webserv/www/html");
-    
+
     std::vector<std::string> indexFiles1;
     // indexFiles1.push_back("index.html");
     route1.setIndexFiles(indexFiles1);
-    
+
     std::set<std::string> methods1;
     methods1.insert("GET");
     methods1.insert("HEAD");
-    
+
     route1.setAllowedMethods(methods1);
-
-
+    std::vector<std::string> _indexFiles1;
+    _indexFiles1.push_back("index.html");
+    route1.setIndexFiles(_indexFiles1);
     route1.setAutoindex(true);
     routes1.insert(std::make_pair("/", route1));
 
@@ -160,7 +161,7 @@ void mocker(WebServerConfig &wsc) {
     Route route2;
     route2.setRootDir("home/simo/cursus/webserv/www");
     std::vector<std::string> _indexFiles;
-    _indexFiles.push_back("indx.html");
+    _indexFiles.push_back("index.html");
     route2.setIndexFiles(_indexFiles);
     std::set<std::string> methods2;
     methods2.insert("GET");

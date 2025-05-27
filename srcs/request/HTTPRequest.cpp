@@ -208,7 +208,7 @@ void HTTPRequest::handleGet() {
     std::map<std::string, Route>::const_iterator it_route = routes.find(getPath());
     std::string pathToSearch;
     Route route;
-    std::cout << "GET method" << std::endl;
+    std::cout << "GET method: " << getPath() << std::endl;
     if(it_route == routes.end()) {
         // std::cout << "route not found: " <<  << std::endl;
         // route.setRootDir("home/simo/cursus/webserv/www/html");

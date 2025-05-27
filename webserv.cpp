@@ -17,7 +17,7 @@ int main() {
     mocker(config);
     // printConfig(config);
 
-    std::fstream file("./tests/test_js.txt"); 
+    std::fstream file("./tests/mock_req2.txt"); 
     if(!file) {
         std::cout << "file not found" << std::endl;
         return 0;

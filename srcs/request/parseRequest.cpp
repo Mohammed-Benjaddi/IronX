@@ -17,12 +17,14 @@ int checkAllowedMethods(HTTPRequest &request) {
     if(allowedMethod.find(request.getMethod()) == allowedMethod.end()) {
         request.setStatusCode(405);
         request.setStatusMessage("Method Not Allowed");
+        request.setPath("errors/405.html");
         return -1;
     }
   } else {
     std::cout << "+++ location not found" << std::endl;
     request.setStatusCode(404);
     request.setStatusMessage("Not Found");
+    request.setPath("errors/404.html");
     return -1;
   }
 
@@ -67,6 +69,7 @@ int parse( HTTPRequest &request, const std::string &raw_request) {
   // if(ss.str().length() > request.getConfig()->getMaxBodySize()) {
   //     request.setStatusCode(413);
   //     request.setStatusMessage("Request Entity Too Large");
+        // request.setPath("errors/413.html");
   //     return -1;
   // }
   std::getline(ss, line);
@@ -74,6 +77,7 @@ int parse( HTTPRequest &request, const std::string &raw_request) {
   while (std::getline(ss, line)) {
     request.setHeaders(line);
   }
+
   return 1;
 }
 
@@ -82,12 +86,14 @@ bool checkRequestURI(HTTPRequest &request, std::string uri) {
   if(URIHasUnallowedChar(uri)) {
       request.setStatusCode(400);
       request.setStatusMessage("Bad request");
+      request.setPath("errors/400.html");
       return false;
   }
   // 414 Request-URI Too Long
   if(uri.length() > 2048) {
       request.setStatusCode(414);
       request.setStatusMessage("Request-URI Too Long");
+      request.setPath("errors/414.html");
       return false;
   }
   return true;
@@ -107,8 +113,12 @@ void find_method_uri(HTTPRequest &request, const std::string &line) {
       request.setQuery(uri.substr(queryPos + 1));
       request.setPath(uri.substr(0, queryPos));
   }
-  if(uri[uri.length() - 1] == '/')
+  if(uri[uri.length() - 1] == '/') {
     uri = uri.substr(0, uri.length() - 1);
+    std::cout << "new path ==> " << (uri.empty() ? "only slash" : uri) << std::endl;
+    // std::cout << "|" << uri << "|" << std::endl;
+    uri = "/";
+  }
   request.setMethod(method);
   request.setPath(uri);
   request.setHTTPVersion(httpVersion);
