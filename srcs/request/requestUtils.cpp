@@ -120,7 +120,7 @@ void fileHasNoCGI(HTTPRequest &request, Route &route, std::string &file_name) {
 void directoryHasIndexFiles(HTTPRequest &request, Route &route, std::vector<std::string> index_files) {
     std::cout << "index files: " << std::endl;
     for(size_t i = 0; i < index_files.size(); i++) {
-        std::cout << "index file #" << i << " --> " << route.getRootDir() + "/" + request.getPath() + "/" +  index_files[i] << std::endl;
+        std::cout << "index file #" << i << " --> " << route.getRootDir() + request.getPath() +  index_files[i] << std::endl;
         std::string path = "/" + route.getRootDir() + request.getPath() + "/" + index_files[i];
 
         // std::cout << "route dir ----> " <<route.getRootDir()  << std::endl;

@@ -200,6 +200,7 @@ void HTTPRequest::executeCGI(Route &route) {
         std::cout << "a file must be deleted" << std::endl;
         deleteRequestedFile(*this, "/" + route.getRootDir() + getPath(), "");
     }
+    
 }
 
 void HTTPRequest::handleGet() {
