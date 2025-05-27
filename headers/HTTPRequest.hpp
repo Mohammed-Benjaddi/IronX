@@ -18,19 +18,7 @@
 #include <filesystem>
 #include <cstring>
 
-class HTTPRequest : public IHTTPMessage {
-private:
-    std::map<std::string, std::string> headers;
-    WebServerConfig *config;
-    HTTPResponse*   _response;
-    std::string     method;
-    std::string     path;
-    std::string     httpVersion;
-    std::string     rootDir;
-    std::string     body;
-    std::string     query;
-    std::string     fileContent;
-    int             clientId;
+
 typedef struct sFormFile {
     std::string name;
     std::string filename;
@@ -68,7 +56,6 @@ public:
     void setQuery(const std::string& query);
     void setFileContent(const std::string& fileContent);
     void setClientId(int _clientId);
-    void setRootDir(const std::string rootDir);
 
     void setBodyFound(bool b);
     void setFormFile(std::vector<FormFile>& formFiles);
@@ -90,10 +77,7 @@ public:
     std::string getRootDir() const;
     
 
-    virtual std::vector<uint8_t> to_bytes() const;
-
     std::string getBoundary() const;
-    std::string getRootDir() const;
     bool isBodyFound() const;
     std::vector<FormFile> &getFormFiles();
     std::string getFileExtension();

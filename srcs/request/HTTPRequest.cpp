@@ -233,6 +233,7 @@ void HTTPRequest::handleGet() {
     }
     else
         pathIsFile(*this, routes, route);
+    }
 }
 
 void HTTPRequest::handleDELETE() {
