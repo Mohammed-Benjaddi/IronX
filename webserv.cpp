@@ -5,6 +5,8 @@
 #include "headers/Multiplexer.hpp"
 #include "mocker.hpp"
 
+#include <sstream>
+
 int main() {
     WebServerConfig config;
 
@@ -15,20 +17,31 @@ int main() {
     mocker(config);
     // printConfig(config);
 
-    // std::fstream file("./tests/delete_req.txt");    
-    // HTTPRequest request(file, config, 0);
-
-    ServerLauncher  launcher;
-
-    try {
-            launcher.launch(config);
-            Multiplexer     mux(launcher.getSockets(), config);
-            mux.run();
-    } catch (const std::exception &e) {
-            std::cerr << "Error Launching Server: " << e.what() << std::endl;
+    std::fstream file("./tests/mock_req2.txt"); 
+    if(!file) {
+        std::cout << "file not found" << std::endl;
+        return 0;
     }
+    std::stringstream ss;
 
-    return (0);
+    ss << file.rdbuf();
+
+    // std::cout << "str ===> " << ss.str() << std::endl;
+
+    const std::string raw_request = ss.str();
+    HTTPRequest request(raw_request, &config, 0);
+
+//     ServerLauncher  launcher;
+
+//     try {
+//             launcher.launch(config);
+//             Multiplexer     mux(launcher.getSockets(), config);
+//             mux.run();
+//     } catch (const std::exception &e) {
+//             std::cerr << "Error Launching Server: " << e.what() << std::endl;
+//     }
+
+//     return (0);
 }
 
 

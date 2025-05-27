@@ -16,6 +16,13 @@
 #include <filesystem>
 #include <cstring>
 
+typedef struct sFormFile {
+    std::string name;
+    std::string filename;
+    std::string contentType;
+    std::vector<char> data;
+} FormFile;
+
 class HTTPRequest : public IHTTPMessage {
 private:
     WebServerConfig *config;
@@ -27,6 +34,11 @@ private:
     std::string query;
     int clientId;
     std::string fileContent;
+    bool bodyFound;
+    std::string rootDir;
+    std::vector<FormFile> formFiles;
+    std::string fileExtension;
+
 public:
     HTTPRequest(const std::string &raw_request, WebServerConfig *config, int clientId);
     ~HTTPRequest();
@@ -41,7 +53,11 @@ public:
     void setQuery(const std::string& query);
     void setFileContent(const std::string& fileContent);
     void setClientId(int _clientId);
-
+    void setBodyFound(bool b);
+    void setFormFile(std::vector<FormFile>& formFiles);
+    void setRootDir(std::string rootDor);
+    void setFileExtension(const std::string& path);
+    
     // Getters
     WebServerConfig *getConfig() const;
     std::string getMethod() const;
@@ -54,8 +70,14 @@ public:
     std::string getQuery() const;
     std::string getFileContent() const;
     int getClientId() const;
+    std::string getBoundary() const;
+    std::string getRootDir() const;
+    bool isBodyFound() const;
+    std::vector<FormFile> &getFormFiles();
+    std::string getFileExtension();
 
     virtual std::vector<uint8_t> to_bytes() const;
+
 
     void handleRequest();
     void handleGet();
