@@ -6,16 +6,12 @@
 #include "ServerSocket.hpp"
 #include "Connection.hpp"
 
-
-
-
 class   Multiplexer {
     private:
     //* Connected Clients (starting empty)
-        std::map<int, Connection> activeConnections;
+        std::map<int, Connection> activeConnections; 
     //* Listening Sockets
         std::vector<ServerSocket> serverSockets;
-    //* supported mime types
         int epoll_fd;
         WebServerConfig& _config;
     public:
@@ -32,6 +28,9 @@ class   Multiplexer {
         int     accept_new_client(int);
         void    make_fd_non_blocking(int);
         void    add_fd_to_epoll(int, uint32_t);
+            int     accept_new_client(int);
+            void    make_fd_non_blocking(int);
+            void    add_fd_to_epoll(int, uint32_t);
         void    handle_client_event(int, uint32_t);
         void    close_connection(int);
         class ClientDisconnectedException : public std::exception {

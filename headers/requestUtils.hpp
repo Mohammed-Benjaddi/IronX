@@ -21,3 +21,4 @@ void pathIsFile(HTTPRequest &request, std::map<std::string, Route> &routes, Rout
 void autoIndexOfDirectory(Route &route);
 bool isDirectoryEmpty(std::string path);
 void deleteRequestedFile(HTTPRequest &request, std::string path, std::string filename);
+void uploadFiles(HTTPRequest &request);

@@ -6,8 +6,3 @@ Postman-Token: 53fc53bc-f4e1-46df-915c-45f3dfa95f9a
 Host: 10.11.2.7:8088
 Accept-Encoding: gzip, deflate, br
 Connection: keep-alive
-
-------
-[binary]
-------
-

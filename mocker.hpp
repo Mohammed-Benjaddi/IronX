@@ -206,7 +206,7 @@ void mocker(WebServerConfig &wsc) {
     server2.setHost("127.0.0.1");
     
     std::vector<uint16_t> ports2;
-    ports2.push_back(8893);
+    ports2.push_back(8888);
     server2.setPorts(ports2);
     
     std::vector<std::string> hostnames2;
@@ -252,4 +252,3 @@ void mocker(WebServerConfig &wsc) {
     clusters.push_back(server2);
     wsc.setClusters(clusters);
 }
-
