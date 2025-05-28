@@ -187,27 +187,28 @@ std::string HTTPRequest::getFileExtension() {
 void HTTPRequest::handleRequest() {
     setFileExtension(getPath());
     std::cout << "file ===> " << getFileExtension() << std::endl;
-    if(getMethod() == "GET") {
+    std::cout << " ============== New GET ================" << std::endl;
+    if (getMethod() == "GET") {
         handleGet();
-        std::cout << "full path ===> " << getRootDir() + getPath() << std::endl;
-        if (getPath() == "/") {
-            std::cout << "path is root" << std::endl;
-            setPath("index.html");
-        }
-        HTTPResponse response(getHeader("Connection"), getRootDir() + getPath());
+        // if (getPath() == "/") {
+        //     std::cout << "path is root" << std::endl;
+        //     setPath("index.html");
+        // // } else if (getFileExtension() == "html") {
+        // //     setPath("html/" + getPath());
+        // }
     }
-    else if(getMethod() == "POST")
+    else if (getMethod() == "POST")
         handlePOST();
-    else if(getMethod() == "DELETE")
+    else if (getMethod() == "DELETE")
         handleDELETE();
+    std::cout << "full path ===> " << getRootDir() + getPath() << std::endl;
 }
 
 void HTTPRequest::executeCGI(Route &route) {
-    if(getMethod() == "DELETE") {
+    if (getMethod() == "DELETE") {
         std::cout << "a file must be deleted" << std::endl;
         deleteRequestedFile(*this, "/" + route.getRootDir() + getPath(), "");
     }
-    
 }
 
 void HTTPRequest::handleGet() {
@@ -227,14 +228,14 @@ void HTTPRequest::handleGet() {
     if (isDirExist(getPath(), route.getRootDir())) {
     Route route;
     std::cout << "GET method: " << getPath() << std::endl;
-    if(it_route == routes.end()) {
+    if (it_route == routes.end()) {
         // std::cout << "route not found: " <<  << std::endl;
         // route.setRootDir("home/simo/cursus/webserv/www/html");
         route.setRootDir(getRootDir());
         route.setAutoindex(false);
     } else
         copyToRoute(route, it_route);
-    if(isDirExist(getPath(), route.getRootDir())) {
+    if (isDirExist(getPath(), route.getRootDir())) {
         std::cout << "-------> it is a directoty" << std::endl;
         pathIsDirectory(*this, routes, route, getPath());
     }

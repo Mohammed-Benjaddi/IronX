@@ -5,6 +5,7 @@
 #include "../headers/WebServerConfig.hpp"
 #include "../headers/FileStreamer.hpp"
 #include "../headers/HTTPResponse.hpp"
+#include "../headers/HTTPRequest.hpp"
 
 class Connection {
     public:
@@ -30,5 +31,6 @@ class Connection {
         WebServerConfig *_config;
         FileStreamer    *_streamer;
         HTTPResponse    *_httpResponse;
+        HTTPRequest     *_httpRequest;
         // Connection& operator=(const Connection& other);
 };

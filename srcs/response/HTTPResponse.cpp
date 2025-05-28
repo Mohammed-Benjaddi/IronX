@@ -1,11 +1,11 @@
 #include "../../headers/HTTPResponse.hpp"
 
 
-HTTPResponse::HTTPResponse(std::string connection, std::string path)
-	: _connection(connection), _headersSent(false), _complete(false) {
+HTTPResponse::HTTPResponse(HTTPRequest* request)
+	: _connection("keep-alive"), _headersSent(false), _complete(false) {
     std::cout << "Response Started\n";
-    std::cout << "Response Path: " <<   path << std::endl;
-    _streamer = new FileStreamer(path, connection);
+    std::cout << "Response Path: " << request->getRootDir() << request->getPath() << std::endl;
+    _streamer = new FileStreamer(request->getRootDir() + request->getPath(), _connection);
     _mimeType = getMimeType(_streamer->getPath());
     this->prepareHeaders();
 };
@@ -44,7 +44,7 @@ std::string HTTPResponse::getMimeType(const std::string& path) {
 
 void    HTTPResponse::prepareHeaders() {
     std::ostringstream oss;
-    
+
     oss << "HTTP/1.1 200 OK\r\n";
     oss << "Content-Type: " << _mimeType << "\r\n";
     oss << "Content-Length: " << _streamer->getFileSize() << "\r\n";

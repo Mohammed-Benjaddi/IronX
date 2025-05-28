@@ -6,10 +6,12 @@
 
 class FileStreamer;
 
+class HTTPRequest;
+
 //? Would build HTTP Request
 class HTTPResponse {
     public:
-        HTTPResponse(std::string connection, std::string path);
+        HTTPResponse(HTTPRequest* request);
         std::string	getNextChunk();
         bool		isComplete() const;
         void		prepareHeaders();

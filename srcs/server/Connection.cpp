@@ -44,17 +44,14 @@ void Connection::handleRead() {
         }
     }
 
-    // std::cout << _readBuffer << std::endl;
-
     //!  Merge Point Multiplexer <-> Request Branches   */
-    HTTPRequest request(_readBuffer, _config, 0);
-    
-    std::string fullPath = request.getRootDir() + request.getPath();
 
-    _streamer = new FileStreamer(fullPath, request.getHeader("Connection"));
-    _httpResponse = new HTTPResponse(request.getHeader("Connection"), fullPath);
+    _httpRequest = new HTTPRequest(_readBuffer, _config, 0);
+
+    _httpResponse = new HTTPResponse(_httpRequest);
 
     //? build new epoll event modufying existing one
+
     re_armFd();
 }
 

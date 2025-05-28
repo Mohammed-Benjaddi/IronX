@@ -109,7 +109,7 @@ void fileHasNoCGI(HTTPRequest &request, Route &route, std::string &file_name) {
     std::string filePath = ("/" + route.getRootDir() + request.getPath() + file_name);
     if(request.getMethod() == "GET") {
         GETReadFileContent(request, filePath);
-        std::cout << "file content: " << request.getFileContent() << std::endl;
+        // std::cout << "file content: " << request.getFileContent() << std::endl;
     }
     else if(request.getMethod() == "DELETE") {
         std::cout << "a file must be deleted" << std::endl;
@@ -135,6 +135,8 @@ void directoryHasIndexFiles(HTTPRequest &request, Route &route, std::vector<std:
                 // file does not have CGI
                 // should return the requested file 200 OK
                 std::string filename = "/" + index_files[i];
+                std::cout << "indexfile " << index_files[i] << std::endl;
+                request.setPath(index_files[i]);
                 request.setFileExtension(filename);
                 fileHasNoCGI(request, route, filename);
                 return;
@@ -208,8 +210,11 @@ void pathIsDirectory(HTTPRequest &request, std::map<std::string, Route> &routes,
             request.handleRequest();
             return;
         }
-        if(index_files.size() == 0)
+        if(index_files.size() == 0) {
+            // std::cout << "==========================" << std::endl;
+            // exit(0);
             directoryHasNoIndexFiles(request, route);
+        }
         else
             directoryHasIndexFiles(request, route, index_files);
         closedir(dir);
