@@ -3,6 +3,7 @@
 
 int checkAllowedMethods(HTTPRequest &request) {
   const std::map<std::string, Route>& routes = request.getConfig()->getClusters()[request.getClientId()].getRoutes();
+  // std::cout << "req ---> " << request.getRootDir() + request.getPath() << std::endl;
   std::map<std::string, Route>::const_iterator route_it = routes.find(request.getPath());
   if(route_it != routes.end()) {
     const std::set<std::string> &allowedMethod  = route_it->second.getAllowedMethods();
@@ -17,15 +18,15 @@ int checkAllowedMethods(HTTPRequest &request) {
     if(allowedMethod.find(request.getMethod()) == allowedMethod.end()) {
         request.setStatusCode(405);
         request.setStatusMessage("Method Not Allowed");
-        request.setPath("errors/405.html");
+        request.setPath("/errors/405.html");
         return -1;
     }
   } else {
-    std::cout << "+++ location not found" << std::endl;
-    request.setStatusCode(404);
-    request.setStatusMessage("Not Found");
-    request.setPath("errors/404.html");
-    return -1;
+    // std::cout << "+++ location not found" << std::endl;
+    // request.setStatusCode(404);
+    // request.setStatusMessage("Not Found");
+    // request.setPath("/errors/404.html");
+    // return -1;
   }
 
   return 1;
@@ -52,16 +53,15 @@ bool URIHasUnallowedChar(std::string uri) {
   return false;
 }
 
-#include <unistd.h>
-#include <string>
-
 int parse( HTTPRequest &request, const std::string &raw_request) {
   std::string line;
   std::stringstream ss(raw_request);
   char buffer[BUFSIZ];
 
-  if (getcwd(buffer, sizeof(buffer)) != NULL)
-      request.setRootDir(std::string(buffer) + "/www/");
+  if (getcwd(buffer, sizeof(buffer)) != NULL) {
+    std::cout << "=====> " << std::string(buffer) << std::endl;
+    request.setRootDir(std::string(buffer) + "/www");
+  }
   else
       request.setRootDir("");
 
@@ -69,7 +69,7 @@ int parse( HTTPRequest &request, const std::string &raw_request) {
   // if(ss.str().length() > request.getConfig()->getMaxBodySize()) {
   //     request.setStatusCode(413);
   //     request.setStatusMessage("Request Entity Too Large");
-        // request.setPath("errors/413.html");
+        // request.setPath("/errors/413.html");
   //     return -1;
   // }
   std::getline(ss, line);
@@ -86,14 +86,14 @@ bool checkRequestURI(HTTPRequest &request, std::string uri) {
   if(URIHasUnallowedChar(uri)) {
       request.setStatusCode(400);
       request.setStatusMessage("Bad request");
-      request.setPath("errors/400.html");
+      request.setPath("/errors/400.html");
       return false;
   }
   // 414 Request-URI Too Long
   if(uri.length() > 2048) {
       request.setStatusCode(414);
       request.setStatusMessage("Request-URI Too Long");
-      request.setPath("errors/414.html");
+      request.setPath("/errors/414.html");
       return false;
   }
   return true;
@@ -108,16 +108,23 @@ void find_method_uri(HTTPRequest &request, const std::string &line) {
     std::cout << "URI is not correct" << std::endl;
     return;
   }
+  request.setLocation(uri);
+
+  std::cout << "uri ---> " << uri << " | " << request.getLocation() << std::endl;
+  // exit(0);
+  
   size_t queryPos = uri.find('?');
   if (queryPos != std::string::npos) {
       request.setQuery(uri.substr(queryPos + 1));
       request.setPath(uri.substr(0, queryPos));
   }
-  if(uri[uri.length() - 1] == '/') {
+  if(uri[uri.length() - 1] == '/' && uri.size() == 1) {
     uri = uri.substr(0, uri.length() - 1);
     std::cout << "new path ==> " << (uri.empty() ? "only slash" : uri) << std::endl;
-    // std::cout << "|" << uri << "|" << std::endl;
+    std::cout << "|" << uri << "|" << std::endl;
     uri = "/";
+  } else {
+    uri = uri.substr(1);
   }
   request.setMethod(method);
   request.setPath(uri);
@@ -280,4 +287,25 @@ std::vector<FormFile> parseMultipartFormData(const std::string &body, const std:
     // }
 
     return files;
+}
+
+std::string extractDirectory(const std::string& location) {
+    if (location.empty()) {
+        return "";
+    }
+    if (location == "/") {
+        return "/";
+    }
+    size_t lastSlash = location.rfind('/');
+    if (lastSlash == 0) {
+        return location;
+    }
+    if (lastSlash == location.length() - 1) {
+        std::string trimmed = location;
+        while (!trimmed.empty() && trimmed[trimmed.length() - 1] == '/') {
+            trimmed.erase(trimmed.length() - 1);
+        }
+        return extractDirectory(trimmed);
+    }
+    return location.substr(0, lastSlash);
 }

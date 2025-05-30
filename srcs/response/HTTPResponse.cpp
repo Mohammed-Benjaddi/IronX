@@ -4,8 +4,8 @@
 HTTPResponse::HTTPResponse(HTTPRequest* request)
 	: _connection("keep-alive"), _headersSent(false), _complete(false) {
     std::cout << "Response Started\n";
-    std::cout << "Response Path: " << request->getRootDir() << request->getPath() << std::endl;
-    _streamer = new FileStreamer(request->getRootDir() + request->getPath(), _connection);
+    std::cout << "Response Path: " << request->getPath() << std::endl;
+    _streamer = new FileStreamer(request->getPath(), _connection);
     _mimeType = getMimeType(_streamer->getPath());
     this->prepareHeaders();
 };

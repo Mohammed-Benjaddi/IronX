@@ -1,9 +1,11 @@
 #include "requestUtils.hpp"
 // #include "HTTPRequest.hpp"
 
+
+// ! edit this shit
 bool isFileExist(const char* path) {
     struct stat buffer;
-    // printf("----> file to look for ---> %s\n", path);
+    printf("----> file to look for ---> %s\n", path);
     if (stat(path, &buffer) != 0) {
         return false;
     }
@@ -12,25 +14,26 @@ bool isFileExist(const char* path) {
 
 bool isDirExist(std::string path, std::string rootDir) {
     struct stat buffer;
-    std::string location = "/" + rootDir + path;
+    std::string location = rootDir + path;
+    std::cout << "path to search ----> " << location << std::endl;
+    
     if(location[location.length() - 1] == '/')
         location = location.substr(0, location.length() - 1);
-    std::cout << "path to search ----> " << location << std::endl;
     if (stat(location.c_str(), &buffer) != 0) {
         std::cout << "it is not a directory" << std::endl;
         return false;
     }
-    std::cout << "it is a directory" << std::endl;
-    return S_ISDIR(buffer.st_mode);
+    std::cout << "it is a file" << std::endl;
+    return true;
 }
 
 bool isDirectory(const std::string path, std::string rootDir) {
     DIR *dir;
     if(path[path.size() - 1] == '/')
         return true;
-    std::cout << "check path ---> " << ("/" + rootDir + path + "/") << std::endl;
-    if ((dir = opendir(("/" + rootDir + path + "/").c_str())) != NULL) {
-        std::cout << "I found a folder: " << "/" + rootDir + path + "/" << std::endl;
+    std::cout << "check path ---> " << (rootDir + "/" + path) << std::endl;
+    if ((dir = opendir((rootDir + "/" + path).c_str())) != NULL) {
+        std::cout << "I found a folder: " << rootDir + "/" + path << std::endl;
         closedir(dir);
         return true;
     }
@@ -71,17 +74,23 @@ void copyToRoute(Route &route, std::map<std::string, Route>::const_iterator &it)
 
 void GETReadFileContent(HTTPRequest &request, std::string path) {
     std::ifstream file(path.c_str());
+
     if(!file.is_open()) {
-        std::cout << "* could not open" << std::endl;
+        std::cout << "* could not open: " << path << std::endl;
         request.setStatusCode(403);
         request.setStatusMessage("Forbidden");
         request.setFileContent("");
-        request.setPath("errors/403.html");
+        request.setPath(request.getRootDir() + "/errors/403.html");
         return;
     }
+    // ! remove it later;
+    std::cout << "file opened successfully: " << path << std::endl;
+    request.setPath(path);
+    // exit(0);
     std::stringstream ss;
     ss << file.rdbuf();
     request.setFileContent(ss.str());
+    file.close();
 } 
 
 void deleteRequestedFile(HTTPRequest &request, std::string path, std::string filename) {
@@ -92,7 +101,7 @@ void deleteRequestedFile(HTTPRequest &request, std::string path, std::string fil
         request.setStatusCode(403);
         request.setStatusMessage("Forbidden");
         request.setFileContent("");
-        request.setPath("errors/403.html");
+        request.setPath(request.getRootDir() + "/errors/403.html");
         return;
     }
     int result = remove((path).c_str());
@@ -106,9 +115,9 @@ void deleteRequestedFile(HTTPRequest &request, std::string path, std::string fil
 }
 
 void fileHasNoCGI(HTTPRequest &request, Route &route, std::string &file_name) {
-    std::string filePath = ("/" + route.getRootDir() + request.getPath() + file_name);
+    std::string filePath = (route.getRootDir() + "/" + file_name);
     if(request.getMethod() == "GET") {
-        GETReadFileContent(request, filePath);
+        GETReadFileContent(request, route.getRootDir() + "/" + request.getPath() + "/" + file_name);
         // std::cout << "file content: " << request.getFileContent() << std::endl;
     }
     else if(request.getMethod() == "DELETE") {
@@ -120,8 +129,11 @@ void fileHasNoCGI(HTTPRequest &request, Route &route, std::string &file_name) {
 void directoryHasIndexFiles(HTTPRequest &request, Route &route, std::vector<std::string> index_files) {
     std::cout << "index files: " << std::endl;
     for(size_t i = 0; i < index_files.size(); i++) {
-        std::cout << "index file #" << i << " --> " << route.getRootDir() + request.getPath() +  index_files[i] << std::endl;
-        std::string path = "/" + route.getRootDir() + request.getPath() + "/" + index_files[i];
+        std::cout << "|" << request.getPath() << "|" << std::endl; 
+        std::string path = route.getRootDir() + "/" + request.getPath() + "/" + index_files[i];
+
+        // std::cout << "index file #" << i << " --> " << route.getRootDir() + request.getPath() +  index_files[i] << std::endl;
+        std::cout << "index file #" << i << " --> " << path << std::endl;
 
         // std::cout << "route dir ----> " <<route.getRootDir()  << std::endl;
         // std::cout << "request path ----> " << request.getPath()  << std::endl;
@@ -135,8 +147,9 @@ void directoryHasIndexFiles(HTTPRequest &request, Route &route, std::vector<std:
                 // file does not have CGI
                 // should return the requested file 200 OK
                 std::string filename = "/" + index_files[i];
-                std::cout << "indexfile " << index_files[i] << std::endl;
-                request.setPath(index_files[i]);
+                std::cout << "indexfile " << route.getRootDir() + "/" + request.getPath() + "/" + index_files[i] << std::endl;
+
+                // request.setPath(index_files[i]);
                 request.setFileExtension(filename);
                 fileHasNoCGI(request, route, filename);
                 return;
@@ -147,20 +160,20 @@ void directoryHasIndexFiles(HTTPRequest &request, Route &route, std::vector<std:
     }
     request.setStatusCode(404);
     request.setStatusMessage("Not Found");
-    request.setPath("errors/404.html");
+    request.setPath(request.getRootDir() + "/errors/404.html");
 }
 
 void pathIsFile(HTTPRequest &request, std::map<std::string, Route> &routes, Route &route) {
     (void) routes;
     // std::cout << "path is file: " << route.getRootDir() << std::endl;
     std::string filePath = (route.getRootDir() + request.getPath());
-    // std::cout << " ********** " << filePath << "***********" << std::endl;
-    if(!isFileExist(filePath.c_str())) {
+    std::cout << " ********** " << filePath << "***********" << std::endl;
+    if(!isFileExist(("/" + filePath).c_str())) {
         std::cout << "* file not found" << std::endl;
         request.setStatusCode(404);
         request.setStatusMessage("Not Found");
         request.setFileContent("");
-        request.setPath("errors/404.html");
+        request.setPath(request.getRootDir() + "/errors/404.html");
         return;
     }
     if(isLocationHasCGI(filePath))
@@ -179,13 +192,13 @@ void DELETEDirectory(HTTPRequest &request, std::map<std::string, Route> &routes,
     if((dir = opendir(location.c_str())) == NULL) {
         request.setStatusCode(403);
         request.setStatusMessage("Forbidden");
-        request.setPath("errors/403.html");
+        request.setPath(request.getRootDir() + "/errors/403.html");
     } else {
         if(!isDirectoryEmpty(location)) {
             std::cout << "directory is not empty" << std::endl;
             request.setStatusCode(409);
             request.setStatusMessage("Conflict");
-            request.setPath("errors/409.html");
+            request.setPath(request.getRootDir() + "/errors/409.html");
         } else {
             int result = remove((location).c_str());
             if(!result)
@@ -199,9 +212,15 @@ void DELETEDirectory(HTTPRequest &request, std::map<std::string, Route> &routes,
 void pathIsDirectory(HTTPRequest &request, std::map<std::string, Route> &routes, Route &route, const std::string &_path) {
     (void) routes;
     DIR *dir;
-
-    if((dir = opendir(("/" + route.getRootDir() + _path).c_str())) != NULL) {
+    // std::cout << "_path: " << _path << std::endl;
+    // exit(0);
+    // if(_path == "/")
+    //     _path = " ";
+    std::cout << "simo ===> |" << route.getRootDir() << "|" << std::endl;
+    // std::cout << "simo ===> " << (route.getRootDir() + (_path == "/" ? "" : _path)) << std::endl;
+    if((dir = opendir((route.getRootDir() + "/" + (_path == "/" ? "" : _path)).c_str())) != NULL) {
         const std::vector<std::string> index_files = route.getIndexFiles();
+
         // if must be redirected
         if(!route.getRedirect().empty()) {
             std::cout << "redirection ---> " << route.getRedirect() << std::endl;
@@ -211,17 +230,18 @@ void pathIsDirectory(HTTPRequest &request, std::map<std::string, Route> &routes,
             return;
         }
         if(index_files.size() == 0) {
-            // std::cout << "==========================" << std::endl;
-            // exit(0);
+            std::cout << "==========================" << std::endl;
             directoryHasNoIndexFiles(request, route);
         }
-        else
+        else {
+            // exit(0);
             directoryHasIndexFiles(request, route, index_files);
+        }
         closedir(dir);
     } else {
         request.setStatusCode(404);
         request.setStatusMessage("Not Found");
-        request.setPath("errors/404.html");
+        request.setPath(request.getRootDir() + "/errors/404.html");
     }
 }
 
@@ -229,7 +249,7 @@ void directoryHasNoIndexFiles(HTTPRequest &request, Route &route) {
     if(!route.isAutoindex()) {
         request.setStatusCode(403);
         request.setStatusMessage("Forbidden");
-        request.setPath("errors/403.html");
+        request.setPath(request.getRootDir() + "/errors/403.html");
     } else
         autoIndexOfDirectory(route);
 }

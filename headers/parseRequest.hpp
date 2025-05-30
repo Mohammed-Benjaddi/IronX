@@ -13,3 +13,4 @@ bool checkRequestURI(HTTPRequest &request, std::string uri);
 void find_method_uri(HTTPRequest &request, const std::string &line);
 std::vector<FormFile> parseMultipartFormData(const std::string &body, const std::string &boundary);
 std::string trim(const std::string& str);
+std::string extractDirectory(const std::string& location);

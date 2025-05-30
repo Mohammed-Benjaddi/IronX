@@ -144,7 +144,14 @@ void mocker(WebServerConfig &wsc) {
 
     // Route 1: /
     Route route1;
-    route1.setRootDir("/home/nab/Desktop/webserve-42/www");
+    char buffer[BUFSIZ];
+    std::string path;
+    if (getcwd(buffer, sizeof(buffer)) != NULL)
+        path = std::string(buffer) + "/www";
+    else
+        path = "";
+    std::cout << "get----> " << route1.getRootDir() << std::endl;
+    route1.setRootDir(path);
     
     std::vector<std::string> indexFiles1;
     indexFiles1.push_back("index.html");
@@ -159,9 +166,10 @@ void mocker(WebServerConfig &wsc) {
 
     // Route 2: /cgi-bin
     Route route2;
-    route2.setRootDir("home/nab/Desktop/webserve-42/www");
+    route2.setRootDir(path);
     std::vector<std::string> _indexFiles;
-    _indexFiles.push_back("indx.html");
+    _indexFiles.push_back("index.html");
+    _indexFiles.push_back("index.php");
     route2.setIndexFiles(_indexFiles);
     std::set<std::string> methods2;
     methods2.insert("GET");
@@ -190,7 +198,7 @@ void mocker(WebServerConfig &wsc) {
 
     // Route 4: /old-site
     Route route4;
-    route4.setRedirect("/new-site");
+    route4.setRedirect("/nw-site");
     
     std::set<std::string> methods4;
     methods4.insert("GET");

@@ -44,6 +44,7 @@ private:
     std::string rootDir;
     std::vector<FormFile> formFiles;
     std::string fileExtension;
+    std::string location;
 
 public:
     HTTPRequest(const std::string &raw_request, WebServerConfig *config, int clientId);
@@ -64,7 +65,7 @@ public:
     void setFormFile(std::vector<FormFile>& formFiles);
     void setRootDir(std::string rootDor);
     void setFileExtension(const std::string& path);
-    
+    void setLocation(std::string& location);
     // Getters
     WebServerConfig *getConfig() const;
     std::string getMethod() const;
@@ -78,6 +79,7 @@ public:
     std::string getFileContent() const;
     int getClientId() const;
     std::string getRootDir() const;
+    std::string getLocation() const;
 
     std::string getBoundary() const;
     bool isBodyFound() const;
