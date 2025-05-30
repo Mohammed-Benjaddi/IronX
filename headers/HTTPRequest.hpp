@@ -88,11 +88,12 @@ public:
 
     virtual std::vector<uint8_t> to_bytes() const;
 
+    void setRoutesInfo(std::map<std::string, Route> &routes, Route &route);
 
     void handleRequest();
-    void handleGet();
+    void handleGet(std::map<std::string, Route> &routes, Route &route);
     void handlePOST();
-    void handleDELETE();
+    void handleDELETE(std::map<std::string, Route> &routes, Route &route);
 
     void executeCGI(Route &route);
 };

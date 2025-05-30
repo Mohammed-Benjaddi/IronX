@@ -1,11 +1,10 @@
 #include "HTTPRequest.hpp"
 
 HTTPRequest::HTTPRequest(const std::string &raw_request, WebServerConfig *_config, int _clientId) : IHTTPMessage(), config(_config), clientId(_clientId) {
-    parse(*this, raw_request);
-    std::cout << "-------------------------------> " << std::endl;
-    std::cout << getRootDir() + getPath() << std::endl;
-    std::cout << "-------------------------------> " << std::endl;
-    checkAllowedMethods(*this);
+    if(parse(*this, raw_request) == -1)
+        return;
+    if(checkAllowedMethods(*this) == -1)
+        return;
     handleRequest();
 }
 
@@ -194,24 +193,32 @@ std::string HTTPRequest::getFileExtension() {
     return fileExtension;
 }
 
+void HTTPRequest::setRoutesInfo(std::map<std::string, Route> &routes, Route &route) {
+    routes = config->getClusters()[clientId].getRoutes();
+    std::map<std::string, Route>::const_iterator it_route = routes.find(getLocation());
+    if (it_route == routes.end()) {
+        char buffer[BUFSIZ];
+        if (getcwd(buffer, sizeof(buffer)) != NULL)
+            route.setRootDir(getRootDir());
+        else
+            route.setRootDir("");
+        route.setAutoindex(false);
+    } else
+        copyToRoute(route, it_route);
+}
+
 void HTTPRequest::handleRequest() {
+    Route route;
+    std::map<std::string, Route> routes;
+
+    setRoutesInfo(routes, route);
     setFileExtension(getPath());
-    std::cout << "file ===> " << getFileExtension() << std::endl;
-    std::cout << " ============== New GET ================" << std::endl;
-    std::cout << "method ====> " << getMethod() << std::endl;
-    if (getMethod() == "GET") {
-        handleGet();
-        // if (getPath() == "/") {
-        //     std::cout << "path is root" << std::endl;
-        //     setPath("index.html");
-        // // } else if (getFileExtension() == "html") {
-        // //     setPath("html/" + getPath());
-        // }
-    }
+    if (getMethod() == "GET")
+        handleGet(routes, route);
     else if (getMethod() == "POST")
         handlePOST();
     else if (getMethod() == "DELETE")
-        handleDELETE();
+        handleDELETE(routes, route);
     std::cout << "full path ===> " << getRootDir() + getPath() << std::endl;
 }
 
@@ -222,56 +229,14 @@ void HTTPRequest::executeCGI(Route &route) {
     }
 }
 
-void HTTPRequest::handleGet() {
-    std::map<std::string, Route> routes = config->getClusters()[clientId].getRoutes();
-    std::cout << "getPath ++++ " << getPath() << std::endl;
-    std::map<std::string, Route>::const_iterator it_route = routes.find(getLocation());
-    std::string pathToSearch;
-
-    Route route;
-
-    std::cout << "GET method" << std::endl;
-    if (it_route == routes.end()) {
-        std::cout << "getPath ===> " << getPath() << std::endl;
-        // exit(0);
-        char buffer[BUFSIZ];
-        // ! remove it
-        if (getcwd(buffer, sizeof(buffer)) != NULL) {
-            route.setRootDir("home/simo/cursus/webserv/www");
-        }
-        else
-            route.setRootDir("");
-        route.setAutoindex(false);
-    } else
-        copyToRoute(route, it_route);
-    std::cout << "GET method: " << getPath() << std::endl;
-    // if (isDirExist(getPath(), route.getRootDir())) {
-    if (isDirectory(getPath(), route.getRootDir())) {
-        std::cout << "-------> it is a directoty: " << route.getRootDir() + getPath() << std::endl;
-        // exit(0);
+void HTTPRequest::handleGet(std::map<std::string, Route> &routes, Route &route) {
+    if (isDirectory(getPath(), route.getRootDir()))
         pathIsDirectory(*this, routes, route, getPath());
-    }
-    else {
-        // exit(0);
-        std::cout << "-------> it is a file" << std::endl;
+    else
         pathIsFile(*this, routes, route);
-    }
-    // }
 }
 
-void HTTPRequest::handleDELETE() {
-    std::cout << "DELETE method" << std::endl;
-    std::map<std::string, Route> routes = config->getClusters()[clientId].getRoutes();
-
-    std::map<std::string, Route>::const_iterator it_route = routes.find(getPath());
-    std::cout << "* it route ---> " << getPath() << std::endl;
-    std::string pathToSearch;
-    Route route;
-    if(it_route == routes.end()) {
-        route.setRootDir("home/simo/cursus/webserv/www");
-        route.setAutoindex(false);
-    } else
-        copyToRoute(route, it_route);
+void HTTPRequest::handleDELETE(std::map<std::string, Route> &routes, Route &route) {
     if(isDirExist(getPath(), route.getRootDir())) {
         std::cout << "path is directory" << std::endl;
         DELETEDirectory(*this, routes, route, getPath());

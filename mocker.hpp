@@ -172,6 +172,7 @@ void mocker(WebServerConfig &wsc) {
     _indexFiles.push_back("index.php");
     route2.setIndexFiles(_indexFiles);
     std::set<std::string> methods2;
+    route2.setAutoindex(true);
     methods2.insert("GET");
     methods2.insert("POST");
     route2.setAllowedMethods(methods2);

@@ -2,14 +2,20 @@
 // #include "HTTPRequest.hpp"
 
 
-// ! edit this shit
+// ! edit this
 bool isFileExist(const char* path) {
-    struct stat buffer;
-    printf("----> file to look for ---> %s\n", path);
-    if (stat(path, &buffer) != 0) {
-        return false;
+    // struct stat buffer;
+    // printf("----> file to look for ---> %s\n", path);
+    // if (stat(path, &buffer) != 0) {
+    //     return false;
+    // }
+    // return S_ISREG(buffer.st_mode);
+    std::ifstream file(path);
+    if(file.is_open()) {
+        file.close();
+        return true;
     }
-    return S_ISREG(buffer.st_mode);
+    return false;
 }
 
 bool isDirExist(std::string path, std::string rootDir) {
@@ -29,8 +35,9 @@ bool isDirExist(std::string path, std::string rootDir) {
 
 bool isDirectory(const std::string path, std::string rootDir) {
     DIR *dir;
-    if(path[path.size() - 1] == '/')
-        return true;
+    // ! watch this
+    // if(path[path.size() - 1] == '/')
+    //     return true;
     std::cout << "check path ---> " << (rootDir + "/" + path) << std::endl;
     if ((dir = opendir((rootDir + "/" + path).c_str())) != NULL) {
         std::cout << "I found a folder: " << rootDir + "/" + path << std::endl;
@@ -73,6 +80,8 @@ void copyToRoute(Route &route, std::map<std::string, Route>::const_iterator &it)
 }
 
 void GETReadFileContent(HTTPRequest &request, std::string path) {
+    // ! edit this
+    // std::ifstream file((path.substr(0, path.size() - 1)).c_str());
     std::ifstream file(path.c_str());
 
     if(!file.is_open()) {
@@ -115,9 +124,9 @@ void deleteRequestedFile(HTTPRequest &request, std::string path, std::string fil
 }
 
 void fileHasNoCGI(HTTPRequest &request, Route &route, std::string &file_name) {
-    std::string filePath = (route.getRootDir() + "/" + file_name);
+    std::string filePath = (route.getRootDir() + file_name);
     if(request.getMethod() == "GET") {
-        GETReadFileContent(request, route.getRootDir() + "/" + request.getPath() + "/" + file_name);
+        GETReadFileContent(request, route.getRootDir() + "/" + request.getPath() + file_name);
         // std::cout << "file content: " << request.getFileContent() << std::endl;
     }
     else if(request.getMethod() == "DELETE") {
@@ -147,7 +156,7 @@ void directoryHasIndexFiles(HTTPRequest &request, Route &route, std::vector<std:
                 // file does not have CGI
                 // should return the requested file 200 OK
                 std::string filename = "/" + index_files[i];
-                std::cout << "indexfile " << route.getRootDir() + "/" + request.getPath() + "/" + index_files[i] << std::endl;
+                std::cout << "indexfile " << route.getRootDir() + "/" + request.getPath() + filename << std::endl;
 
                 // request.setPath(index_files[i]);
                 request.setFileExtension(filename);
@@ -166,9 +175,9 @@ void directoryHasIndexFiles(HTTPRequest &request, Route &route, std::vector<std:
 void pathIsFile(HTTPRequest &request, std::map<std::string, Route> &routes, Route &route) {
     (void) routes;
     // std::cout << "path is file: " << route.getRootDir() << std::endl;
-    std::string filePath = (route.getRootDir() + request.getPath());
+    std::string filePath = (route.getRootDir() + "/" + request.getPath());
     std::cout << " ********** " << filePath << "***********" << std::endl;
-    if(!isFileExist(("/" + filePath).c_str())) {
+    if(!isFileExist((filePath).c_str())) {
         std::cout << "* file not found" << std::endl;
         request.setStatusCode(404);
         request.setStatusMessage("Not Found");
@@ -287,13 +296,13 @@ void autoIndexOfDirectory(Route &route) {
     for(size_t i = 0; i < 2; i++) {
         if(isFileExist((path + indexes[i]).c_str())) {
             std::cout << "file ----> " << path + indexes[i] << std::endl;
-            return;
+            // return;
         }
     }
     std::vector<std::string> entries = getDirectoryListing(path, false);
     std::cout << "route ===> " << route.getRootDir() << std::endl;
     for(size_t i = 0; i < entries.size(); i++) {
-        std::cout << "---> " << entries[i] << std::endl;
+        std::cout << "+++++ ---> " << entries[i] << std::endl;
     }
 }
 

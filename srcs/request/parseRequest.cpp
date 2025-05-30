@@ -18,14 +18,14 @@ int checkAllowedMethods(HTTPRequest &request) {
     if(allowedMethod.find(request.getMethod()) == allowedMethod.end()) {
         request.setStatusCode(405);
         request.setStatusMessage("Method Not Allowed");
-        request.setPath("/errors/405.html");
+        request.setPath(request.getRootDir() + "/errors/405.html");
         return -1;
     }
   } else {
     // std::cout << "+++ location not found" << std::endl;
     // request.setStatusCode(404);
     // request.setStatusMessage("Not Found");
-    // request.setPath("/errors/404.html");
+    // request.setPath(request.getRootDir() + "/errors/404.html");
     // return -1;
   }
 
@@ -69,11 +69,12 @@ int parse( HTTPRequest &request, const std::string &raw_request) {
   // if(ss.str().length() > request.getConfig()->getMaxBodySize()) {
   //     request.setStatusCode(413);
   //     request.setStatusMessage("Request Entity Too Large");
-        // request.setPath("/errors/413.html");
+        // request.setPath(request.getRootDir() + "/errors/413.html");
   //     return -1;
   // }
   std::getline(ss, line);
-  find_method_uri(request, line);
+  if(find_method_uri(request, line) == -1)
+    return -1;
   while (std::getline(ss, line)) {
     request.setHeaders(line);
   }
@@ -86,27 +87,27 @@ bool checkRequestURI(HTTPRequest &request, std::string uri) {
   if(URIHasUnallowedChar(uri)) {
       request.setStatusCode(400);
       request.setStatusMessage("Bad request");
-      request.setPath("/errors/400.html");
+      request.setPath(request.getRootDir() + "/errors/400.html");
       return false;
   }
   // 414 Request-URI Too Long
   if(uri.length() > 2048) {
       request.setStatusCode(414);
       request.setStatusMessage("Request-URI Too Long");
-      request.setPath("/errors/414.html");
+      request.setPath(request.getRootDir() + "/errors/414.html");
       return false;
   }
   return true;
 }
 
-void find_method_uri(HTTPRequest &request, const std::string &line) {
+int find_method_uri(HTTPRequest &request, const std::string &line) {
   std::stringstream sstream(line);
   std::cout << "line ===> " << line << std::endl;
   std::string method, uri, httpVersion;
   sstream >> method >> uri >> httpVersion;
   if(!checkRequestURI(request, uri)) {
     std::cout << "URI is not correct" << std::endl;
-    return;
+    return -1;
   }
   request.setLocation(uri);
 
@@ -124,11 +125,17 @@ void find_method_uri(HTTPRequest &request, const std::string &line) {
     std::cout << "|" << uri << "|" << std::endl;
     uri = "/";
   } else {
-    uri = uri.substr(1);
+    size_t size = uri.size() - 1;
+    if(uri[size] == '/')
+      size--;
+    uri = uri.substr(1, size);
+    std::cout << "uri +++ " << uri << std::endl;
+    // exit(0);
   }
   request.setMethod(method);
   request.setPath(uri);
   request.setHTTPVersion(httpVersion);
+  return 1;
 }
 
 std::vector<char> trim_crlf(const std::string &str) {
