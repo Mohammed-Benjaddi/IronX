@@ -221,10 +221,6 @@ void DELETEDirectory(HTTPRequest &request, std::map<std::string, Route> &routes,
 void pathIsDirectory(HTTPRequest &request, std::map<std::string, Route> &routes, Route &route, const std::string &_path) {
     (void) routes;
     DIR *dir;
-    // std::cout << "_path: " << _path << std::endl;
-    // exit(0);
-    // if(_path == "/")
-    //     _path = " ";
     std::cout << "simo ===> |" << route.getRootDir() << "|" << std::endl;
     // std::cout << "simo ===> " << (route.getRootDir() + (_path == "/" ? "" : _path)) << std::endl;
     if((dir = opendir((route.getRootDir() + "/" + (_path == "/" ? "" : _path)).c_str())) != NULL) {
@@ -243,7 +239,6 @@ void pathIsDirectory(HTTPRequest &request, std::map<std::string, Route> &routes,
             directoryHasNoIndexFiles(request, route);
         }
         else {
-            // exit(0);
             directoryHasIndexFiles(request, route, index_files);
         }
         closedir(dir);
@@ -259,8 +254,10 @@ void directoryHasNoIndexFiles(HTTPRequest &request, Route &route) {
         request.setStatusCode(403);
         request.setStatusMessage("Forbidden");
         request.setPath(request.getRootDir() + "/errors/403.html");
-    } else
+    } else {
+        exit(0);
         autoIndexOfDirectory(route);
+    }
 }
 
 std::vector<std::string> getDirectoryListing(const std::string& path, bool show_hidden) {
