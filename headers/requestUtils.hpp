@@ -18,7 +18,7 @@ void directoryHasNoIndexFiles(HTTPRequest &request, Route &route);
 std::vector<std::string> getDirectoryListing(const std::string& path, bool show_hidden);
 void pathIsDirectory(HTTPRequest &request, std::map<std::string, Route> &routes, Route &route, const std::string &_path);
 void pathIsFile(HTTPRequest &request, std::map<std::string, Route> &routes, Route &route);
-void autoIndexOfDirectory(Route &route);
+void autoIndexOfDirectory(Route &route, HTTPRequest &request);
 bool isDirectoryEmpty(std::string path);
 void deleteRequestedFile(HTTPRequest &request, std::string path, std::string filename);
 void uploadFiles(HTTPRequest &request);

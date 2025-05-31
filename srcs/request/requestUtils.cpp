@@ -255,8 +255,9 @@ void directoryHasNoIndexFiles(HTTPRequest &request, Route &route) {
         request.setStatusMessage("Forbidden");
         request.setPath(request.getRootDir() + "/errors/403.html");
     } else {
-        exit(0);
-        autoIndexOfDirectory(route);
+        // exit(0);
+        
+        autoIndexOfDirectory(route, request);
     }
 }
 
@@ -285,15 +286,22 @@ std::vector<std::string> getDirectoryListing(const std::string& path, bool show_
     return entries;
 }
 
-void autoIndexOfDirectory(Route &route) {
+void autoIndexOfDirectory(Route &route, HTTPRequest &request) {
     // search for index.html
+    
     std::cout << "start listing files" << std::endl;
     std::string indexes[2] = {"index.html", "index.htm"};
-    std::string path = route.getRootDir() + "/";
+    std::string path = route.getRootDir() + "/" + request.getPath() + "/";
+    std::cout << "path : " << path << std::endl;
+    // exit(0);
     for(size_t i = 0; i < 2; i++) {
+        std::cout << "---> " << path + indexes[i] << std::endl;
+        // exit(0);
         if(isFileExist((path + indexes[i]).c_str())) {
             std::cout << "file ----> " << path + indexes[i] << std::endl;
-            // return;
+            request.setPath(path + indexes[i]);
+            // exit(0);
+            return;
         }
     }
     std::vector<std::string> entries = getDirectoryListing(path, false);
