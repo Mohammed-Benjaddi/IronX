@@ -45,6 +45,7 @@ private:
     std::vector<FormFile> formFiles;
     std::string fileExtension;
     std::string location;
+    std::map<int, std::string> error_pages;
 
 public:
     HTTPRequest(const std::string &raw_request, WebServerConfig *config, int clientId);
@@ -66,6 +67,8 @@ public:
     void setRootDir(std::string rootDor);
     void setFileExtension(const std::string& path);
     void setLocation(std::string& location);
+    void setErrorPages(const std::map<int, std::string>& error_pages);
+
     // Getters
     WebServerConfig *getConfig() const;
     std::string getMethod() const;
@@ -80,7 +83,7 @@ public:
     int getClientId() const;
     std::string getRootDir() const;
     std::string getLocation() const;
-
+    std::string getErrorPages(int code) const;
     std::string getBoundary() const;
     bool isBodyFound() const;
     std::vector<FormFile> &getFormFiles();

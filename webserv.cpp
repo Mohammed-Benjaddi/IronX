@@ -15,6 +15,7 @@ int main() {
 
     //! Load Configuration
     mocker(config);
+
     // printConfig(config);
 
     // std::fstream file("./tests/mock_req2.txt"); 

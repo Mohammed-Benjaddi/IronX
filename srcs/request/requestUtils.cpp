@@ -65,12 +65,13 @@ bool isLocationHasCGI(std::string filepath) {
 void copyToRoute(Route &route, std::map<std::string, Route>::const_iterator &it) {
     route.setRootDir(it->second.getRootDir());
     route.setIndexFiles(it->second.getIndexFiles());
-
     std::set<std::string>::iterator iter = it->second.getAllowedMethods().begin();
+    //! edit this: status code must be 405 [Not allowed] if the route has not the request method
     while(iter != it->second.getAllowedMethods().end()) {
         std::cout << "method ----> " << *iter << std::endl;
         iter++;
     }
+    // exit(0);
 
     route.setAllowedMethods(it->second.getAllowedMethods());
     route.setAutoindex(it->second.isAutoindex());
@@ -89,7 +90,8 @@ void GETReadFileContent(HTTPRequest &request, std::string path) {
         request.setStatusCode(403);
         request.setStatusMessage("Forbidden");
         request.setFileContent("");
-        request.setPath(request.getRootDir() + "/errors/403.html");
+        // request.setPath(request.getRootDir() + "/errors/403.html");
+        request.setPath(request.getErrorPages(request.getStatusCode()));;
         return;
     }
     // ! remove it later;
@@ -110,7 +112,8 @@ void deleteRequestedFile(HTTPRequest &request, std::string path, std::string fil
         request.setStatusCode(403);
         request.setStatusMessage("Forbidden");
         request.setFileContent("");
-        request.setPath(request.getRootDir() + "/errors/403.html");
+        // request.setPath(request.getRootDir() + "/errors/403.html");
+        request.setPath(request.getErrorPages(request.getStatusCode()));;
         return;
     }
     int result = remove((path).c_str());
@@ -169,7 +172,8 @@ void directoryHasIndexFiles(HTTPRequest &request, Route &route, std::vector<std:
     }
     request.setStatusCode(404);
     request.setStatusMessage("Not Found");
-    request.setPath(request.getRootDir() + "/errors/404.html");
+    // request.setPath(request.getRootDir() + "/errors/404.html");
+    request.setPath(request.getErrorPages(request.getStatusCode()));;
 }
 
 void pathIsFile(HTTPRequest &request, std::map<std::string, Route> &routes, Route &route) {
@@ -182,7 +186,8 @@ void pathIsFile(HTTPRequest &request, std::map<std::string, Route> &routes, Rout
         request.setStatusCode(404);
         request.setStatusMessage("Not Found");
         request.setFileContent("");
-        request.setPath(request.getRootDir() + "/errors/404.html");
+        // request.setPath(request.getRootDir() + "/errors/404.html");
+        request.setPath(request.getErrorPages(request.getStatusCode()));;
         return;
     }
     if(isLocationHasCGI(filePath))
@@ -201,13 +206,15 @@ void DELETEDirectory(HTTPRequest &request, std::map<std::string, Route> &routes,
     if((dir = opendir(location.c_str())) == NULL) {
         request.setStatusCode(403);
         request.setStatusMessage("Forbidden");
-        request.setPath(request.getRootDir() + "/errors/403.html");
+        // request.setPath(request.getRootDir() + "/errors/403.html");
+        request.setPath(request.getErrorPages(request.getStatusCode()));;
     } else {
         if(!isDirectoryEmpty(location)) {
             std::cout << "directory is not empty" << std::endl;
             request.setStatusCode(409);
             request.setStatusMessage("Conflict");
-            request.setPath(request.getRootDir() + "/errors/409.html");
+            // request.setPath(request.getRootDir() + "/errors/409.html");
+            request.setPath(request.getErrorPages(request.getStatusCode()));;
         } else {
             int result = remove((location).c_str());
             if(!result)
@@ -245,7 +252,8 @@ void pathIsDirectory(HTTPRequest &request, std::map<std::string, Route> &routes,
     } else {
         request.setStatusCode(404);
         request.setStatusMessage("Not Found");
-        request.setPath(request.getRootDir() + "/errors/404.html");
+        // request.setPath(request.getRootDir() + "/errors/404.html");
+        request.setPath(request.getErrorPages(request.getStatusCode()));;
     }
 }
 
@@ -253,7 +261,8 @@ void directoryHasNoIndexFiles(HTTPRequest &request, Route &route) {
     if(!route.isAutoindex()) {
         request.setStatusCode(403);
         request.setStatusMessage("Forbidden");
-        request.setPath(request.getRootDir() + "/errors/403.html");
+        // request.setPath(request.getRootDir() + "/errors/403.html");
+        request.setPath(request.getErrorPages(request.getStatusCode()));;
     } else {
         // exit(0);
         

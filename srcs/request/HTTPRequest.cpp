@@ -77,6 +77,12 @@ void HTTPRequest::setFormFile(std::vector<FormFile> &formFiles) {
     this->formFiles = formFiles;
 }
 
+void HTTPRequest::setErrorPages(const std::map<int, std::string>& error_pages) {
+    this->error_pages = error_pages;
+}
+
+// ---------------------------------------------------
+
 WebServerConfig *HTTPRequest::getConfig() const {
     return config;
 }
@@ -155,7 +161,6 @@ void HTTPRequest::setRootDir(std::string rootDir) {
 }
 
 std::string HTTPRequest::getBoundary() const {
-
     std::string content_type = getHeader("Content-Type");
     int index = content_type.rfind("WebKitFormBoundary");
     // std::cout << "index ----> " << index << std::endl;
@@ -168,6 +173,13 @@ std::string HTTPRequest::getBoundary() const {
 std::vector<FormFile> &HTTPRequest::getFormFiles() {
     return formFiles;
 }
+
+std::string HTTPRequest::getErrorPages(int code) const {
+    if(error_pages.find(code) != error_pages.end())
+        return getRootDir() + error_pages.at(code);
+    return "***";
+}
+
 // Methods
 
 std::vector<uint8_t> HTTPRequest::to_bytes() const {
@@ -195,16 +207,19 @@ std::string HTTPRequest::getFileExtension() {
 
 void HTTPRequest::setRoutesInfo(std::map<std::string, Route> &routes, Route &route) {
     routes = config->getClusters()[clientId].getRoutes();
+    // std::cout << "location: " << (getLocation() == "/new-site" ? "yes" : "no") << std::endl;
+    std::cout << "* * * location: " << getLocation() << std::endl;
     std::map<std::string, Route>::const_iterator it_route = routes.find(getLocation());
-    if (it_route == routes.end()) {
-        char buffer[BUFSIZ];
-        if (getcwd(buffer, sizeof(buffer)) != NULL)
-            route.setRootDir(getRootDir());
-        else
-            route.setRootDir("");
-        route.setAutoindex(false);
-    } else
+    if (it_route == routes.end() && getLocation() != "/favicon.ico") {
+        setStatusCode(404);
+        setStatusMessage("Not Found");
+        setPath(getErrorPages(getStatusCode()));
+        std::cout << "waaaa3 ===> " << getLocation() << std::endl;
+        return;
+        
+    } else {
         copyToRoute(route, it_route);
+    }
 }
 
 void HTTPRequest::handleRequest() {
@@ -249,7 +264,7 @@ void HTTPRequest::handleDELETE(std::map<std::string, Route> &routes, Route &rout
 void HTTPRequest::handlePOST() {
     std::cout << "POST method" << std::endl;
     //! remove this later;
-    exit(0);
+    // exit(0);
     // std::vector<FormFile> formFiles = parseMultipartFormData(getBody(), getBoundary());
     std::vector<FormFile> formFiles = parseMultipartFormData(getBody(), getBoundary());
     setFormFile(formFiles);

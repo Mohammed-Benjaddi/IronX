@@ -18,7 +18,7 @@ int checkAllowedMethods(HTTPRequest &request) {
     if(allowedMethod.find(request.getMethod()) == allowedMethod.end()) {
         request.setStatusCode(405);
         request.setStatusMessage("Method Not Allowed");
-        request.setPath(request.getRootDir() + "/errors/405.html");
+        request.setPath(request.getErrorPages(request.getStatusCode()));;
         return -1;
     }
   } else {
@@ -58,6 +58,7 @@ int parse( HTTPRequest &request, const std::string &raw_request) {
   std::stringstream ss(raw_request);
   char buffer[BUFSIZ];
 
+  request.setErrorPages(request.getConfig()->getErrorPages());
   if (getcwd(buffer, sizeof(buffer)) != NULL) {
     std::cout << "=====> " << std::string(buffer) << std::endl;
     request.setRootDir(std::string(buffer) + "/www");
@@ -87,14 +88,15 @@ bool checkRequestURI(HTTPRequest &request, std::string uri) {
   if(URIHasUnallowedChar(uri)) {
       request.setStatusCode(400);
       request.setStatusMessage("Bad request");
-      request.setPath(request.getRootDir() + "/errors/400.html");
+      request.setPath(request.getErrorPages(400));
       return false;
   }
   // 414 Request-URI Too Long
   if(uri.length() > 2048) {
       request.setStatusCode(414);
       request.setStatusMessage("Request-URI Too Long");
-      request.setPath(request.getRootDir() + "/errors/414.html");
+      // request.setPath(request.getRootDir() + "/errors/414.html");
+      request.setPath(request.getErrorPages(request.getStatusCode()));;
       return false;
   }
   return true;
@@ -109,6 +111,7 @@ int find_method_uri(HTTPRequest &request, const std::string &line) {
     std::cout << "URI is not correct" << std::endl;
     return -1;
   }
+  
   request.setLocation(uri);
 
   std::cout << "uri ---> " << uri << " | " << request.getLocation() << std::endl;
@@ -305,7 +308,7 @@ std::string extractDirectory(const std::string& location) {
     }
     size_t lastSlash = location.rfind('/');
     if (lastSlash == 0) {
-        return location;
+        return "/";
     }
     if (lastSlash == location.length() - 1) {
         std::string trimmed = location;

@@ -21,6 +21,7 @@ void printConfig(const WebServerConfig& config) {
     }
     std::cout << "\n";
 
+    // exit(0);
     // Print clusters (servers)
     const std::vector<Cluster>& clusters = config.getClusters();
     for (size_t i = 0; i < clusters.size(); i++) {
@@ -105,7 +106,6 @@ void printConfig(const WebServerConfig& config) {
     }
 }
 
-
 #include <cstdlib>  // for rand() and srand()
 #include <ctime> 
 void mocker(WebServerConfig &wsc) {
@@ -116,7 +116,7 @@ void mocker(WebServerConfig &wsc) {
     std::map<int, std::string> error_pages;
     error_pages.insert(std::make_pair(400, "/errors/400.html"));
     error_pages.insert(std::make_pair(403, "/errors/403.html"));
-    error_pages.insert(std::make_pair(404, "/errors/404.html"));
+    // error_pages.insert(std::make_pair(404, "/errors/404.html"));
     error_pages.insert(std::make_pair(500, "/errors/500.html"));
     error_pages.insert(std::make_pair(503, "/errors/503.html"));
     wsc.setErrorPages(error_pages);
@@ -173,7 +173,7 @@ void mocker(WebServerConfig &wsc) {
     route2.setIndexFiles(_indexFiles);
     std::set<std::string> methods2;
     route2.setAutoindex(true);
-    methods2.insert("GET");
+    // methods2.insert("GET");
     methods2.insert("POST");
     route2.setAllowedMethods(methods2);
     
