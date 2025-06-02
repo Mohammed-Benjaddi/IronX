@@ -1,8 +1,10 @@
 #include "HTTPRequest.hpp"
 
 HTTPRequest::HTTPRequest(const std::string &raw_request, WebServerConfig *_config, int _clientId) : IHTTPMessage(), config(_config), clientId(_clientId) {
+    // std::cout << "raw \n" << raw_request << std::endl;
     if(parse(*this, raw_request) == -1)
         return;
+    // exit(0);
     if(checkAllowedMethods(*this) == -1)
         return;
     handleRequest();

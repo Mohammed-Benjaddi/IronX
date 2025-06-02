@@ -116,7 +116,7 @@ void mocker(WebServerConfig &wsc) {
     std::map<int, std::string> error_pages;
     error_pages.insert(std::make_pair(400, "/errors/400.html"));
     error_pages.insert(std::make_pair(403, "/errors/403.html"));
-    // error_pages.insert(std::make_pair(404, "/errors/404.html"));
+    error_pages.insert(std::make_pair(404, "/errors/404.html"));
     error_pages.insert(std::make_pair(500, "/errors/500.html"));
     error_pages.insert(std::make_pair(503, "/errors/503.html"));
     wsc.setErrorPages(error_pages);
@@ -168,9 +168,9 @@ void mocker(WebServerConfig &wsc) {
     Route route2;
     route2.setRootDir(path);
     std::vector<std::string> _indexFiles;
-    _indexFiles.push_back("index.html");
-    _indexFiles.push_back("index.php");
-    route2.setIndexFiles(_indexFiles);
+    // _indexFiles.push_back("index.html");
+    // _indexFiles.push_back("index.php");
+    // route2.setIndexFiles(_indexFiles);
     std::set<std::string> methods2;
     route2.setAutoindex(true);
     // methods2.insert("GET");

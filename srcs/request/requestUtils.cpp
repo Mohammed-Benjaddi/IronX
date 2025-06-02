@@ -4,18 +4,19 @@
 
 // ! edit this
 bool isFileExist(const char* path) {
-    // struct stat buffer;
-    // printf("----> file to look for ---> %s\n", path);
-    // if (stat(path, &buffer) != 0) {
-    //     return false;
-    // }
-    // return S_ISREG(buffer.st_mode);
-    std::ifstream file(path);
-    if(file.is_open()) {
-        file.close();
-        return true;
+    struct stat buffer;
+    printf("----> file to look for ---> %s\n", path);
+    if (stat(path, &buffer) != 0) {
+        return false;
     }
-    return false;
+    return true;
+    // return S_ISREG(buffer.st_mode);
+    // std::ifstream file(path);
+    // if(file.is_open()) {
+    //     file.close();
+    //     return true;
+    // }
+    // return false;
 }
 
 bool isDirExist(std::string path, std::string rootDir) {
@@ -48,7 +49,7 @@ bool isDirectory(const std::string path, std::string rootDir) {
 }
 
 bool isLocationHasCGI(std::string filepath) {
-    const char* cgi_extensions[] = {".py", ".php", ".js", NULL};
+    const char* cgi_extensions[] = {".py", ".php", NULL};
     size_t dot_pos = filepath.rfind('.');
     if (dot_pos == std::string::npos)
         return false;
@@ -160,7 +161,7 @@ void directoryHasIndexFiles(HTTPRequest &request, Route &route, std::vector<std:
                 // should return the requested file 200 OK
                 std::string filename = "/" + index_files[i];
                 std::cout << "indexfile " << route.getRootDir() + "/" + request.getPath() + filename << std::endl;
-
+                // request.setPath(path);
                 // request.setPath(index_files[i]);
                 request.setFileExtension(filename);
                 fileHasNoCGI(request, route, filename);
@@ -246,6 +247,10 @@ void pathIsDirectory(HTTPRequest &request, std::map<std::string, Route> &routes,
             directoryHasNoIndexFiles(request, route);
         }
         else {
+            // std::cout << "locatio"
+            for(size_t i = 0; i < index_files.size(); i++)
+                std::cout << "----> " << index_files[i] << std::endl;
+            // exit(0);
             directoryHasIndexFiles(request, route, index_files);
         }
         closedir(dir);
@@ -318,6 +323,10 @@ void autoIndexOfDirectory(Route &route, HTTPRequest &request) {
     for(size_t i = 0; i < entries.size(); i++) {
         std::cout << "+++++ ---> " << entries[i] << std::endl;
     }
+    std::cout << "path ---> " << path << std::endl;
+    request.setPath(path + "index.html");
+    request.setStatusCode(9999);
+    // exit(0);
 }
 
 bool isDirectoryEmpty(std::string path) {

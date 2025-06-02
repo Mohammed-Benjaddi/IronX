@@ -307,9 +307,12 @@ std::string extractDirectory(const std::string& location) {
         return "/";
     }
     size_t lastSlash = location.rfind('/');
-    if (lastSlash == 0) {
-        return "/";
-    }
+    size_t firstSlash = location.find('/');
+    size_t dot = location.find(".");
+    if (lastSlash == firstSlash && dot != std::string::npos)
+      return "/";
+    else if (lastSlash == firstSlash && dot == std::string::npos)
+      return location;
     if (lastSlash == location.length() - 1) {
         std::string trimmed = location;
         while (!trimmed.empty() && trimmed[trimmed.length() - 1] == '/') {
