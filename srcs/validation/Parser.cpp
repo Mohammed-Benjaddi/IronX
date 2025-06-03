@@ -6,19 +6,12 @@
 /*   By: ael-maaz <ael-maaz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 17:38:54 by ael-maaz          #+#    #+#             */
-/*   Updated: 2025/06/02 22:40:33 by ael-maaz         ###   ########.fr       */
+/*   Updated: 2025/06/03 22:51:52 by ael-maaz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../headers/Parser.hpp"
 
-std::string trim(const std::string& s) {
-    size_t start = s.find_first_not_of(" \t\r\n");
-    if (start == std::string::npos)
-        return "";
-    size_t end = s.find_last_not_of(" \t\r\n");
-    return s.substr(start, end - start + 1);
-}
 
 
 Parser::Parser()
@@ -31,12 +24,16 @@ Parser::~Parser()
 	return ;
 }
 
-int Parser::OpenTomlFile()
+
+int Parser::OpenTomlFile(std::string path)
 {
-	this->infile.open("./config/config.toml");
+	if(checkExtension(path) == 1)
+		throw std::runtime_error("bad extension");
+	std::string fullpath = "./config/" + path;
+	this->infile.open(fullpath);
 	if(!this->infile.is_open())
 	{
-		std::cerr << "Couldnt open config file, Please make sure config.toml is present in config folder and read permission is set\n"; 
+		std::cerr << "Couldnt open config file, Please make sure the config file is present in config folder and read permission is set\n"; 
 		throw std::runtime_error("lol");
 	}
 	return 0;
@@ -56,23 +53,74 @@ std::vector<std::string> Parser::ReadLines()
 		size_t pos  = lines[i].find("#");
 		if(pos != std::string::npos)
 			lines[i].erase(pos);
-		std::cout << lines[i] << std::endl;
 	}
 	return lines;
 }
 
+
+
+			// this->lines[i] = removeSpaces(this->lines[i]);
+			// this->lines[i].erase(std::remove(this->lines[i].begin(), this->lines[i].end(), ' '), this->lines[i].end());
+			// std::cout <<this->lines[i]<< std::endl;
 void Parser::parseLines(WebServerConfig& conf)
 {
-	
+	(void) conf;
+	std::vector<std::string> data_lines;
+	// bool label_flag = false;
+	for(size_t i = 0; i < this->lines.size();i++)
+	{
+		std::string label;
+		if(this->lines[i][0] == '[')
+		{
+			if(this->lines[i][1] == '[')
+			{
+				size_t pos = this->lines[i].find(']');
+				if(pos == std::string::npos || (this->lines[i][pos+1] != ']') || ((pos + 1) != this->lines[i].size() - 1))		
+					throw std::runtime_error("Invalid syntax");
+				else
+				{
+					label = this->lines[i].substr(2,pos - 2);
+					std::cout << "label line: " <<label << std::endl;
+					if(checkBracketLabel(trim(label)) == "bad")
+						throw std::runtime_error("Invalid label");
+					else
+						std::cout << "Something else\n";
+						//fillConfFile
+						
+				}
+			}
+			else
+			{
+				size_t pos = this->lines[i].find(']');
+				if(pos == std::string::npos || pos != this->lines[i].size() - 1)
+				{					
+					throw std::runtime_error("Invalid syntax");
+				}
+				else
+				{
+					label = this->lines[i].substr(1,pos - 1);
+					std::cout << "label line: " <<label << std::endl;
+					if(checkLabel(trim(label)) == "bad")
+						throw std::runtime_error("Invalid label");
+					else
+						std::cout << "Something else\n";
+						//fillConfFile
+						
+				}
+			}
+		}
+		else
+			std::cout << "data line: "<< this->lines[i] << std::endl;
+	}
 }
 
-int Parser::MainParser()
+int Parser::MainParser(std::string path)
 {
 	WebServerConfig conf;
 	try
 	{
-		OpenTomlFile();
-		ReadLines();
+		OpenTomlFile(path);
+		this->lines = ReadLines();
 		parseLines(conf);
 	}
 	catch(std::exception& e)

@@ -6,7 +6,7 @@
 /*   By: ael-maaz <ael-maaz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 17:38:56 by ael-maaz          #+#    #+#             */
-/*   Updated: 2025/06/02 22:34:38 by ael-maaz         ###   ########.fr       */
+/*   Updated: 2025/06/03 22:24:28 by ael-maaz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,10 +28,16 @@ class Parser {
 	public:
 		Parser();
 		~Parser();
-		int OpenTomlFile();
-		int MainParser();
+		int OpenTomlFile(std::string path);
+		int MainParser(std::string path);
 		std::ifstream infile;
 		std::vector<std::string> lines;
 		std::vector<std::string> ReadLines();
 		void parseLines(WebServerConfig& conf);
 };
+
+std::string checkLabel(std::string label);
+std::string checkBracketLabel(std::string label);
+std::string trim(const std::string& s);
+std::string removeSpaces(const std::string& s);
+int checkExtension(std::string path);
