@@ -21,6 +21,7 @@ void printConfig(const WebServerConfig& config) {
     }
     std::cout << "\n";
 
+    // exit(0);
     // Print clusters (servers)
     const std::vector<Cluster>& clusters = config.getClusters();
     for (size_t i = 0; i < clusters.size(); i++) {
@@ -105,7 +106,6 @@ void printConfig(const WebServerConfig& config) {
     }
 }
 
-
 #include <cstdlib>  // for rand() and srand()
 #include <ctime> 
 void mocker(WebServerConfig &wsc) {
@@ -169,8 +169,8 @@ void mocker(WebServerConfig &wsc) {
     route2.setRootDir(path);
     std::vector<std::string> _indexFiles;
     _indexFiles.push_back("index.html");
-    _indexFiles.push_back("index.php");
-    route2.setIndexFiles(_indexFiles);
+    // _indexFiles.push_back("file.html");
+    // route2.setIndexFiles(_indexFiles);
     std::set<std::string> methods2;
     route2.setAutoindex(true);
     methods2.insert("GET");
@@ -189,11 +189,11 @@ void mocker(WebServerConfig &wsc) {
     // Route 3: /uploads
     Route route3;
     route3.setRootDir("/var/www/uploads");
-    
+
     std::set<std::string> methods3;
     methods3.insert("POST");
     route3.setAllowedMethods(methods3);
-    
+
     route3.setUploadDir("/var/www/uploads/tmp");
     routes1.insert(std::make_pair("/uploads", route3));
 

@@ -11,7 +11,7 @@ bool isDirExist(std::string path, std::string rootDir);
 bool isDirectory(const std::string path, std::string rootDir);
 void DELETEDirectory(HTTPRequest &request, std::map<std::string, Route> &routes, Route &route, const std::string &_path);
 bool isLocationHasCGI(std::string filepath);
-void copyToRoute(Route &route, std::map<std::string, Route>::const_iterator &it);
+int copyToRoute(HTTPRequest &request, Route &route, std::map<std::string, Route>::const_iterator &it);
 void fileHasNoCGI(HTTPRequest &request, Route &route, std::string &file_name);
 void directoryHasIndexFiles(HTTPRequest &request, Route &route, std::vector<std::string> index_files);
 void directoryHasNoIndexFiles(HTTPRequest &request, Route &route);

@@ -1,8 +1,10 @@
 #include "HTTPRequest.hpp"
 
 HTTPRequest::HTTPRequest(const std::string &raw_request, WebServerConfig *_config, int _clientId) : IHTTPMessage(), config(_config), clientId(_clientId) {
+    // std::cout << "raw \n" << raw_request << std::endl;
     if(parse(*this, raw_request) == -1)
         return;
+    // exit(0);
     if(checkAllowedMethods(*this) == -1)
         return;
     handleRequest();
@@ -76,6 +78,12 @@ void HTTPRequest::setLocation(std::string &location) {
 void HTTPRequest::setFormFile(std::vector<FormFile> &formFiles) {
     this->formFiles = formFiles;
 }
+
+void HTTPRequest::setErrorPages(const std::map<int, std::string>& error_pages) {
+    this->error_pages = error_pages;
+}
+
+// ---------------------------------------------------
 
 WebServerConfig *HTTPRequest::getConfig() const {
     return config;
@@ -155,7 +163,6 @@ void HTTPRequest::setRootDir(std::string rootDir) {
 }
 
 std::string HTTPRequest::getBoundary() const {
-
     std::string content_type = getHeader("Content-Type");
     int index = content_type.rfind("WebKitFormBoundary");
     // std::cout << "index ----> " << index << std::endl;
@@ -168,6 +175,13 @@ std::string HTTPRequest::getBoundary() const {
 std::vector<FormFile> &HTTPRequest::getFormFiles() {
     return formFiles;
 }
+
+std::string HTTPRequest::getErrorPages(int code) const {
+    if(error_pages.find(code) != error_pages.end())
+        return getRootDir() + error_pages.at(code);
+    return "***";
+}
+
 // Methods
 
 std::vector<uint8_t> HTTPRequest::to_bytes() const {
@@ -193,25 +207,32 @@ std::string HTTPRequest::getFileExtension() {
     return fileExtension;
 }
 
-void HTTPRequest::setRoutesInfo(std::map<std::string, Route> &routes, Route &route) {
+int HTTPRequest::setRoutesInfo(std::map<std::string, Route> &routes, Route &route) {
     routes = config->getClusters()[clientId].getRoutes();
+    // std::cout << "location: " << (getLocation() == "/new-site" ? "yes" : "no") << std::endl;
+    // std::cout << "* * * location: " << getLocation() << std::endl;
     std::map<std::string, Route>::const_iterator it_route = routes.find(getLocation());
-    if (it_route == routes.end()) {
-        char buffer[BUFSIZ];
-        if (getcwd(buffer, sizeof(buffer)) != NULL)
-            route.setRootDir(getRootDir());
-        else
-            route.setRootDir("");
-        route.setAutoindex(false);
-    } else
-        copyToRoute(route, it_route);
+    if (it_route == routes.end() && getLocation() != "/favicon.ico") {
+        setStatusCode(404);
+        setStatusMessage("Not Found");
+        setPath(getErrorPages(getStatusCode()));
+        // std::cout << "waaaa3 ===> " << getLocation() << std::endl;
+        return -1;
+        
+    } else {
+        
+        if(copyToRoute(*this, route, it_route) == -1)
+            return -1;
+    }
+    return 1;
 }
 
 void HTTPRequest::handleRequest() {
     Route route;
     std::map<std::string, Route> routes;
 
-    setRoutesInfo(routes, route);
+    if(setRoutesInfo(routes, route) == -1)
+        return;
     setFileExtension(getPath());
     if (getMethod() == "GET")
         handleGet(routes, route);
@@ -219,13 +240,17 @@ void HTTPRequest::handleRequest() {
         handlePOST();
     else if (getMethod() == "DELETE")
         handleDELETE(routes, route);
-    std::cout << "full path ===> " << getRootDir() + getPath() << std::endl;
+    std::cout << "=======> status code: " << getStatusCode() << std::endl;
+    // std::cout << "full path ===> " << getRootDir() + getPath() << std::endl;
 }
 
 void HTTPRequest::executeCGI(Route &route) {
     if (getMethod() == "DELETE") {
         std::cout << "a file must be deleted" << std::endl;
         deleteRequestedFile(*this, "/" + route.getRootDir() + getPath(), "");
+    } else {
+        // CGI *cgi = new CGI(*this);
+        // (void) cgi;
     }
 }
 
@@ -249,7 +274,7 @@ void HTTPRequest::handleDELETE(std::map<std::string, Route> &routes, Route &rout
 void HTTPRequest::handlePOST() {
     std::cout << "POST method" << std::endl;
     //! remove this later;
-    exit(0);
+    // exit(0);
     // std::vector<FormFile> formFiles = parseMultipartFormData(getBody(), getBoundary());
     std::vector<FormFile> formFiles = parseMultipartFormData(getBody(), getBoundary());
     setFormFile(formFiles);
