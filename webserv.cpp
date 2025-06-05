@@ -12,7 +12,7 @@ int main() {
 
     // const std::string request_test_file = "./tests/request_mock.txt";
     // const std::string response_test_file = "./tests/response_mock.txt";
-
+    // parse(config);
     //! Load Configuration
     mocker(config);
 

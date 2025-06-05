@@ -104,7 +104,7 @@ bool checkRequestURI(HTTPRequest &request, std::string uri) {
 
 int find_method_uri(HTTPRequest &request, const std::string &line) {
   std::stringstream sstream(line);
-  std::cout << "line ===> " << line << std::endl;
+  // std::cout << "line ===> " << line << std::endl;
   std::string method, uri, httpVersion;
   sstream >> method >> uri >> httpVersion;
   if(!checkRequestURI(request, uri)) {
@@ -114,7 +114,7 @@ int find_method_uri(HTTPRequest &request, const std::string &line) {
   
   request.setLocation(uri);
 
-  std::cout << "uri ---> " << uri << " | " << request.getLocation() << std::endl;
+  // std::cout << "uri ---> " << uri << " | " << request.getLocation() << std::endl;
   // exit(0);
   
   size_t queryPos = uri.find('?');
@@ -124,15 +124,15 @@ int find_method_uri(HTTPRequest &request, const std::string &line) {
   }
   if(uri[uri.length() - 1] == '/' && uri.size() == 1) {
     uri = uri.substr(0, uri.length() - 1);
-    std::cout << "new path ==> " << (uri.empty() ? "only slash" : uri) << std::endl;
-    std::cout << "|" << uri << "|" << std::endl;
+    // std::cout << "new path ==> " << (uri.empty() ? "only slash" : uri) << std::endl;
+    // std::cout << "|" << uri << "|" << std::endl;
     uri = "/";
   } else {
     size_t size = uri.size() - 1;
     if(uri[size] == '/')
       size--;
     uri = uri.substr(1, size);
-    std::cout << "uri +++ " << uri << std::endl;
+    // std::cout << "uri +++ " << uri << std::endl;
     // exit(0);
   }
   request.setMethod(method);

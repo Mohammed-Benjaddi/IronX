@@ -17,7 +17,9 @@
 #include "parseRequest.hpp"
 #include <filesystem>
 #include <cstring>
+#include "CGI.hpp"
 
+class CGI;
 
 typedef struct sFormFile {
     std::string name;
@@ -25,7 +27,6 @@ typedef struct sFormFile {
     std::string contentType;
     std::vector<char> data;
 } FormFile;
-
 
 class HTTPRequest : public IHTTPMessage {
 private:
@@ -46,7 +47,7 @@ private:
     std::string fileExtension;
     std::string location;
     std::map<int, std::string> error_pages;
-
+    CGI *cgi;
 public:
     HTTPRequest(const std::string &raw_request, WebServerConfig *config, int clientId);
     ~HTTPRequest();
@@ -91,7 +92,7 @@ public:
 
     virtual std::vector<uint8_t> to_bytes() const;
 
-    void setRoutesInfo(std::map<std::string, Route> &routes, Route &route);
+    int setRoutesInfo(std::map<std::string, Route> &routes, Route &route);
 
     void handleRequest();
     void handleGet(std::map<std::string, Route> &routes, Route &route);

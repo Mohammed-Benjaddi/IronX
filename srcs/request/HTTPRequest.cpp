@@ -207,28 +207,32 @@ std::string HTTPRequest::getFileExtension() {
     return fileExtension;
 }
 
-void HTTPRequest::setRoutesInfo(std::map<std::string, Route> &routes, Route &route) {
+int HTTPRequest::setRoutesInfo(std::map<std::string, Route> &routes, Route &route) {
     routes = config->getClusters()[clientId].getRoutes();
     // std::cout << "location: " << (getLocation() == "/new-site" ? "yes" : "no") << std::endl;
-    std::cout << "* * * location: " << getLocation() << std::endl;
+    // std::cout << "* * * location: " << getLocation() << std::endl;
     std::map<std::string, Route>::const_iterator it_route = routes.find(getLocation());
     if (it_route == routes.end() && getLocation() != "/favicon.ico") {
         setStatusCode(404);
         setStatusMessage("Not Found");
         setPath(getErrorPages(getStatusCode()));
-        std::cout << "waaaa3 ===> " << getLocation() << std::endl;
-        return;
+        // std::cout << "waaaa3 ===> " << getLocation() << std::endl;
+        return -1;
         
     } else {
-        copyToRoute(route, it_route);
+        
+        if(copyToRoute(*this, route, it_route) == -1)
+            return -1;
     }
+    return 1;
 }
 
 void HTTPRequest::handleRequest() {
     Route route;
     std::map<std::string, Route> routes;
 
-    setRoutesInfo(routes, route);
+    if(setRoutesInfo(routes, route) == -1)
+        return;
     setFileExtension(getPath());
     if (getMethod() == "GET")
         handleGet(routes, route);
@@ -236,13 +240,21 @@ void HTTPRequest::handleRequest() {
         handlePOST();
     else if (getMethod() == "DELETE")
         handleDELETE(routes, route);
-    std::cout << "full path ===> " << getRootDir() + getPath() << std::endl;
+    // std::cout << "full path ===> " << getRootDir() + getPath() << std::endl;
 }
 
 void HTTPRequest::executeCGI(Route &route) {
+    std::cout << "a CGI file found" << std::endl;
+    // exit(0);
     if (getMethod() == "DELETE") {
         std::cout << "a file must be deleted" << std::endl;
         deleteRequestedFile(*this, "/" + route.getRootDir() + getPath(), "");
+    } else {
+        cgi = new CGI(*this);
+        (void) cgi;
+        std::cout << "root ---> " << getRootDir() << std::endl;
+        std::cout << cgi->executeCGI() << std::endl;
+        // exit(0);
     }
 }
 

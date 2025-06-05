@@ -63,15 +63,24 @@ bool isLocationHasCGI(std::string filepath) {
     return false;
 }
 
-void copyToRoute(Route &route, std::map<std::string, Route>::const_iterator &it) {
+int copyToRoute(HTTPRequest &request, Route &route, std::map<std::string, Route>::const_iterator &it) {
     route.setRootDir(it->second.getRootDir());
     route.setIndexFiles(it->second.getIndexFiles());
-    std::set<std::string>::iterator iter = it->second.getAllowedMethods().begin();
+    // std::set<std::string>::iterator iter = it->second.getAllowedMethods().begin();
     //! edit this: status code must be 405 [Not allowed] if the route has not the request method
-    while(iter != it->second.getAllowedMethods().end()) {
-        std::cout << "method ----> " << *iter << std::endl;
-        iter++;
+    // while(iter != it->second.getAllowedMethods().end()) {
+    //     std::cout << "method ----> " << *iter << std::endl;
+    //     iter++;
+    // }
+    if(it->second.getAllowedMethods().find(request.getMethod()) == it->second.getAllowedMethods().end()) {
+        request.setStatusCode(405);
+        request.setStatusMessage("Method Not Allowed");
+        request.setPath(request.getErrorPages(request.getStatusCode()));;
+        std::cout << "405 detected" << std::endl;
+        // exit(0);
+        return -1;
     }
+
     // exit(0);
 
     route.setAllowedMethods(it->second.getAllowedMethods());
@@ -79,6 +88,7 @@ void copyToRoute(Route &route, std::map<std::string, Route>::const_iterator &it)
     route.setRedirect(it->second.getRedirect());
     route.setUploadDir(it->second.getUploadDir());
     route.setCGIConfig(it->second.getCGIConfig());
+    return 1;
 }
 
 void GETReadFileContent(HTTPRequest &request, std::string path) {
@@ -247,7 +257,7 @@ void pathIsDirectory(HTTPRequest &request, std::map<std::string, Route> &routes,
             directoryHasNoIndexFiles(request, route);
         }
         else {
-            // std::cout << "locatio"
+            // std::cout << "location"
             for(size_t i = 0; i < index_files.size(); i++)
                 std::cout << "----> " << index_files[i] << std::endl;
             // exit(0);
@@ -303,27 +313,27 @@ std::vector<std::string> getDirectoryListing(const std::string& path, bool show_
 void autoIndexOfDirectory(Route &route, HTTPRequest &request) {
     // search for index.html
     
-    std::cout << "start listing files" << std::endl;
+    // std::cout << "start listing files" << std::endl;
     std::string indexes[2] = {"index.html", "index.htm"};
     std::string path = route.getRootDir() + "/" + request.getPath() + "/";
-    std::cout << "path : " << path << std::endl;
+    // std::cout << "path : " << path << std::endl;
     // exit(0);
     for(size_t i = 0; i < 2; i++) {
-        std::cout << "---> " << path + indexes[i] << std::endl;
+        // std::cout << "---> " << path + indexes[i] << std::endl;
         // exit(0);
         if(isFileExist((path + indexes[i]).c_str())) {
-            std::cout << "file ----> " << path + indexes[i] << std::endl;
+            // std::cout << "file ----> " << path + indexes[i] << std::endl;
             request.setPath(path + indexes[i]);
             // exit(0);
             return;
         }
     }
     std::vector<std::string> entries = getDirectoryListing(path, false);
-    std::cout << "route ===> " << route.getRootDir() << std::endl;
+    // std::cout << "route ===> " << route.getRootDir() << std::endl;
     for(size_t i = 0; i < entries.size(); i++) {
-        std::cout << "+++++ ---> " << entries[i] << std::endl;
+        // std::cout << "+++++ ---> " << entries[i] << std::endl;
     }
-    std::cout << "path ---> " << path << std::endl;
+    // std::cout << "path ---> " << path << std::endl;
     request.setPath(path + "index.html");
     request.setStatusCode(9999);
     // exit(0);
