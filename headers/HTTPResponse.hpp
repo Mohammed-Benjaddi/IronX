@@ -1,31 +1,67 @@
 #pragma once
 
-#include "HTTPRequest.hpp"
-#include "WebServerConfig.hpp"
+#include <map>
+#include <string>
+#include <sstream>
 #include "FileStreamer.hpp"
+#include "HTTPRequest.hpp"
+#include "requestUtils.hpp"
+#include "responseUtils.hpp"
 
 class FileStreamer;
-
 class HTTPRequest;
 
-//? Would build HTTP Request
 class HTTPResponse {
-    public:
-        HTTPResponse(HTTPRequest* request);
-        std::string	getNextChunk();
-        bool		isComplete() const;
-        void		prepareHeaders();
-        std::string getConnectionHeader();
-    private:
-        std::string     mimeType;
-        std::string     _connection;
-		FileStreamer    *_streamer;
-		std::string	    _headers;
-        std::string     _mimeType;
-		bool            _headersSent;
-		bool            _complete;
+public:
+    // Constructors
+    HTTPResponse();
+    HTTPResponse(HTTPRequest* request);
+    
+    ~HTTPResponse();
 
-        static std::map<std::string, std::string> _mimeTypes;
-        static std::map<std::string, std::string> initMimeTypes();
-        static std::string getMimeType(const std::string& path);
+    std::string getNextChunk();
+    bool isComplete() const;
+    std::string getConnectionHeader();
+    
+    size_t getFileSize(std::string path) const;
+    void    setStatus(int code, const std::string& message);
+    void setHeader(const std::string& key, const std::string& value);
+    void setConnection(const std::string& connection);
+
+    void setBody(const std::string& body);              
+    void setStreamer(FileStreamer* streamer);           
+
+    int getStatusCode() const;
+    std::string getStatusMessage() const;
+    std::map<std::string, std::string> getHeaders() const;
+
+    // void build_OK_Response(HTTPRequest* request);
+    // void buildResponse(HTTPRequest* request);          
+    void buildAutoIndexResponse(HTTPRequest*);
+
+    static HTTPResponse fromError(int code, const std::string& message, const std::string& body);
+    static HTTPResponse fromRedirect(const std::string& location);
+
+    static std::string getMimeType(const std::string& path);
+
+private:
+    int                             _statusCode;
+    std::string                     _statusMessage;
+    std::string                     _connectionType;
+    std::string                     _connection;
+
+    FileStreamer*                   _streamer;
+    HTTPRequest*                    _request;
+    std::string                     _body;
+    std::string                     _tempFilePath;
+    size_t                          _bodyPos;
+
+    std::map<std::string, std::string> _headers;
+
+    bool                            _headersSent;
+    bool                            _complete;
+
+    // MIME types
+    static std::map<std::string, std::string> _mimeTypes;
+    // static std::map<std::string, std::string> initMimeTypes();
 };

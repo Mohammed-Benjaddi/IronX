@@ -19,6 +19,9 @@
 #include <cstring>
 // #include "CGI.hpp"
 
+class HTTPResponse;
+class FileStreamer;
+
 typedef struct sFormFile {
     std::string name;
     std::string filename;

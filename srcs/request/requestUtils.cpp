@@ -195,6 +195,7 @@ void pathIsFile(HTTPRequest &request, std::map<std::string, Route> &routes, Rout
     if(!isFileExist((filePath).c_str())) {
         std::cout << "* file not found" << std::endl;
         request.setStatusCode(404);
+
         request.setStatusMessage("Not Found");
         request.setFileContent("");
         // request.setPath(request.getRootDir() + "/errors/404.html");
@@ -266,6 +267,7 @@ void pathIsDirectory(HTTPRequest &request, std::map<std::string, Route> &routes,
         closedir(dir);
     } else {
         request.setStatusCode(404);
+
         request.setStatusMessage("Not Found");
         // request.setPath(request.getRootDir() + "/errors/404.html");
         request.setPath(request.getErrorPages(request.getStatusCode()));;

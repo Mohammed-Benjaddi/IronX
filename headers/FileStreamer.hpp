@@ -37,6 +37,7 @@ class FileStreamer {
         bool        isOpen() const;
         bool        isEOF() const;
         size_t      getFileSize();
+        size_t      getFileSize(std::string) const;
         std::string getConnectionHeader();
         void        setRange(size_t start, size_t end);
         size_t      getStartByte() const;
