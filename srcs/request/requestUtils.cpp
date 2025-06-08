@@ -191,9 +191,17 @@ void pathIsFile(HTTPRequest &request, std::map<std::string, Route> &routes, Rout
     (void) routes;
     // std::cout << "path is file: " << route.getRootDir() << std::endl;
     std::string filePath = (route.getRootDir() + "/" + request.getPath());
+    // if(!request.getQuery().empty()) {
+    //     size_t q = filePath.find(request.getQuery());
+    //     if(q != std::string::npos) {
+    //         std::cout << "waaaaaaa3: " << filePath.substr(0, q - 1) << std::endl;
+    //         filePath = filePath.substr(0, q - 1);
+    //         // exit(0);
+    //     }
+    // }
     std::cout << " ********** " << filePath << "***********" << std::endl;
     if(!isFileExist((filePath).c_str())) {
-        std::cout << "* file not found" << std::endl;
+        std::cout << "* file not found: " << filePath << std::endl;
         request.setStatusCode(404);
         request.setStatusMessage("Not Found");
         request.setFileContent("");

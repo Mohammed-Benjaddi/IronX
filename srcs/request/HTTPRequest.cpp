@@ -289,8 +289,8 @@ void HTTPRequest::handleRequest()
 
 void HTTPRequest::executeCGI(Route &route)
 {
+
     std::cout << "a CGI file found" << std::endl;
-    // exit(0);
     if (getMethod() == "DELETE")
     {
         std::cout << "a file must be deleted" << std::endl;
@@ -299,9 +299,18 @@ void HTTPRequest::executeCGI(Route &route)
     else
     {
         CGIConfig cgiConfig = route.getCGIConfig();
+        std::string path = getPath();
         std::vector<std::string> extensions = cgiConfig.getExtensions();
-        std::string path_ext = getPath().substr(getPath().rfind("."));
+        // if(!getQuery().empty()) {
+        //     size_t q = path.find(getQuery());
+        //     if(q != std::string::npos)
+        //         path = path.substr(0, q - 1); 
+        // }
+        std::string path_ext = path.substr(path.rfind("."));
         std::vector<std::string>::iterator it = std::find(extensions.begin(), extensions.end(), path_ext);
+        std::cout << "path ext: " << path_ext << std::endl;
+        std::cout << "ext size ---> " << extensions.size() << std::endl;
+        // exit(0);
         if (it == extensions.end())
         {
             std::cout << "-----> extensions not found" << std::endl;

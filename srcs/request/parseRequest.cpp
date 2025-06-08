@@ -41,7 +41,7 @@ int checkAllowedMethods(HTTPRequest &request) {
 // }
 
 bool URIHasUnallowedChar(std::string uri) {
-  const std::string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_-~/?#[]@!$$('*+,'=%.";
+  const std::string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_-~/?#[]@!$$('*+,'=%.&";
   const std::vector<char> allowedChars(chars.begin(), chars.end());
   
   for(size_t i = 0; i < uri.size(); i++) {
@@ -122,6 +122,7 @@ int find_method_uri(HTTPRequest &request, const std::string &line) {
   if (queryPos != std::string::npos) {
       request.setQuery(uri.substr(queryPos + 1));
       request.setPath(uri.substr(0, queryPos));
+      uri = uri.substr(0, queryPos);
   }
   if(uri[uri.length() - 1] == '/' && uri.size() == 1) {
     uri = uri.substr(0, uri.length() - 1);

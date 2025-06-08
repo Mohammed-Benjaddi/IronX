@@ -9,6 +9,8 @@ CGI::CGI(HTTPRequest &_request, Route &_route) : request(_request), route(_route
     extension = script_path.substr(script_path.rfind("."));
     request_body = "body must be here";
     setupEnvironment();
+    std::cout << "query ---> " << query_string << std::endl;
+    // exit(0);
 }
 
 void CGI::setupEnvironment()
@@ -145,9 +147,7 @@ std::string CGI::executeCGI()
 
         // Send POST data to child if any
         if (!request_body.empty())
-        {
             write(stdin_pipe[1], request_body.c_str(), request_body.length());
-        }
         close(stdin_pipe[1]);
 
         // Read output from child
