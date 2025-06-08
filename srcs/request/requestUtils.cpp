@@ -198,7 +198,7 @@ void pathIsFile(HTTPRequest &request, std::map<std::string, Route> &routes, Rout
         request.setStatusMessage("Not Found");
         request.setFileContent("");
         // request.setPath(request.getRootDir() + "/errors/404.html");
-        request.setPath(request.getErrorPages(request.getStatusCode()));;
+        request.setPath(request.getErrorPages(request.getStatusCode()));
         return;
     }
     if(isLocationHasCGI(filePath))

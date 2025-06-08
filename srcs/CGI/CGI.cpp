@@ -1,15 +1,18 @@
 #include "CGI.hpp"
 
-CGI::CGI(HTTPRequest &_request) : request(_request) {
-        std::cout << "++++++ " << request.getRootDir() + "/" + request.getPath() << std::endl;
-        script_path = request.getRootDir() + "/" + request.getPath();
-        request_method = request.getMethod();
-        query_string = request.getQuery();
-        request_body = "body must be here";
+CGI::CGI(HTTPRequest &_request, Route &_route) : request(_request), route(_route)
+{
+    std::cout << "++++++ " << request.getRootDir() + "/" + request.getPath() << std::endl;
+    script_path = request.getRootDir() + "/" + request.getPath();
+    request_method = request.getMethod();
+    query_string = request.getQuery();
+    extension = script_path.substr(script_path.rfind("."));
+    request_body = "body must be here";
     setupEnvironment();
 }
 
-void CGI::setupEnvironment() {
+void CGI::setupEnvironment()
+{
     env_vars["REQUEST_METHOD"] = request_method;
     env_vars["QUERY_STRING"] = query_string;
     // env_vars["CONTENT_LENGTH"] = intToString(request_body.length());
@@ -19,13 +22,15 @@ void CGI::setupEnvironment() {
     env_vars["SCRIPT_NAME"] = script_path;
 }
 
-std::string CGI::intToString(int num) {
+std::string CGI::intToString(int num)
+{
     std::ostringstream ss;
     ss << num;
     return ss.str();
 }
 
-char **CGI::createEnvArray() {
+char **CGI::createEnvArray()
+{
     char **env_array = new char *[env_vars.size() + 1];
     int i = 0;
 
@@ -41,28 +46,36 @@ char **CGI::createEnvArray() {
     return env_array;
 }
 
-void CGI::freeEnvArray(char **env_array) {
-    for (int i = 0; env_array[i] != NULL; i++)
-    {
-        delete[] env_array[i];
-    }
-    delete[] env_array;
-}
+// void CGI::freeEnvArray(char **env_array) {
+//     for (int i = 0; env_array[i] != NULL; i++)
+//     {
+//         delete[] env_array[i];
+//     }
+//     delete[] env_array;
+// }
 
-std::string CGI::getInterpreter(const std::string &script_path) {
+std::vector<std::string> CGI::getInterpreter(const std::string &script_path)
+{
     // Simple extension-based interpreter detection
+    // ! must get the interpreter form CGIConfig instance and then check the exitence of the interpreter
+    
+    std::vector<std::string> interpreters;
+    CGIConfig config = route.getCGIConfig();
+    // std::vector<std::string> extensions = config.getExtensions();
+    // std::vector<std::string>::iterator it = std::find(extensions.begin(), extensions.end(), extension);
+    std::string interpreter = config.getInterpreter();
+    interpreters.push_back(interpreter);
+    // interpreters.push_back("/usr/bin/env");
     if (script_path.find(".py") != std::string::npos)
-    {
-        return "/usr/bin/env";
-    }
+        interpreters.push_back("python3");
     else if (script_path.find(".php") != std::string::npos)
-    {
-        return "/usr/bin/php";
-    }
-    return script_path;
+        interpreters.push_back("php");
+    interpreters.push_back(script_path);
+    return interpreters;
 }
 
-std::string CGI::executeCGI() {
+std::string CGI::executeCGI()
+{
     int pipe_fd[2];
     int stdin_pipe[2];
 
@@ -109,22 +122,23 @@ std::string CGI::executeCGI() {
         char **env_array = createEnvArray();
 
         // Execute the script
-        std::string interpreter = getInterpreter(script_path);
-        std::string py = "python3";
+        std::vector<std::string> interpreter = getInterpreter(script_path);
+        // std::string py = "python3";
         char *args[3];
-        args[0] = const_cast<char *>(interpreter.c_str());
-        args[1] = const_cast<char *>(py.c_str());
-        args[2] = const_cast<char *>(script_path.c_str());
+        args[0] = const_cast<char *>(interpreter[0].c_str());
+        args[1] = const_cast<char *>(interpreter[1].c_str());
+        args[2] = const_cast<char *>(interpreter[2].c_str());
         args[3] = NULL;
         // std::cout << "---------> " << interpreter << " | " <<
         //     py << " | " << script_path << std::endl;
         // exit(0);
-        execve(interpreter.c_str(), args, env_array);
+        execve(interpreter[0].c_str(), args, env_array);
 
         std::cerr << "CGI execution failed" << std::endl;
         exit(1);
     }
-    else {
+    else
+    {
         // Parent process
         close(pipe_fd[1]);    // Close write end
         close(stdin_pipe[0]); // Close read end of stdin pipe
@@ -153,10 +167,12 @@ std::string CGI::executeCGI() {
         int status;
         waitpid(pid, &status, 0);
 
-        if (WIFEXITED(status) && WEXITSTATUS(status) == 0) {
+        if (WIFEXITED(status) && WEXITSTATUS(status) == 0)
+        {
             return formatCGIResponse(output);
         }
-        else {
+        else
+        {
             std::cout << "---------> something went wrong" << std::endl;
             std::cout << "Exit status: " << WEXITSTATUS(status) << std::endl;
             std::cout << "Script output: [" << output << "]" << std::endl;
@@ -191,7 +207,8 @@ std::string CGI::formatCGIResponse(const std::string &cgi_output)
 
     // Check if Content-Type is already set
     std::string response = "HTTP/1.1 200 OK\r\n";
-    if (headers.find("Content-Type:") == std::string::npos) {
+    if (headers.find("Content-Type:") == std::string::npos)
+    {
         response += "Content-Type: text/html\r\n";
     }
 
