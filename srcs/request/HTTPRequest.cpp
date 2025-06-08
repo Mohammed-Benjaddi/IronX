@@ -216,7 +216,8 @@ int HTTPRequest::setRoutesInfo(std::map<std::string, Route> &routes, Route &rout
         setStatusCode(404);
         setStatusMessage("Not Found");
         setPath(getErrorPages(getStatusCode()));
-        // std::cout << "waaaa3 ===> " << getLocation() << std::endl;
+        std::cout << "waaaa3 ===> " << getLocation() << std::endl;
+        exit(0);
         return -1;
         
     } else {

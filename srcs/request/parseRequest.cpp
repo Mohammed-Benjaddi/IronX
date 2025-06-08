@@ -313,7 +313,8 @@ std::string extractDirectory(const std::string& location)
         return "/";
     if (lastSlash == firstSlash && dot == std::string::npos)
         return location;
-    if (dot != std::string::npos && lastSlash != firstSlash) {
+    // if (dot != std::string::npos && lastSlash != firstSlash) {
+    if (lastSlash != firstSlash) {
         size_t secondSlash = location.find('/', firstSlash + 1);
         if (secondSlash != std::string::npos)
             return location.substr(0, secondSlash);
@@ -325,5 +326,6 @@ std::string extractDirectory(const std::string& location)
         }
         return extractDirectory(trimmed);
     }
+    std::cout << "-------------> here" << std::endl;
     return location.substr(0, lastSlash);
 }
