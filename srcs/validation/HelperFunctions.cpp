@@ -6,7 +6,7 @@
 /*   By: ael-maaz <ael-maaz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 17:32:43 by ael-maaz          #+#    #+#             */
-/*   Updated: 2025/06/03 22:24:17 by ael-maaz         ###   ########.fr       */
+/*   Updated: 2025/06/10 20:49:27 by ael-maaz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,4 +70,34 @@ int checkExtension(std::string path)
 	}
 	return 1;
 	
+}
+
+bool string_to_int(const std::string& str, int& result) {
+    std::stringstream ss(str);
+    ss >> result;
+
+    // Check for conversion failure or leftover characters
+    if (ss.fail() || !ss.eof()) {
+        return false;  // Invalid input
+    }
+    return true;
+}
+
+int testKey(std::string key, std::string value, std::string label)
+{
+	(void) value;
+	if(label == "global")
+	{
+		if(key != "max_body_size")
+			throw std::runtime_error("Invalid variable for label global");
+		else
+		{
+			int result;
+			if(!string_to_int(value,result))
+				return 1;		
+			else
+				std::cout << "number: " << result << std::endl;
+		}
+	}
+	return 0;
 }

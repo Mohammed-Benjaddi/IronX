@@ -6,7 +6,7 @@
 /*   By: ael-maaz <ael-maaz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 17:38:54 by ael-maaz          #+#    #+#             */
-/*   Updated: 2025/06/03 22:51:52 by ael-maaz         ###   ########.fr       */
+/*   Updated: 2025/06/10 20:54:36 by ael-maaz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,12 +66,15 @@ void Parser::parseLines(WebServerConfig& conf)
 {
 	(void) conf;
 	std::vector<std::string> data_lines;
-	// bool label_flag = false;
+	std::vector<std::string> labels;
+	bool label_flag = false;
 	for(size_t i = 0; i < this->lines.size();i++)
 	{
+		std::cout <<this->lines[i] << std::endl;
 		std::string label;
 		if(this->lines[i][0] == '[')
 		{
+			label_flag = true;
 			if(this->lines[i][1] == '[')
 			{
 				size_t pos = this->lines[i].find(']');
@@ -83,14 +86,15 @@ void Parser::parseLines(WebServerConfig& conf)
 					std::cout << "label line: " <<label << std::endl;
 					if(checkBracketLabel(trim(label)) == "bad")
 						throw std::runtime_error("Invalid label");
-					else
-						std::cout << "Something else\n";
+					// else
+					// 	std::cout << "Something else\n";
 						//fillConfFile
 						
 				}
 			}
 			else
 			{
+				
 				size_t pos = this->lines[i].find(']');
 				if(pos == std::string::npos || pos != this->lines[i].size() - 1)
 				{					
@@ -102,15 +106,40 @@ void Parser::parseLines(WebServerConfig& conf)
 					std::cout << "label line: " <<label << std::endl;
 					if(checkLabel(trim(label)) == "bad")
 						throw std::runtime_error("Invalid label");
-					else
-						std::cout << "Something else\n";
-						//fillConfFile
-						
+					labels.push_back(trim(label));
+					std::string target = trim(label);
+
+					std::vector<std::string>::iterator it = std::find(labels.begin(), labels.end(), target);
+
+					if (it != labels.end())
+					{
+						std::cout << labels.back() << std::endl;
+						throw std::runtime_error("Duplicate labels");
+					}
+											
 				}
 			}
 		}
 		else
-			std::cout << "data line: "<< this->lines[i] << std::endl;
+		{
+			std::string line = this->lines[i];
+			std::stringstream ss(line);
+			std::string key, value;
+			// std::cout << "data line: "<< this->lines[i] << std::endl;
+			
+			if (std::getline(ss, key, '=') && std::getline(ss, value))
+			{
+				std::cout << "Key: \"" << trim(key) << "\"\n";
+				std::cout << "Value: " << trim(value) << "\n";
+				testKey(key,value,label);
+			}
+			else
+			{
+				std::cerr << "Malformed line, missing '='\n";
+				throw std::runtime_error("Invalid Syntax");
+			}
+			
+		}
 	}
 }
 

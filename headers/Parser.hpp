@@ -6,7 +6,7 @@
 /*   By: ael-maaz <ael-maaz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 17:38:56 by ael-maaz          #+#    #+#             */
-/*   Updated: 2025/06/03 22:24:28 by ael-maaz         ###   ########.fr       */
+/*   Updated: 2025/06/10 20:50:38 by ael-maaz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 #include <iostream>
 #include <fstream>
 #include <stdint.h>
+#include <sstream>
 
 #include "WebServerConfig.hpp"
 
@@ -41,3 +42,4 @@ std::string checkBracketLabel(std::string label);
 std::string trim(const std::string& s);
 std::string removeSpaces(const std::string& s);
 int checkExtension(std::string path);
+int testKey(std::string key, std::string value, std::string label);

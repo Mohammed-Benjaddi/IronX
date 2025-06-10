@@ -8,6 +8,7 @@
 # Requirement: "Set the maximum allowed size for client request bodies."
 # Explanation: Maximum upload size in bytes (1MB default)
 max_body_size = 1048576
+#max_body_size = 54632
 
 # Requirement: "Set up default error pages."
 # Explanation: Maps HTTP error codes to custom error pages
@@ -18,6 +19,8 @@ max_body_size = 1048576
 500 = "/errors/500.html" # Internal Server Error
 503 = "/errors/503.html" # Service Unavailable
 
+
+#[global]
 # ======================
 # SERVER DEFINITIONS
 # ======================
