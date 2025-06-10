@@ -183,6 +183,8 @@ void mocker(WebServerConfig &wsc) {
     cgi1.setExtensions(extensions1);
     cgi1.setInterpreter("/usr/bin/env");
     route2.setCGIConfig(cgi1);
+
+    // route2.setRedirect("/");
     
     routes1.insert(std::make_pair("/new-site", route2));
 
@@ -196,7 +198,7 @@ void mocker(WebServerConfig &wsc) {
     route3.setAllowedMethods(methods3);
 
     // route3.setUploadDir("/var/www/uploads/tmp");
-    routes1.insert(std::make_pair("/cgi-bin", route3));
+    routes1.insert(std::make_pair("/upload", route3));
 
     // Route 4: /old-site
     Route route4;

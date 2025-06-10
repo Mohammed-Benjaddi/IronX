@@ -77,11 +77,8 @@ int copyToRoute(HTTPRequest &request, Route &route, std::map<std::string, Route>
         request.setStatusMessage("Method Not Allowed");
         request.setPath(request.getErrorPages(request.getStatusCode()));;
         std::cout << "405 detected" << std::endl;
-        // exit(0);
         return -1;
     }
-
-    // exit(0);
 
     route.setAllowedMethods(it->second.getAllowedMethods());
     route.setAutoindex(it->second.isAutoindex());
@@ -138,6 +135,11 @@ void deleteRequestedFile(HTTPRequest &request, std::string path, std::string fil
 }
 
 void fileHasNoCGI(HTTPRequest &request, Route &route, std::string &file_name) {
+    if(request.getMethod() == "POST") {
+        request.setStatusCode(405);
+        request.setStatusMessage("Method Not Allowed");
+        request.setPath(request.getErrorPages(request.getStatusCode()));;
+    }
     std::string filePath = (route.getRootDir() + file_name);
     if(request.getMethod() == "GET") {
         GETReadFileContent(request, route.getRootDir() + "/" + request.getPath() + file_name);
@@ -191,14 +193,6 @@ void pathIsFile(HTTPRequest &request, std::map<std::string, Route> &routes, Rout
     (void) routes;
     // std::cout << "path is file: " << route.getRootDir() << std::endl;
     std::string filePath = (route.getRootDir() + "/" + request.getPath());
-    // if(!request.getQuery().empty()) {
-    //     size_t q = filePath.find(request.getQuery());
-    //     if(q != std::string::npos) {
-    //         std::cout << "waaaaaaa3: " << filePath.substr(0, q - 1) << std::endl;
-    //         filePath = filePath.substr(0, q - 1);
-    //         // exit(0);
-    //     }
-    // }
     std::cout << " ********** " << filePath << "***********" << std::endl;
     if(!isFileExist((filePath).c_str())) {
         std::cout << "* file not found: " << filePath << std::endl;
@@ -207,6 +201,10 @@ void pathIsFile(HTTPRequest &request, std::map<std::string, Route> &routes, Rout
         request.setFileContent("");
         // request.setPath(request.getRootDir() + "/errors/404.html");
         request.setPath(request.getErrorPages(request.getStatusCode()));
+        return;
+    }
+    if(!route.getRedirect().empty()) {
+        request.RedirectionFound(route);
         return;
     }
     if(isLocationHasCGI(filePath))
@@ -251,13 +249,8 @@ void pathIsDirectory(HTTPRequest &request, std::map<std::string, Route> &routes,
     // std::cout << "simo ===> " << (route.getRootDir() + (_path == "/" ? "" : _path)) << std::endl;
     if((dir = opendir((route.getRootDir() + "/" + (_path == "/" ? "" : _path)).c_str())) != NULL) {
         const std::vector<std::string> index_files = route.getIndexFiles();
-
-        // if must be redirected
         if(!route.getRedirect().empty()) {
-            std::cout << "redirection ---> " << route.getRedirect() << std::endl;
-            request.setPath(route.getRedirect());
-            // this must be fixed cause it's not gonna always be a GET request - simon
-            request.handleRequest();
+            request.RedirectionFound(route);
             return;
         }
         if(index_files.size() == 0) {

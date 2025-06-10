@@ -2,10 +2,13 @@
 
 HTTPRequest::HTTPRequest(const std::string &raw_request, WebServerConfig *_config, int _clientId) : IHTTPMessage(), config(_config), clientId(_clientId)
 {
-    // std::cout << "raw \n" << raw_request << std::endl;
+    // std::cout << "raw \n" << raw_request.substr(0, 20) << std::endl;
     if (parse(*this, raw_request) == -1)
         return;
-    // exit(0);
+    // if(getMethod() == "POST") {
+    //     std::cout << "---> " << getBody().substr(0, 300) << std::endl;
+    //     exit(0);
+    // }
     if (checkAllowedMethods(*this) == -1)
         return;
     handleRequest();
@@ -13,8 +16,7 @@ HTTPRequest::HTTPRequest(const std::string &raw_request, WebServerConfig *_confi
 
 HTTPRequest::~HTTPRequest() {}
 
-void HTTPRequest::setMethod(const std::string &method)
-{
+void HTTPRequest::setMethod(const std::string &method) {
     this->method = method;
 }
 
@@ -87,7 +89,7 @@ void HTTPRequest::setBodyFound(bool b)
     this->bodyFound = b;
 }
 
-void HTTPRequest::setLocation(std::string &location)
+void HTTPRequest::setLocation(const std::string &location)
 {
     this->location = extractDirectory(location);
 }
@@ -281,7 +283,7 @@ void HTTPRequest::handleRequest()
     if (getMethod() == "GET")
         handleGet(routes, route);
     else if (getMethod() == "POST")
-        handlePOST();
+        handlePOST(routes, route);
     else if (getMethod() == "DELETE")
         handleDELETE(routes, route);
     // std::cout << "full path ===> " << getRootDir() + getPath() << std::endl;
@@ -320,11 +322,13 @@ void HTTPRequest::executeCGI(Route &route)
         }
         else
         {
+
+            //! add POST implementation here
             std::cout << "root ---> " << getRootDir() << std::endl;
             cgi = new CGI(*this, route);
             (void)cgi;
-            std::cout << "---> cgi executed: " << cgi->executeCGI() << std::endl;
-            exit(0);
+            cgi->executeCGI();
+            // exit(0);
         }
     }
 }
@@ -348,32 +352,40 @@ void HTTPRequest::handleDELETE(std::map<std::string, Route> &routes, Route &rout
         pathIsFile(*this, routes, route);
 }
 
-void HTTPRequest::handlePOST()
+void HTTPRequest::RedirectionFound(Route &route) {
+    setPath(route.getRedirect());
+    setLocation(getPath());
+    setStatusCode(301);
+    setStatusMessage("Moved Permanently");
+    handleRequest();
+}
+
+void HTTPRequest::handlePOST(std::map<std::string, Route> &routes, Route &route)
 {
     std::cout << "POST method" << std::endl;
-    //! remove this later;
-    // exit(0);
-    // std::vector<FormFile> formFiles = parseMultipartFormData(getBody(), getBoundary());
-    std::vector<FormFile> formFiles = parseMultipartFormData(getBody(), getBoundary());
-    setFormFile(formFiles);
+    exit(0);
+    std::string contentType = getHeader("Content-Type");
+    std::cout << getBody();
 
-    if (getFormFiles().empty())
-    {
-        std::cout << "no form files" << std::endl;
+    if (isDirExist(getPath(), route.getRootDir())) {
+        std::cout << "path is directory" << std::endl;
+        if(contentType.rfind("application/x-www-form-urlencoded") != std::string::npos) {
+            setStatusCode(400);
+            setStatusMessage("Bad Request");
+            setPath(getErrorPages(getStatusCode()));
+            return;
+        }
+        std::vector<FormFile> formFiles = parseMultipartFormData(getBody(), getBoundary());
+        setFormFile(formFiles);
+
+        if (getFormFiles().empty()) {
+            std::cout << "no form files" << std::endl;
+        }
+        uploadFiles(*this);
+    } else {
+        pathIsFile(*this, routes, route);
     }
-    // std::cout << "form size ---> " << formFiles.size() << std::endl;
-    uploadFiles(*this);
-    // for (size_t i = 0; i < formFiles.size(); ++i) {
-    //     std::cout << "File " << i + 1 << ":\n";
-    //     std::cout << "  Name: " << formFiles[i].name << "\n";
-    //     std::cout << "  Filename: " << formFiles[i].filename << "\n";
-    //     std::cout << "  Content-Type: " << formFiles[i].contentType << "\n";
-    //     std::cout << "  Data size: " << formFiles[i].data.size() << " bytes\n";
-    //     // std::cout << "  Data preview: " << formFiles[i].data.substr(0, 50) << "\n";
-    //     std::cout << "Data preview: ";
-    //     for(size_t j = 0; j < formFiles[i].data.size(); j++) {
-    //         std::cout << formFiles[i].data[j];
-    //     }
-    //     std::cout << std::endl;
-    // }
+    exit(0);
+    // std::vector<FormFile> formFiles = parseMultipartFormData(getBody(), getBoundary());
+    
 }

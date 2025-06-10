@@ -70,7 +70,7 @@ int parse( HTTPRequest &request, const std::string &raw_request) {
   // if(ss.str().length() > request.getConfig()->getMaxBodySize()) {
   //     request.setStatusCode(413);
   //     request.setStatusMessage("Request Entity Too Large");
-        // request.setPath(request.getRootDir() + "/errors/413.html");
+  //     request.setPath(request.getRootDir() + "/errors/413.html");
   //     return -1;
   // }
   std::getline(ss, line);

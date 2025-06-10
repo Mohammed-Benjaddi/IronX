@@ -67,7 +67,7 @@ public:
     void setFormFile(std::vector<FormFile>& formFiles);
     void setRootDir(std::string rootDor);
     void setFileExtension(const std::string& path);
-    void setLocation(std::string& location);
+    void setLocation(const std::string& location);
     void setErrorPages(const std::map<int, std::string>& error_pages);
 
     // Getters
@@ -94,9 +94,11 @@ public:
 
     int setRoutesInfo(std::map<std::string, Route> &routes, Route &route);
 
+    void RedirectionFound(Route &route);
+
     void handleRequest();
     void handleGet(std::map<std::string, Route> &routes, Route &route);
-    void handlePOST();
+    void handlePOST(std::map<std::string, Route> &routes, Route &route);
     void handleDELETE(std::map<std::string, Route> &routes, Route &route);
 
     void executeCGI(Route &route);
