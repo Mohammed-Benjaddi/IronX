@@ -357,13 +357,14 @@ void HTTPRequest::RedirectionFound(Route &route) {
     setLocation(getPath());
     setStatusCode(301);
     setStatusMessage("Moved Permanently");
+    setMethod("GET");
     handleRequest();
 }
 
 void HTTPRequest::handlePOST(std::map<std::string, Route> &routes, Route &route)
 {
     std::cout << "POST method" << std::endl;
-    exit(0);
+    // exit(0);
     std::string contentType = getHeader("Content-Type");
     std::cout << getBody();
 
@@ -385,7 +386,7 @@ void HTTPRequest::handlePOST(std::map<std::string, Route> &routes, Route &route)
     } else {
         pathIsFile(*this, routes, route);
     }
-    exit(0);
+    // exit(0);
     // std::vector<FormFile> formFiles = parseMultipartFormData(getBody(), getBoundary());
     
 }

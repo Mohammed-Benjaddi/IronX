@@ -159,7 +159,7 @@ void mocker(WebServerConfig &wsc) {
     
     std::set<std::string> methods1;
     methods1.insert("GET");
-    methods1.insert("HEAD");
+    methods1.insert("POST");
     route1.setAllowedMethods(methods1);
     route1.setAutoindex(true);
     routes1.insert(std::make_pair("/", route1));
@@ -196,6 +196,13 @@ void mocker(WebServerConfig &wsc) {
     methods3.insert("GET");
     methods3.insert("POST");
     route3.setAllowedMethods(methods3);
+    std::vector<std::string> _indexFiles1;
+    _indexFiles1.push_back("index.html");
+    _indexFiles1.push_back("file.html");
+    route3.setIndexFiles(_indexFiles1);
+
+
+    route3.setRedirect("/");
 
     // route3.setUploadDir("/var/www/uploads/tmp");
     routes1.insert(std::make_pair("/upload", route3));
