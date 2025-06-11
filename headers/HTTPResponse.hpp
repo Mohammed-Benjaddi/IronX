@@ -16,31 +16,29 @@ public:
     // Constructors
     HTTPResponse();
     HTTPResponse(HTTPRequest* request);
-    
     ~HTTPResponse();
 
     std::string getNextChunk();
     bool isComplete() const;
     std::string getConnectionHeader();
     
-    size_t getFileSize(std::string path) const;
+    void    handleDeletion();
+
+    size_t  getFileSize(std::string path) const;
     void    setStatus(int code, const std::string& message);
-    void setHeader(const std::string& key, const std::string& value);
-    void setConnection(const std::string& connection);
+    void    setHeader(const std::string& key, const std::string& value);
+    void    setConnection(const std::string& connection);
 
-    void setBody(const std::string& body);              
-    void setStreamer(FileStreamer* streamer);           
+    void    setBody(const std::string& body);              
+    void    setStreamer(FileStreamer* streamer);           
 
-    int getStatusCode() const;
+    int     getStatusCode() const;
     std::string getStatusMessage() const;
     std::map<std::string, std::string> getHeaders() const;
 
     // void build_OK_Response(HTTPRequest* request);
     // void buildResponse(HTTPRequest* request);          
     void buildAutoIndexResponse(HTTPRequest*);
-
-    static HTTPResponse fromError(int code, const std::string& message, const std::string& body);
-    static HTTPResponse fromRedirect(const std::string& location);
 
     static std::string getMimeType(const std::string& path);
 
@@ -65,3 +63,4 @@ private:
     static std::map<std::string, std::string> _mimeTypes;
     // static std::map<std::string, std::string> initMimeTypes();
 };
+

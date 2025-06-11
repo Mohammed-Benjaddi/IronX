@@ -65,7 +65,7 @@ deleteJobButton.addEventListener('click', async () => {
     }
 });
 
-fileInput.addEventListener('change', async (e) => {
+fileInput.addEventListener('change', (e) => {
     const selectedFile = e.target.files[0];
     
     if (!selectedFile) {
@@ -79,7 +79,7 @@ fileInput.addEventListener('change', async (e) => {
     formData.append('file', selectedFile);
 
     try {
-        const res = await fetch(`${baseUrl}/upload`, {  // Changed to `/upload` (best practice)
+        const res = fetch(`${baseUrl}/upload`, {  // Changed to `/upload` (best practice)
             method: 'POST',
             body: formData,
         });

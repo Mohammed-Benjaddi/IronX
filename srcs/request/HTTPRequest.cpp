@@ -10,6 +10,7 @@ HTTPRequest::HTTPRequest(const std::string &raw_request, WebServerConfig *_confi
     handleRequest();
 }
 
+
 HTTPRequest::~HTTPRequest() {}
 
 void HTTPRequest::setMethod(const std::string &method) {
@@ -216,13 +217,9 @@ int HTTPRequest::setRoutesInfo(std::map<std::string, Route> &routes, Route &rout
         setStatusCode(404);
         setStatusMessage("Not Found");
         setPath(getErrorPages(getStatusCode()));
-        std::cout << "waaaa3 ===> " << getLocation() << std::endl;
-        exit(0);
         return -1;
-        
     } else {
-        
-        if(copyToRoute(*this, route, it_route) == -1)
+        if (copyToRoute(*this, route, it_route) == -1)
             return -1;
     }
     return 1;
@@ -232,7 +229,7 @@ void HTTPRequest::handleRequest() {
     Route route;
     std::map<std::string, Route> routes;
 
-    if(setRoutesInfo(routes, route) == -1)
+    if (setRoutesInfo(routes, route) == -1)
         return;
     setFileExtension(getPath());
     if (getMethod() == "GET")
@@ -263,7 +260,7 @@ void HTTPRequest::handleGet(std::map<std::string, Route> &routes, Route &route) 
 }
 
 void HTTPRequest::handleDELETE(std::map<std::string, Route> &routes, Route &route) {
-    if(isDirExist(getPath(), route.getRootDir())) {
+    if (isDirExist(getPath(), route.getRootDir())) {
         std::cout << "path is directory" << std::endl;
         DELETEDirectory(*this, routes, route, getPath());
     }

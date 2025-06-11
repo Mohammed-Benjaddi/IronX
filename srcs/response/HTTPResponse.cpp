@@ -18,7 +18,9 @@ HTTPResponse::HTTPResponse(HTTPRequest* request)
 
     if (!request->getStatusCode())
         build_OK_Response(request, this);
-    else
+    else if (request->getMethod() == "DELETE") {
+        setStandardHeaders(this, "text/plain", 0, "close", request->getStatusCode(), request->getStatusMessage());
+    } else
         buildResponse(request, this);
 }
 
@@ -91,6 +93,11 @@ std::string HTTPResponse::getNextChunk() {
             }
         }
         return chunk;
+    } else {
+        if (_bodyPos >= _body.size()) {
+            _complete = true;
+            return "";
+        }
     }
 
     if (_bodyPos < _body.size()) {
@@ -122,20 +129,8 @@ std::string HTTPResponse::getNextChunk() {
 
     make a function that gets you the relative path from route default
 */
+ 
 
-std::string getRelativePath(const std::string& path, const std::string& rootPath) {
-    std::string relative;
-    if (path.find(rootPath) == 0) {
-        relative = path.substr(rootPath.length()); 
-    } else {
-        relative = path;
-    }
-
-    relative = relative.substr(0, relative.size() - 11);
-
-    std::cout << "relative path: " << relative << "\n";
-    return relative;
-}
 
 void HTTPResponse::buildAutoIndexResponse(HTTPRequest *request) {
 

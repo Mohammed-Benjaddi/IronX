@@ -21,3 +21,5 @@ void buildResponse(HTTPRequest* req, HTTPResponse* res);
 
 void setStandardHeaders(HTTPResponse*, const std::string&, size_t , const std::string&, int, std::string);
 
+std::string getRelativePath(const std::string& path, const std::string& rootPath);
+

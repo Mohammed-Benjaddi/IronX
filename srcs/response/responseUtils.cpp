@@ -84,6 +84,20 @@ void setStandardHeaders(HTTPResponse* res, const std::string& contentType,
     res->setStatus(statusCode, statusMessage);
 }
 
+std::string getRelativePath(const std::string& path, const std::string& rootPath) {
+    std::string relative;
+    if (path.find(rootPath) == 0) {
+        relative = path.substr(rootPath.length()); 
+    } else {
+        relative = path;
+    }
+
+    relative = relative.substr(0, relative.size() - 11);
+
+    std::cout << "relative path: " << relative << "\n";
+    return relative;
+}
+
 
 
 

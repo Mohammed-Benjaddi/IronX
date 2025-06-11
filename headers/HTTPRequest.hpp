@@ -32,6 +32,7 @@ typedef struct sFormFile {
 class HTTPRequest : public IHTTPMessage {
 private:
     WebServerConfig *config;
+    int clientId;
     HTTPResponse *response;
     FileStreamer *streamer;
     std::string method;
@@ -40,7 +41,6 @@ private:
     std::map<std::string, std::string> headers;
     std::string body;
     std::string query;
-    int clientId;
     std::string fileContent;
     bool bodyFound;
     std::string rootDir;
@@ -50,7 +50,8 @@ private:
     std::map<int, std::string> error_pages;
 
 public:
-    HTTPRequest(const std::string &raw_request, WebServerConfig *config, int clientId);
+    HTTPRequest(const std::string &, WebServerConfig *, int );
+    HTTPRequest(const std::string &, WebServerConfig *, int , HTTPResponse *);
     ~HTTPRequest();
 
     // Setters

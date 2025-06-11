@@ -27,7 +27,7 @@ void Connection::handleRead() {
         ssize_t bytes_read = recv(
             _fd, 
             buffer,
-            sizeof(buffer),
+            sizeof(buffer), 
             0);
         
         if (bytes_read > 0) {
@@ -45,8 +45,6 @@ void Connection::handleRead() {
     }
 
     //!  Merge Point Multiplexer <-> Request Branches   */
-
-    // std::cout << "Read Buffer : " << _readBuffer << std::endl;   
 
     _httpRequest = new HTTPRequest(_readBuffer, _config, 0);
 
@@ -108,6 +106,7 @@ void Connection::handleWrite() {
             throw Multiplexer::ClientDisconnectedException();
         }
     }
+
     if ((!_writeBuffer.empty() || (_httpResponse && !_httpResponse->isComplete())) && !_closed)
         re_armFd();
 }
@@ -125,3 +124,27 @@ bool	Connection::isClosed()	const {
     return _closed;
 }
 
+
+
+
+    // exit(1);
+    // _streamer = new FileStreamer("/home/nab/Desktop/webserve-42/www/html/razzmatazz.mp3" , request.get_header("Connection"));
+    
+
+    //? *****************************/
+    // char cwd[PATH_MAX];
+    // getcwd(cwd, sizeof(cwd));
+    // std::string fullPath = std::string(cwd);
+    // fullPath += "/www/html";
+    // fullPath += request.getPath();
+    // if (request.getPath().empty())
+    //     request.setPath("/index.html");
+    // if (request.getRootDir().empty())
+    //     request.setRootDir("/home/nab/Desktop/webserve-42/www/html");
+    // fullPath = request.getRootDir() + request.getPath();
+    //     fullPath += "index.html";
+    
+    
+    // std::cout << request.getRootDir() << " " << request.getPath() << "\n";
+    // _streamer = new FileStreamer(fullPath, request.getHeader("Connection"));
+    // _httpResponse = new HTTPResponse(request.getHeader("Connection"), _streamer);

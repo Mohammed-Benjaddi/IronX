@@ -118,34 +118,39 @@ void GETReadFileContent(HTTPRequest &request, std::string path) {
 void deleteRequestedFile(HTTPRequest &request, std::string path, std::string filename) {
     // check permision of the file
     std::ofstream file((path + filename).c_str());
-    if(!file.is_open()) {
+    if (!file.is_open()) {
         std::cout << "* could not open" << std::endl;
         request.setStatusCode(403);
         request.setStatusMessage("Forbidden");
         request.setFileContent("");
         // request.setPath(request.getRootDir() + "/errors/403.html");
-        request.setPath(request.getErrorPages(request.getStatusCode()));;
+        request.setPath(request.getErrorPages(request.getStatusCode()));
         return;
     }
+
+    std::cout << "Location: " << request.getLocation() << std::endl;
+    std::cout << "path: " << path << std::endl;
+
     int result = remove((path).c_str());
-    if(!result) {
+    if (!result) {
         std::cout << "the file removed successfully" << std::endl;
         request.setStatusCode(204);
         request.setStatusMessage("No Content");
     }
     else
         std::cout << "something went wrong" << std::endl;
+    // exit(0);
 }
 
 void fileHasNoCGI(HTTPRequest &request, Route &route, std::string &file_name) {
     std::string filePath = (route.getRootDir() + file_name);
-    if(request.getMethod() == "GET") {
+    if (request.getMethod() == "GET") {
         GETReadFileContent(request, route.getRootDir() + "/" + request.getPath() + file_name);
         // std::cout << "file content: " << request.getFileContent() << std::endl;
     }
-    else if(request.getMethod() == "DELETE") {
+    else if (request.getMethod() == "DELETE") {
         std::cout << "a file must be deleted" << std::endl;
-        deleteRequestedFile(request, "/" + route.getRootDir() + request.getPath(), file_name);
+        deleteRequestedFile(request, "/" + route.getRootDir() + "/" + request.getPath(), file_name);
     }
 }
 
@@ -192,7 +197,7 @@ void pathIsFile(HTTPRequest &request, std::map<std::string, Route> &routes, Rout
     // std::cout << "path is file: " << route.getRootDir() << std::endl;
     std::string filePath = (route.getRootDir() + "/" + request.getPath());
     std::cout << " ********** " << filePath << "***********" << std::endl;
-    if(!isFileExist((filePath).c_str())) {
+    if (!isFileExist((filePath).c_str())) {
         std::cout << "* file not found" << std::endl;
         request.setStatusCode(404);
 
@@ -202,7 +207,7 @@ void pathIsFile(HTTPRequest &request, std::map<std::string, Route> &routes, Rout
         request.setPath(request.getErrorPages(request.getStatusCode()));;
         return;
     }
-    if(isLocationHasCGI(filePath))
+    if (isLocationHasCGI(filePath))
         request.executeCGI(route);
     else {
         std::cout << "file has no CGI" << std::endl;
@@ -229,7 +234,7 @@ void DELETEDirectory(HTTPRequest &request, std::map<std::string, Route> &routes,
             request.setPath(request.getErrorPages(request.getStatusCode()));;
         } else {
             int result = remove((location).c_str());
-            if(!result)
+            if (!result)
                 std::cout << "the folder removed successfully" << std::endl;
             else
                 std::cout << "something went wrong" << std::endl;

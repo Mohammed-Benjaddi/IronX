@@ -26,6 +26,11 @@ FileStreamer::FileStreamer(const std::string& path, std::string connection) :
     _totalSize = st.st_size;
 }
 
+// FileStreamer::FileStreamer(const std::string& connection) 
+//     : _path(""), _offset(0), _eof(true), _connectionHeader(connection), 
+//       _rangeStart(0), _rangeEnd(0), _isPartial(false) , _fd(-1), _totalSize(0) {
+// }
+
 FileStreamer::~FileStreamer() { if (_fd != -1) close(_fd); }
 
 bool FileStreamer::isOpen() const { return (fcntl(_fd, F_GETFD) != -1); };

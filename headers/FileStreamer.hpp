@@ -29,21 +29,22 @@ class FileStreamer {
         bool        _isPartial;
     public:
         FileStreamer(const std::string&, std::string);
+        // FileStreamer(const std::string&);
         // FileStreamer(HTTPRequest &);
         ~FileStreamer();
 
         std::string getNextChunk(size_t chunkSize = 8192);
-        int         getFD() const;
-        bool        isOpen() const;
-        bool        isEOF() const;
+        std::string getConnectionHeader();
+        std::string getPath() const;
         size_t      getFileSize();
         size_t      getFileSize(std::string) const;
-        std::string getConnectionHeader();
+        bool        isEOF() const;
+        bool        isOpen() const;
+        int         getFD() const;
         void        setRange(size_t start, size_t end);
         size_t      getStartByte() const;
         size_t      getEndByte() const;
         bool        isPartialRequest() const;
-        std::string getPath() const;
         class FileFailure : public std::exception {
             public:
                 const char* what() const throw();
