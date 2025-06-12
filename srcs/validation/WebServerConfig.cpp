@@ -113,6 +113,10 @@ const std::map<std::string, Route>& Cluster::getRoutes() const {
     return routes;
 }
 
+std::map<std::string, Route>& Cluster::getRoutes() {
+    return this->routes;
+}
+
 // WebServerConfig methods
 // setters
 void WebServerConfig::setClusters(const std::vector<Cluster>& clusters) {

@@ -65,6 +65,7 @@ class Cluster {
         const std::vector<uint16_t>& getPorts() const;
         const std::vector<std::string>& getHostnames() const;
         const std::map<std::string, Route>& getRoutes() const;
+		std::map<std::string, Route>& getRoutes();
 };
 
 class WebServerConfig {

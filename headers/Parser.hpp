@@ -6,7 +6,7 @@
 /*   By: ael-maaz <ael-maaz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 17:38:56 by ael-maaz          #+#    #+#             */
-/*   Updated: 2025/06/10 20:50:38 by ael-maaz         ###   ########.fr       */
+/*   Updated: 2025/06/12 20:37:45 by ael-maaz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,15 @@
 #include <fstream>
 #include <stdint.h>
 #include <sstream>
-
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <vector>
+#include <map>
+#include <set>
+#include <string>
+#include <algorithm>
+#include <stdexcept>
 #include "WebServerConfig.hpp"
 
 
@@ -29,7 +37,7 @@ class Parser {
 	public:
 		Parser();
 		~Parser();
-		int OpenTomlFile(std::string path);
+		int OpenTomlFile(std::string& path);
 		int MainParser(std::string path);
 		std::ifstream infile;
 		std::vector<std::string> lines;
