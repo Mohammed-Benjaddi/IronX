@@ -15,12 +15,14 @@ HTTPResponse::HTTPResponse()
 HTTPResponse::HTTPResponse(HTTPRequest* request)
     : _statusCode(200), _statusMessage("OK"), _connectionType("keep-alive"),
       _streamer(NULL), _request(request), _bodyPos(0), _headersSent(false), _complete(false) {
-
-    if (!request->getStatusCode())
-        build_OK_Response(request, this);
-    else if (request->getMethod() == "DELETE") {
+    
+    if (request->getMethod() == "DELETE") {
+        // exit(0);
+        std::cout << "Status Code : " << request->getStatusCode() << std::endl;
         setStandardHeaders(this, "text/plain", 0, "close", request->getStatusCode(), request->getStatusMessage());
-    } else
+    } else if (!request->getStatusCode())
+        build_OK_Response(request, this);
+      else
         buildResponse(request, this);
 }
 

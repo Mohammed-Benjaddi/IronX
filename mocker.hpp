@@ -99,7 +99,6 @@ void printConfig(const WebServerConfig& config) {
                 std::cout << "]\n";
                 std::cout << "      Interpreter: " << cgi.getInterpreter() << "\n";
             }
-
             std::cout << "\n";
         }
         std::cout << "\n";
@@ -176,6 +175,7 @@ void mocker(WebServerConfig &wsc) {
     route2.setAutoindex(true);
     methods2.insert("GET");
     methods2.insert("POST");
+    methods2.insert("DELETE");
     route2.setAllowedMethods(methods2);
     
     CGIConfig cgi1;
@@ -189,12 +189,14 @@ void mocker(WebServerConfig &wsc) {
 
     // Route 3: /uploads
     Route route3;
-    route3.setRootDir("/var/www/uploads");
-
+    route3.setRootDir(path);
+    
+    // exit(0);
     std::set<std::string> methods3;
     methods3.insert("POST");
+    methods3.insert("GET");
     route3.setAllowedMethods(methods3);
-
+    route3.setAutoindex(true);
     route3.setUploadDir("/var/www/uploads/tmp");
     routes1.insert(std::make_pair("/uploads", route3));
 

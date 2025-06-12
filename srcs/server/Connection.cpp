@@ -46,6 +46,8 @@ void Connection::handleRead() {
 
     //!  Merge Point Multiplexer <-> Request Branches   */
 
+    std::cout << "REQUEST RECEIVED: \n" << _readBuffer << "\n";
+
     _httpRequest = new HTTPRequest(_readBuffer, _config, 0);
 
     _httpResponse = new HTTPResponse(_httpRequest);
@@ -72,7 +74,6 @@ void Connection::re_armFd() {
 }
 
 void Connection::handleWrite() {
-    //!!!!!!!!  SEGFAULT   
     std::cout << "Im writing\n";
     if (_httpResponse && _httpResponse->isComplete() && _writeBuffer.empty()) {
         std::string connType = _httpResponse->getConnectionHeader();

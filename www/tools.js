@@ -2,6 +2,7 @@ const postJobButton = document.getElementById('post-job-button');
 const deleteJobButton = document.getElementById('delete-job-button');
 const getJobButton = document.getElementById('get-job-button');
 const fileInput = document.getElementById('file-upload');
+let postTargetPath = null;
 
 const baseUrl = `${window.location.protocol}//${window.location.hostname}:${window.location.port}`;
 
@@ -65,21 +66,37 @@ deleteJobButton.addEventListener('click', async () => {
     }
 });
 
-fileInput.addEventListener('change', (e) => {
+postJobButton.addEventListener('click', () => {
+    const path = prompt("Enter the route to POST the file to (e.g., 'upload' or 'files/new'):");
+    if (!path) {
+        console.log('No path provided.');
+        return;
+    }
+
+    postTargetPath = path;
+    fileInput.click();
+});
+
+fileInput.addEventListener('change', async (e) => {
     const selectedFile = e.target.files[0];
-    
+
     if (!selectedFile) {
         console.log('No file selected.');
         return;
     }
 
-    console.log(`File Selected: ${selectedFile.name}`);
-    
+    if (!postTargetPath) {
+        alert('Upload path was not set. Please try again.');
+        return;
+    }
+
+    console.log(`Uploading ${selectedFile.name} to /${postTargetPath}`);
+
     const formData = new FormData();
     formData.append('file', selectedFile);
 
     try {
-        const res = fetch(`${baseUrl}/upload`, {  // Changed to `/upload` (best practice)
+        const res = await fetch(`${baseUrl}/${postTargetPath}`, {
             method: 'POST',
             body: formData,
         });
@@ -96,5 +113,8 @@ fileInput.addEventListener('change', (e) => {
         alert('File uploaded successfully!');
     } catch (err) {
         handleFetchError(err);
+    } finally {
+        postTargetPath = null;
+        fileInput.value = '';  // reset file input
     }
 });

@@ -2,10 +2,10 @@
 
 HTTPRequest::HTTPRequest(const std::string &raw_request, WebServerConfig *_config, int _clientId) : IHTTPMessage(), config(_config), clientId(_clientId) {
     // std::cout << "raw \n" << raw_request << std::endl;
-    if(parse(*this, raw_request) == -1)
+    if (parse(*this, raw_request) == -1)
         return;
     // exit(0);
-    if(checkAllowedMethods(*this) == -1)
+    if (checkAllowedMethods(*this) == -1)
         return;
     handleRequest();
 }
@@ -234,10 +234,14 @@ void HTTPRequest::handleRequest() {
     setFileExtension(getPath());
     if (getMethod() == "GET")
         handleGet(routes, route);
-    else if (getMethod() == "POST")
+    else if (getMethod() == "POST") {
+        exit(0);
         handlePOST();
-    else if (getMethod() == "DELETE")
+    } else if (getMethod() == "DELETE") {
+        // exit(0);
         handleDELETE(routes, route);
+        return ;
+    }
     std::cout << "=======> status code: " << getStatusCode() << std::endl;
     // std::cout << "full path ===> " << getRootDir() + getPath() << std::endl;
 }
@@ -260,14 +264,19 @@ void HTTPRequest::handleGet(std::map<std::string, Route> &routes, Route &route) 
 }
 
 void HTTPRequest::handleDELETE(std::map<std::string, Route> &routes, Route &route) {
+    std::cout << "==========\n";
+    std::cout << getPath() << std::endl;
+    std::cout << getRootDir() << std::endl;
+    std::cout << getLocation() << std::endl;
+    std::cout << "==========\n";
     if (isDirExist(getPath(), route.getRootDir())) {
         std::cout << "path is directory" << std::endl;
         DELETEDirectory(*this, routes, route, getPath());
+        return ;
     }
     else
         pathIsFile(*this, routes, route);
 }
-
 
 void HTTPRequest::handlePOST() {
     std::cout << "POST method" << std::endl;
@@ -277,7 +286,7 @@ void HTTPRequest::handlePOST() {
     std::vector<FormFile> formFiles = parseMultipartFormData(getBody(), getBoundary());
     setFormFile(formFiles);
 
-    if(getFormFiles().empty()) {
+    if (getFormFiles().empty()) {
         std::cout << "no form files" << std::endl;
     }
     // std::cout << "form size ---> " << formFiles.size() << std::endl;
