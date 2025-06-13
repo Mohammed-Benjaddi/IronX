@@ -17,7 +17,10 @@
 #include "parseRequest.hpp"
 #include <filesystem>
 #include <cstring>
-// #include "CGI.hpp"
+
+#include "CGI.hpp"
+
+class CGI;
 
 typedef struct sFormFile {
     std::string name;
@@ -45,6 +48,7 @@ private:
     std::string fileExtension;
     std::string location;
     std::map<int, std::string> error_pages;
+    CGI *cgi;
 
 public:
     HTTPRequest(const std::string &raw_request, WebServerConfig *config, int clientId);
@@ -65,7 +69,8 @@ public:
     void setFormFile(std::vector<FormFile>& formFiles);
     void setRootDir(std::string rootDor);
     void setFileExtension(const std::string& path);
-    void setLocation(std::string& location);
+
+    void setLocation(const std::string& location);
     void setErrorPages(const std::map<int, std::string>& error_pages);
 
     // Getters
@@ -92,9 +97,12 @@ public:
 
     int setRoutesInfo(std::map<std::string, Route> &routes, Route &route);
 
+    void RedirectionFound(Route &route);
+
+
     void handleRequest();
     void handleGet(std::map<std::string, Route> &routes, Route &route);
-    void handlePOST();
+    void handlePOST(std::map<std::string, Route> &routes, Route &route);
     void handleDELETE(std::map<std::string, Route> &routes, Route &route);
 
     void executeCGI(Route &route);

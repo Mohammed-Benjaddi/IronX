@@ -41,7 +41,7 @@ int checkAllowedMethods(HTTPRequest &request) {
 // }
 
 bool URIHasUnallowedChar(std::string uri) {
-  const std::string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_-~/?#[]@!$$('*+,'=%.";
+  const std::string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_-~/?#[]@!$$('*+,'=%.&";
   const std::vector<char> allowedChars(chars.begin(), chars.end());
   
   for(size_t i = 0; i < uri.size(); i++) {
@@ -70,7 +70,7 @@ int parse( HTTPRequest &request, const std::string &raw_request) {
   // if(ss.str().length() > request.getConfig()->getMaxBodySize()) {
   //     request.setStatusCode(413);
   //     request.setStatusMessage("Request Entity Too Large");
-        // request.setPath(request.getRootDir() + "/errors/413.html");
+  //     request.setPath(request.getRootDir() + "/errors/413.html");
   //     return -1;
   // }
   std::getline(ss, line);
@@ -113,14 +113,12 @@ int find_method_uri(HTTPRequest &request, const std::string &line) {
   }
   
   request.setLocation(uri);
-
-  // std::cout << "uri ---> " << uri << " | " << request.getLocation() << std::endl;
-  // exit(0);
   
   size_t queryPos = uri.find('?');
   if (queryPos != std::string::npos) {
       request.setQuery(uri.substr(queryPos + 1));
       request.setPath(uri.substr(0, queryPos));
+      uri = uri.substr(0, queryPos);
   }
   if(uri[uri.length() - 1] == '/' && uri.size() == 1) {
     uri = uri.substr(0, uri.length() - 1);
@@ -299,20 +297,26 @@ std::vector<FormFile> parseMultipartFormData(const std::string &body, const std:
     return files;
 }
 
-std::string extractDirectory(const std::string& location) {
-    if (location.empty()) {
+std::string extractDirectory(const std::string& location)
+{
+    if (location.empty())
         return "";
-    }
-    if (location == "/") {
+    if (location == "/")
         return "/";
-    }
-    size_t lastSlash = location.rfind('/');
     size_t firstSlash = location.find('/');
-    size_t dot = location.find(".");
+    size_t lastSlash = location.rfind('/');
+    size_t dot = location.find('.');
+
     if (lastSlash == firstSlash && dot != std::string::npos)
-      return "/";
-    else if (lastSlash == firstSlash && dot == std::string::npos)
-      return location;
+        return "/";
+    if (lastSlash == firstSlash && dot == std::string::npos)
+        return location;
+    if (dot != std::string::npos && lastSlash != firstSlash) {
+        size_t secondSlash = location.find('/', firstSlash + 1);
+        if (secondSlash != std::string::npos)
+            return location.substr(0, secondSlash);
+    }
+
     if (lastSlash == location.length() - 1) {
         std::string trimmed = location;
         while (!trimmed.empty() && trimmed[trimmed.length() - 1] == '/') {
