@@ -55,7 +55,7 @@ function showResponseInfo(status, headers, isError = false) {
     headersElement.classList.add('typing');
 
     // Play pager sound
-    document.getElementById('pager-beep')?.play();
+    // document.getElementById('pager-beep')?.play();
 }
 
 

@@ -3,18 +3,17 @@
 HTTPRequest::HTTPRequest(const std::string &raw_request, WebServerConfig *_config, int _clientId) : IHTTPMessage(), config(_config), clientId(_clientId)
 {
     // std::cout << "raw \n" << raw_request.substr(0, 20) << std::endl;
-    if  (parse(*this, raw_request) == -1)
+    if (parse(*this, raw_request) == -1)
         return;
     // if(getMethod() == "POST") {
     //     std::cout << "---> " << getBody().substr(0, 300) << std::endl;
     //     exit(0);
     // }
-    if  (checkAllowedMethods(*this) == -1)
+    if (checkAllowedMethods(*this) == -1)
 
         return;
     handleRequest();
 }
-
 
 HTTPRequest::~HTTPRequest() {}
 
@@ -262,11 +261,12 @@ int HTTPRequest::setRoutesInfo(std::map<std::string, Route> &routes, Route &rout
         setStatusCode(404);
         setStatusMessage("Not Found");
         setPath(getErrorPages(getStatusCode()));
+        // std::cout << "waaaa3 ===> " << getLocation() << std::endl;
         return -1;
-        
-    } else {
-        
-        if(copyToRoute(*this, route, it_route) == -1)
+    }
+    else
+    {
+        if (copyToRoute(*this, route, it_route) == -1)
             return -1;
     }
     return 1;
@@ -277,16 +277,16 @@ void HTTPRequest::handleRequest()
     Route route;
     std::map<std::string, Route> routes;
 
-    if(setRoutesInfo(routes, route) == -1)
+    if (setRoutesInfo(routes, route) == -1)
+
         return;
     setFileExtension(getPath());
     if (getMethod() == "GET")
         handleGet(routes, route);
     else if (getMethod() == "POST")
-        handlePOST();
+        handlePOST(routes, route);
     else if (getMethod() == "DELETE")
         handleDELETE(routes, route);
-    std::cout << "=======> status code: " << getStatusCode() << std::endl;
     // std::cout << "full path ===> " << getRootDir() + getPath() << std::endl;
 }
 
@@ -318,10 +318,7 @@ void HTTPRequest::executeCGI(Route &route)
             setStatusCode(404);
             setStatusMessage("Not Found");
             setPath(getErrorPages(getStatusCode()));
-        }
-        else
-        {
-
+        } else {
             //! add POST implementation here
             std::cout << "root ---> " << getRootDir() << std::endl;
             cgi = new CGI(*this, route);
@@ -340,15 +337,17 @@ void HTTPRequest::handleGet(std::map<std::string, Route> &routes, Route &route)
         pathIsFile(*this, routes, route);
 }
 
-void HTTPRequest::handleDELETE(std::map<std::string, Route> &routes, Route &route) {
-    if(isDirExist(getPath(), route.getRootDir())) {
+void HTTPRequest::handleDELETE(std::map<std::string, Route> &routes, Route &route)
+{
+    if (isDirExist(getPath(), route.getRootDir()))
+    {
         std::cout << "path is directory" << std::endl;
         DELETEDirectory(*this, routes, route, getPath());
-        return ;
     }
     else
         pathIsFile(*this, routes, route);
 }
+
 void HTTPRequest::RedirectionFound(Route &route) {
     setPath(route.getRedirect());
     setLocation(getPath());
@@ -374,23 +373,11 @@ void HTTPRequest::handlePOST(std::map<std::string, Route> &routes, Route &route)
         std::vector<FormFile> formFiles = parseMultipartFormData(getBody(), getBoundary());
         setFormFile(formFiles);
 
-    if(getFormFiles().empty()) {
-        std::cout << "no form files" << std::endl;
+        if (getFormFiles().empty()) {
+            std::cout << "no form files" << std::endl;
+        }
+        uploadFiles(*this);
+    } else {
+        pathIsFile(*this, routes, route);
     }
-    // std::cout << "form size ---> " << formFiles.size() << std::endl;
-    uploadFiles(*this);
-    // for (size_t i = 0; i < formFiles.size(); ++i) {
-    //     std::cout << "File " << i + 1 << ":\n";
-    //     std::cout << "  Name: " << formFiles[i].name << "\n";
-    //     std::cout << "  Filename: " << formFiles[i].filename << "\n";
-    //     std::cout << "  Content-Type: " << formFiles[i].contentType << "\n";
-    //     std::cout << "  Data size: " << formFiles[i].data.size() << " bytes\n";
-    //     // std::cout << "  Data preview: " << formFiles[i].data.substr(0, 50) << "\n";
-    //     std::cout << "Data preview: ";
-    //     for(size_t j = 0; j < formFiles[i].data.size(); j++) {
-    //         std::cout << formFiles[i].data[j];
-    //     }
-    //     std::cout << std::endl;
-    // }
-
 }
