@@ -299,11 +299,6 @@ void HTTPRequest::executeCGI(Route &route)
         std::cout << "a file must be deleted" << std::endl;
         deleteRequestedFile(*this, "/" + route.getRootDir() + getPath(), "");
     } else {
-        // CGI *cgi = new CGI(*this);
-        // (void) cgi;
-    }
-    else
-    {
         CGIConfig cgiConfig = route.getCGIConfig();
         std::string path = getPath();
         std::vector<std::string> extensions = cgiConfig.getExtensions();
