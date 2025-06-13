@@ -196,6 +196,7 @@ void mocker(WebServerConfig &wsc) {
     methods3.insert("GET");
     methods3.insert("POST");
     route3.setAllowedMethods(methods3);
+
     std::vector<std::string> _indexFiles1;
     _indexFiles1.push_back("index.html");
     _indexFiles1.push_back("file.html");

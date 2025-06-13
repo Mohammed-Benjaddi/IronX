@@ -5,7 +5,7 @@
 // ! edit this
 bool isFileExist(const char* path) {
     struct stat buffer;
-    printf("----> file to look for ---> %s\n", path);
+  
     if (stat(path, &buffer) != 0) {
         return false;
     }
@@ -79,6 +79,8 @@ int copyToRoute(HTTPRequest &request, Route &route, std::map<std::string, Route>
         std::cout << "405 detected" << std::endl;
         return -1;
     }
+
+    // exit(0);
 
     route.setAllowedMethods(it->second.getAllowedMethods());
     route.setAutoindex(it->second.isAutoindex());

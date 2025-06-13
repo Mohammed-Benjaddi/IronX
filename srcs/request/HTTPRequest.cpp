@@ -10,6 +10,7 @@ HTTPRequest::HTTPRequest(const std::string &raw_request, WebServerConfig *_confi
     //     exit(0);
     // }
     if (checkAllowedMethods(*this) == -1)
+
         return;
     handleRequest();
 }
@@ -265,7 +266,6 @@ int HTTPRequest::setRoutesInfo(std::map<std::string, Route> &routes, Route &rout
     }
     else
     {
-
         if (copyToRoute(*this, route, it_route) == -1)
             return -1;
     }
@@ -278,6 +278,7 @@ void HTTPRequest::handleRequest()
     std::map<std::string, Route> routes;
 
     if (setRoutesInfo(routes, route) == -1)
+
         return;
     setFileExtension(getPath());
     if (getMethod() == "GET")
@@ -297,6 +298,9 @@ void HTTPRequest::executeCGI(Route &route)
     {
         std::cout << "a file must be deleted" << std::endl;
         deleteRequestedFile(*this, "/" + route.getRootDir() + getPath(), "");
+    } else {
+        // CGI *cgi = new CGI(*this);
+        // (void) cgi;
     }
     else
     {

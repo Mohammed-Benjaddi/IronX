@@ -113,10 +113,6 @@ int find_method_uri(HTTPRequest &request, const std::string &line) {
   }
   
   request.setLocation(uri);
-  // std::cout << "location ---> " << request.getLocation() << std::endl;
-  //   exit(0);
-  // std::cout << "uri ---> " << uri << " | " << request.getLocation() << std::endl;
-  // exit(0);
   
   size_t queryPos = uri.find('?');
   if (queryPos != std::string::npos) {
@@ -320,6 +316,7 @@ std::string extractDirectory(const std::string& location)
         if (secondSlash != std::string::npos)
             return location.substr(0, secondSlash);
     }
+
     if (lastSlash == location.length() - 1) {
         std::string trimmed = location;
         while (!trimmed.empty() && trimmed[trimmed.length() - 1] == '/') {

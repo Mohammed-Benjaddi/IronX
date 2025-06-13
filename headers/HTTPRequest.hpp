@@ -17,6 +17,7 @@
 #include "parseRequest.hpp"
 #include <filesystem>
 #include <cstring>
+
 #include "CGI.hpp"
 
 class CGI;
@@ -48,6 +49,7 @@ private:
     std::string location;
     std::map<int, std::string> error_pages;
     CGI *cgi;
+
 public:
     HTTPRequest(const std::string &raw_request, WebServerConfig *config, int clientId);
     ~HTTPRequest();
@@ -67,6 +69,7 @@ public:
     void setFormFile(std::vector<FormFile>& formFiles);
     void setRootDir(std::string rootDor);
     void setFileExtension(const std::string& path);
+
     void setLocation(const std::string& location);
     void setErrorPages(const std::map<int, std::string>& error_pages);
 
@@ -95,6 +98,7 @@ public:
     int setRoutesInfo(std::map<std::string, Route> &routes, Route &route);
 
     void RedirectionFound(Route &route);
+
 
     void handleRequest();
     void handleGet(std::map<std::string, Route> &routes, Route &route);
