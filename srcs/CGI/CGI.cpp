@@ -47,12 +47,12 @@ char **CGI::createEnvArray()
     return env_array;
 }
 
-// void CGI::freeEnvArray(char **env_array) {
-//     for (int i = 0; env_array[i] != NULL; i++) {
-//         delete[] env_array[i];
-//     }
-//     delete[] env_array;
-// }
+void CGI::freeEnvArray(char **env_array) {
+    for (int i = 0; env_array[i] != NULL; i++) {
+        delete[] env_array[i];
+    }
+    delete[] env_array;
+}
 
 std::vector<std::string> CGI::getInterpreter(const std::string &script_path)
 {
@@ -155,6 +155,8 @@ void CGI::executeCGI()
         if (WIFEXITED(status) && WEXITSTATUS(status) == 0) {
             std::cout << "the script executed successfully" << std::endl;
             script_output = output;
+            request.setStatusCode(200);
+            request.setStatusMessage("Ok");
         }
         else {
             std::cout << "---------> something went wrong" << std::endl;

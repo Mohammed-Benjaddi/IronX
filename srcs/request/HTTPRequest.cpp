@@ -364,10 +364,8 @@ void HTTPRequest::RedirectionFound(Route &route) {
 void HTTPRequest::handlePOST(std::map<std::string, Route> &routes, Route &route)
 {
     std::cout << "POST method" << std::endl;
-    // exit(0);
     std::string contentType = getHeader("Content-Type");
     std::cout << getBody();
-
     if (isDirExist(getPath(), route.getRootDir())) {
         std::cout << "path is directory" << std::endl;
         if(contentType.rfind("application/x-www-form-urlencoded") != std::string::npos) {
@@ -386,7 +384,4 @@ void HTTPRequest::handlePOST(std::map<std::string, Route> &routes, Route &route)
     } else {
         pathIsFile(*this, routes, route);
     }
-    // exit(0);
-    // std::vector<FormFile> formFiles = parseMultipartFormData(getBody(), getBoundary());
-    
 }

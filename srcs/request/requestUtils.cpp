@@ -360,7 +360,6 @@ void uploadFiles(HTTPRequest &request) {
     (void) request;
     std::cout << "upload files here ----> " << std::endl;
     std::vector<FormFile> files = request.getFormFiles();
-    // std::cout 
 
     if(files.empty()) {
         std::cout << "empty form" << std::endl;
@@ -370,15 +369,18 @@ void uploadFiles(HTTPRequest &request) {
     std::cout << "content type: " << files[0].contentType << std::endl;
     std::cout << "filename: " << files[0].filename << std::endl;
     std::cout << "name: " << files[0].name << std::endl;
-    for(size_t i = 0; i < 50; i++)
-        std::cout << files[0].data[i];
-    std::cout << std::endl;
+    // for(size_t i = 0; i < 50; i++)
+    //     std::cout << files[0].data[i];
+    // std::cout << std::endl;
 
     std::ofstream file(files[0].filename.c_str(), std::ios::binary);
 
     file.write(&files[0].data[0], files[0].data.size());
     
-    std::cout << std::hex << (0xFF & files[0].data[0]) << " " << (0xFF & files[0].data[1]) << "\n";
+    // std::cout << std::hex << (0xFF & files[0].data[0]) << " " << (0xFF & files[0].data[1]) << "\n";
 
     file.close();
+
+    request.setStatusCode(201);
+    request.setStatusMessage("Created");
 }

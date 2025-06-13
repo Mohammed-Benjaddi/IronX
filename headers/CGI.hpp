@@ -32,7 +32,7 @@ class CGI {
     void setupEnvironment();
     std::string intToString(int num);
     char** createEnvArray();
-    // void freeEnvArray(char** env_array);
+    void freeEnvArray(char** env_array);
     std::vector<std::string> getInterpreter(const std::string& script_path);
     void executeCGI();
 };
