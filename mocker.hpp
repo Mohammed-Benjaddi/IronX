@@ -99,7 +99,6 @@ void printConfig(const WebServerConfig& config) {
                 std::cout << "]\n";
                 std::cout << "      Interpreter: " << cgi.getInterpreter() << "\n";
             }
-
             std::cout << "\n";
         }
         std::cout << "\n";
@@ -159,7 +158,8 @@ void mocker(WebServerConfig &wsc) {
     
     std::set<std::string> methods1;
     methods1.insert("GET");
-    methods1.insert("POST");
+    methods1.insert("HEAD");
+    methods1.insert("DELETE");
     route1.setAllowedMethods(methods1);
     route1.setAutoindex(true);
     routes1.insert(std::make_pair("/", route1));
@@ -175,6 +175,7 @@ void mocker(WebServerConfig &wsc) {
     route2.setAutoindex(true);
     methods2.insert("GET");
     methods2.insert("POST");
+    methods2.insert("DELETE");
     route2.setAllowedMethods(methods2);
     
     CGIConfig cgi1;
@@ -190,23 +191,16 @@ void mocker(WebServerConfig &wsc) {
 
     // Route 3: /uploads
     Route route3;
-    route3.setRootDir(path);
+    route3.setRootDir("/var/www/uploads");
 
     std::set<std::string> methods3;
     methods3.insert("GET");
     methods3.insert("POST");
+    methods3.insert("GET");
     route3.setAllowedMethods(methods3);
 
-    std::vector<std::string> _indexFiles1;
-    _indexFiles1.push_back("index.html");
-    _indexFiles1.push_back("file.html");
-    route3.setIndexFiles(_indexFiles1);
-
-
-    route3.setRedirect("/");
-
-    // route3.setUploadDir("/var/www/uploads/tmp");
-    routes1.insert(std::make_pair("/upload", route3));
+    route3.setUploadDir("/var/www/uploads/tmp");
+    routes1.insert(std::make_pair("/uploads", route3));
 
     // Route 4: /old-site
     Route route4;

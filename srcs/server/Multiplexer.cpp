@@ -105,24 +105,31 @@ void    Multiplexer::handle_new_connection(int server_fd) {
     // std::cout << "Accepted new client: fd = " << client_fd << std::endl;
 }
 
-void	Multiplexer::handle_client_event(int fd, uint32_t event) {
-	//? Fetch Connection object
+#include <cerrno>
+#include <cstring> // for strerror()
+
+void Multiplexer::handle_client_event(int fd, uint32_t event) {
 	try {
-        //! Diconnection Detection
+        //! Disconnection Detection
 	    if (event & (EPOLLERR | EPOLLHUP | EPOLLRDHUP)) {
             throw Multiplexer::ClientDisconnectedException();
 	    }
+
+        // Fetch Connection object
         Connection &conn = activeConnections.at(fd);
-        //! TO CHANGE
+
         if (event & EPOLLIN)
-        conn.handleRead();
-        if (event &EPOLLOUT)
-        conn.handleWrite();
-        // if (conn.isClosed())
-        // epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL);
+            conn.handleRead();
         
-	} catch (std::exception &e) {
-        std::cerr << "Client with fd " << fd << "had a critical event: " << e.what() << std::endl;
+        if (event & EPOLLOUT)
+            conn.handleWrite();
+
+        // Optional cleanup logic
+        // if (conn.isClosed())
+        //     epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL);
+
+	} catch (const std::exception &e) {
+        std::cerr << "Client with fd " << fd << " had a critical event: " << e.what() << std::endl;
         Multiplexer::close_connection(fd);
 	}
 }

@@ -27,7 +27,7 @@ max_body_size = 1048576
 [[servers]]
 # Requirement: "Choose the port and host of each 'server'."
 host = "0.0.0.0" # Listen on all available network interfaces
-port = [8080, 4242, 1923] # Listen on port 8080
+port = [8080, 4242, 1923] # Listen on port 8080 
 # Requirement: "Set up the server_names or not."
 # Explanation: Optional list of domain names this server responds to
 hostnames = ["example.com", "www.example.com"]
@@ -52,7 +52,7 @@ autoindex = false 			# Requirement: "Enable or disable directory listing"
 
 [[servers.routes]]
 path = "/cgi-bin"
-root = "/var/www/cgi-bin"
+root = "/var/www/"
 methods = ["GET", "POST"]
 extensions = [".php"]
 interpreter = "/usr/bin/php-cgi"
@@ -60,7 +60,7 @@ interpreter = "/usr/bin/php-cgi"
 [[servers.routes]]
 path = "/uploads"
 root = "/var/www/uploads"
-methods = ["POST"]
+methods = ["POST      "]
 upload_dir = "/var/www/uploads/tmp"
 
 [[servers.routes]]
@@ -85,7 +85,7 @@ root = "/var/www/api"
 index = "api.php"
 methods = ["GET", "POST", "DELETE"]
 
-[[servers.routes]]
+       [[servers.routes]]
 path = "/cgi"
 root = "/var/www/cgi-bin"
 methods = ["GET", "POST"]
