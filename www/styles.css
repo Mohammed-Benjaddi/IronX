@@ -115,3 +115,27 @@ td a:hover {
     opacity: 0.4;
   }
 }
+
+@keyframes pagerFlash {
+  0%   { opacity: 0.1; }
+  20%  { opacity: 1; }
+  50%  { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+.pager {
+  background-color: #111;
+  border: 2px dashed #0f0;
+  animation: pagerFlash 0.3s ease-in-out 3;
+}
+
+.pager pre {
+  overflow: hidden;
+  white-space: nowrap;
+  animation: typing 2s steps(30, end) 1 forwards;
+}
+
+@keyframes typing {
+  from { width: 0 }
+  to   { width: 100% }
+}

@@ -6,9 +6,62 @@ let postTargetPath = null;
 
 const baseUrl = `${window.location.protocol}//${window.location.hostname}:${window.location.port}`;
 
+function getStatusMessage(status) {
+    const code = parseInt(status);
+    const messages = {
+        200: 'OK',
+        201: 'Created',
+        204: 'No Content',
+        400: 'Bad Request',
+        401: 'Unauthorized',
+        403: 'Forbidden',
+        404: 'Not Found',
+        405: 'Method Not Allowed',
+        413: 'Payload Too Large',
+        500: 'Internal Server Error',
+        502: 'Bad Gateway',
+        503: 'Service Unavailable',
+    };
+    return messages[code] || '';
+}
+
+function showResponseInfo(status, headers, isError = false) {
+    const panel = document.getElementById('response-panel');
+    const statusElement = document.getElementById('response-status');
+    const headersElement = document.getElementById('response-headers');
+
+    // Set panel color based on success or error
+    panel.classList.remove('hidden', 'bg-red-800', 'bg-gray-800');
+    panel.classList.add(isError ? 'bg-red-800' : 'bg-gray-800');
+
+    // Set status text
+    statusElement.textContent = `Status: ${status} ${getStatusMessage(status)}`;
+    statusElement.classList.toggle('text-red-400', isError);
+    statusElement.classList.toggle('text-lime-300', !isError);
+
+    // Prepare and animate headers
+    let headersText = '';
+    for (const [key, value] of headers.entries()) {
+        headersText += `${key}: ${value}\n`;
+    }
+
+    headersElement.textContent = '';
+    headersElement.classList.remove('typing');
+
+    // Force reflow to restart animation
+    void headersElement.offsetWidth;
+
+    headersElement.textContent = headersText;
+    headersElement.classList.add('typing');
+
+    // Play pager sound
+    document.getElementById('pager-beep')?.play();
+}
+
+
 const handleFetchError = (err) => {
     console.error('Error:', err);
-    alert('An error occurred. Check the console for details.');
+    // alert('An error occurred. Check the console for details.');
 };
 
 postJobButton.addEventListener('click', () => {
@@ -35,6 +88,11 @@ getJobButton.addEventListener('click', async () => {
             console.log(`${key}: ${value}`);
         }
         console.log("+++++++++++++++++++++++++++");
+        if (!res.ok) {
+            showResponseInfo(res.status, res.headers, true);
+            throw new Error(`Upload failed: ${res.status} ${res.statusText}`);
+        } else
+            showResponseInfo(res.status, res.headers, false);
     } catch (err) {
         handleFetchError(err);
     }
@@ -54,13 +112,15 @@ deleteJobButton.addEventListener('click', async () => {
         });
 
         if (!res.ok) {
-            throw new Error(`Failed to delete: ${res.status} ${res.statusText}`);
-        }
+            showResponseInfo(res.status, res.headers, true);
+            throw new Error(`Upload failed: ${res.status} ${res.statusText}`);
+        } else
+            showResponseInfo(res.status, res.headers, false);
         for (const [key, value] of res.headers.entries()) {
             console.log(`${key}: ${value}`);
         }
         console.log(`Path Deleted Successfully!`);
-        alert('Deleted successfully!');
+        // alert('Deleted successfully!');
     } catch (err) {
         handleFetchError(err);
     }
@@ -86,7 +146,7 @@ fileInput.addEventListener('change', async (e) => {
     }
 
     if (!postTargetPath) {
-        alert('Upload path was not set. Please try again.');
+        // alert('Upload path was not set. Please try again.');
         return;
     }
 
@@ -102,15 +162,18 @@ fileInput.addEventListener('change', async (e) => {
         });
 
         if (!res.ok) {
+            showResponseInfo(res.status, res.headers, true);
             throw new Error(`Upload failed: ${res.status} ${res.statusText}`);
-        }
+        } else
+            showResponseInfo(res.status, res.headers, false);
 
         for (const [key, value] of res.headers.entries()) {
             console.log(`${key}: ${value}`);
         }
 
         console.log('File uploaded successfully!');
-        alert('File uploaded successfully!');
+        // alert('File uploaded successfully!');
+       
     } catch (err) {
         handleFetchError(err);
     } finally {

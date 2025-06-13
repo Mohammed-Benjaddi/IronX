@@ -235,10 +235,8 @@ void HTTPRequest::handleRequest() {
     if (getMethod() == "GET")
         handleGet(routes, route);
     else if (getMethod() == "POST") {
-        exit(0);
         handlePOST();
     } else if (getMethod() == "DELETE") {
-        // exit(0);
         handleDELETE(routes, route);
         return ;
     }

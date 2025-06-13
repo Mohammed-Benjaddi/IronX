@@ -5,10 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>WebServ: Liberty Error</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- <link rel="stylesheet" href="/styles.css" /> -->
+  <link rel="stylesheet" href="/styles.css" />
 </head>
 <body class="relative min-h-screen flex flex-col items-center justify-center p-8">
-
   <div class="overlay"></div>
 
   <div class="content">
@@ -27,7 +26,12 @@
       <!-- <button class="gta-btn" id="put-job-button"> PUT </button> -->
       <input type="file" id="file-upload" style="display: none;" />
     </div>
-  </div>
+    <div id="response-panel" class="pager mt-8 p-4 text-lime-300 font-mono rounded-lg w-full max-w-2xl hidden">
+      <h3 class="text-xl font-bold mb-2">📟 RESPONSE PAGER</h3>
+      <p id="response-status" class="mb-2"></p>
+      <pre id="response-headers" class="whitespace-pre-wrap text-sm"></pre>
+    </div>
+  <audio id="pager-beep" src="/pager.mp3" preload="auto"></audio>
   <script src="tools.js"></script>
 </body>
 </html>

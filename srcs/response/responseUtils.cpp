@@ -98,10 +98,6 @@ std::string getRelativePath(const std::string& path, const std::string& rootPath
     return relative;
 }
 
-
-
-
-
 // HTTPResponse fromRedirect(const std::string &location) {
 //     HTTPResponse res;
 //     res.setStatus(301, "Moved Permanently");

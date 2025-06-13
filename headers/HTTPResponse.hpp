@@ -3,6 +3,7 @@
 #include <map>
 #include <string>
 #include <sstream>
+#include <filesystem>
 #include "FileStreamer.hpp"
 #include "HTTPRequest.hpp"
 #include "requestUtils.hpp"

@@ -158,11 +158,15 @@ void HTTPResponse::buildAutoIndexResponse(HTTPRequest *request) {
     for (std::vector<std::string>::const_iterator it = entries.begin(); it != entries.end(); ++it) {
         const std::string& entry = *it;
         const std::string entryPathToRoute = relative + "/" + entry;
+        const std::string absolutePath = rootPath + relative + "/" + entry;
 
-        html << "<tr><td><a class=\"td a\" href=\"" <<  entryPathToRoute << "\">📂 " << entry << "</a></td>";
-        html << "<td class=\"td\">" << getFileSize(entryPathToRoute) << " B</td></tr>\n";
+        size_t size = getFileSize(absolutePath);
+
+        html << "<tr><td><a class=\"td a\" href=\"" << entryPathToRoute << "\">📂 " << entry << "</a></td>";
+        html << "<td class=\"td\">" << size << " B</td></tr>\n";
     }
 
+    // exit(0);
     html << "</tbody></table>\n<a class=\"gta-btn\" href=\"/\">⬅ Back to home</a>\n</div>\n</body>\n</html>\n";
 
     std::string outputPath = directoryPath + "/index.html";

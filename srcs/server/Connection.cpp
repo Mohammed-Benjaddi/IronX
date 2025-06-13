@@ -22,26 +22,23 @@ std::string& Connection::getWriteBuffer() {
 void Connection::handleRead() {
     //! tmp buffer - CHUNK -
 
-    char buffer[4096];
-    while (true) {
-        ssize_t bytes_read = recv(
-            _fd, 
-            buffer,
-            sizeof(buffer), 
-            0);
-        
-        if (bytes_read > 0) {
-            _readBuffer.append(buffer, bytes_read);
-        }
-        else if (bytes_read == 0) {
-            //? Client closed connection
-            _closed = true;
-            throw Multiplexer::ClientDisconnectedException();
-        }
-        else {
-            //? No more data to read now
-            break;
-        }
+        char buffer[4096];
+    ssize_t bytes_read = recv(_fd, buffer, sizeof(buffer), 0);
+
+    if (bytes_read > 0) {
+        _readBuffer.append(buffer, bytes_read);
+        re_armFd();
+    } else if (bytes_read == 0) {
+        std::cout << "Full request received:\n" << _readBuffer << "\n";
+
+        _httpRequest = new HTTPRequest(_readBuffer, _config, 0);
+        _httpResponse = new HTTPResponse(_httpRequest);
+        re_armFd();
+    } else if (bytes_read < 0) {
+        return;
+    } else {
+        _closed = true;
+        throw Multiplexer::ClientDisconnectedException();
     }
 
     //!  Merge Point Multiplexer <-> Request Branches   */
@@ -79,15 +76,8 @@ void Connection::handleWrite() {
         std::string connType = _httpResponse->getConnectionHeader();
         delete _httpResponse;
         _httpResponse = NULL;       
-        // if (connType == "close") {
-        // 	close(_fd);
-        // 	_closed = true;
-
-		// 	return ;
-        // } else {
 		reset();
         re_armFd();
-        // }
         return ;
     }
 

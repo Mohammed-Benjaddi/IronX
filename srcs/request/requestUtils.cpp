@@ -44,6 +44,7 @@ bool isDirExist(std::string path, std::string rootDir) {
 
 bool isDirectory(const std::string path, std::string rootDir) {
     DIR *dir;
+
     // ! watch this
     // if(path[path.size() - 1] == '/')
     //     return true;
