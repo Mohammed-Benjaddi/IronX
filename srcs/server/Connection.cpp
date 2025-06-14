@@ -22,7 +22,7 @@ std::string& Connection::getWriteBuffer() {
 void Connection::handleRead() {
     //! tmp buffer - CHUNK -
 
-        char buffer[4096];
+    char buffer[4096];
     ssize_t bytes_read = recv(_fd, buffer, sizeof(buffer), 0);
 
     if (bytes_read > 0) {
@@ -30,7 +30,6 @@ void Connection::handleRead() {
         re_armFd();
     } else if (bytes_read == 0) {
         std::cout << "Full request received:\n" << _readBuffer << "\n";
-
         _httpRequest = new HTTPRequest(_readBuffer, _config, 0);
         _httpResponse = new HTTPResponse(_httpRequest);
         re_armFd();
@@ -40,18 +39,6 @@ void Connection::handleRead() {
         _closed = true;
         throw Multiplexer::ClientDisconnectedException();
     }
-
-    //!  Merge Point Multiplexer <-> Request Branches   */
-
-    std::cout << "REQUEST RECEIVED: \n" << _readBuffer << "\n";
-
-    _httpRequest = new HTTPRequest(_readBuffer, _config, 0);
-
-    _httpResponse = new HTTPResponse(_httpRequest);
-
-    //? build new epoll event modufying existing one
-
-    re_armFd();
 }
 
 void Connection::re_armFd() {
