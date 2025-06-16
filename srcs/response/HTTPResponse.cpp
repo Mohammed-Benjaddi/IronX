@@ -16,8 +16,7 @@ HTTPResponse::HTTPResponse(HTTPRequest* request)
     : _statusCode(200), _statusMessage("OK"), _connectionType("keep-alive"),
       _streamer(NULL), _request(request), _bodyPos(0), _headersSent(false), _complete(false) {
     
-    if (request->getMethod() == "DELETE") {
-        // exit(0);
+    if (request->getMethod() == "DELETE" || request->getMethod() == "POST") {
         std::cout << "Status Code : " << request->getStatusCode() << std::endl;
         setStandardHeaders(this, "text/plain", 0, "close", request->getStatusCode(), request->getStatusMessage());
     } else if (!request->getStatusCode())

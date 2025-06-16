@@ -7,7 +7,6 @@ Connection::Connection()
     : _fd(-1), _readBuffer(""), _writeBuffer(""), _closed(false), _config(NULL), _streamer(NULL), _httpResponse(NULL), _headersParsed(false), _expectedBodyLength(0) {};
 
 
-// ! To be changed only serving static file now !!
 Connection::Connection(int fd, int epoll_fd, WebServerConfig* config)
     : _fd(fd), _epoll_fd(epoll_fd), _readBuffer(""), _writeBuffer(""), _connectionHeader(""), _headersPart(""), _closed(false), _config(config), _streamer(NULL), _httpResponse(NULL), _headersParsed(false), _expectedBodyLength(0) {};
 
@@ -19,57 +18,32 @@ std::string& Connection::getWriteBuffer() {
     return this->_writeBuffer;
 }
 
-void Connection::handleRead() {
+ void Connection::handleRead() {
     char buffer[4096];
     ssize_t bytes_read = recv(_fd, buffer, sizeof(buffer), 0);
 
     if (bytes_read > 0) {
         _readBuffer.append(buffer, bytes_read);
-        std::cout << "\033[92m" << "READING::::::: at a time" << std::endl;
-        std::cout << "\033[92m" << "Current SIZE: " << _readBuffer.size() << std::endl;
-                std::cout << "\033[95m" << bytes_read << std::endl;
 
         if (!_headersParsed) {
             size_t pos = _readBuffer.find("\r\n\r\n");
             if (pos != std::string::npos) {
                 _headersPart = _readBuffer.substr(0, pos + 4);
                 _headersParsed = true;
-                parseContentLength(); // Sets _expectedBodyLength
-                std::cout << "\033[31m" << "[Headers parsed]\n" << _headersPart; // Assuming RED is defined as "\033[31m"
-                std::cout << "\033[34m" << "[Expected Body Length] " << _expectedBodyLength << "\n"; // Assuming BLUE is defined as "\033[34m"
-                // Handle case: no body required
-                if (_expectedBodyLength == 0) {
-                    _httpRequest = new HTTPRequest(_readBuffer, _config, 0);
-                    _httpResponse = new HTTPResponse(_httpRequest);
-                    re_armFd();
-                    return ;
-                }
+                parseContentLength();
             }
         }
-
-        // If headers parsed and we have full request (headers + body)
-        if (_headersParsed && _readBuffer.size() >= (_headersPart.size() + _expectedBodyLength)) {
-            std::cout << "\033[31m" <<  "========" << std::endl;
-            std::cout << "\033[31m" << "========" << std::endl;
-            std::cout << "TOTAL UPLOAD SIZE" << _headersPart.size() + _expectedBodyLength << std::endl;
-            std::cout << "_readBUFFER SIZE " << _readBuffer.size() << std::endl;
-            // exit(0);
-            _httpRequest = new HTTPRequest(_readBuffer, _config, 0);
-            _httpResponse = new HTTPResponse(_httpRequest);
-            re_armFd();
-            return ;
+        if (_headersParsed) {
+            if ((_expectedBodyLength == 0) || (_readBuffer.size() >= (_headersPart.size() + _expectedBodyLength))) {
+                _httpRequest = new HTTPRequest(_readBuffer, _config, 0);
+                _httpResponse = new HTTPResponse(_httpRequest);
+                re_armFd();
+            } else
+                return ;
         }
-        // Still need more body data
-        re_armFd();
-    } else if (bytes_read == 0) {
+    } else {
         _closed = true;
         throw Multiplexer::ClientDisconnectedException();
-    } else {
-        if (errno != EAGAIN && errno != EWOULDBLOCK) {
-            _closed = true;
-            throw Multiplexer::ClientDisconnectedException();
-        }
-        // Else: try again later
     }
 }
 
@@ -147,26 +121,3 @@ void Connection::parseContentLength() {
     std::string value = _headersPart.substr(start, end - start);
     _expectedBodyLength = std::atol(value.c_str());
 }
-
-
-    // exit(1);
-    // _streamer = new FileStreamer("/home/nab/Desktop/webserve-42/www/html/razzmatazz.mp3" , request.get_header("Connection"));
-    
-
-    //? *****************************/
-    // char cwd[PATH_MAX];
-    // getcwd(cwd, sizeof(cwd));
-    // std::string fullPath = std::string(cwd);
-    // fullPath += "/www/html";
-    // fullPath += request.getPath();
-    // if (request.getPath().empty())
-    //     request.setPath("/index.html");
-    // if (request.getRootDir().empty())
-    //     request.setRootDir("/home/nab/Desktop/webserve-42/www/html");
-    // fullPath = request.getRootDir() + request.getPath();
-    //     fullPath += "index.html";
-    
-    
-    // std::cout << request.getRootDir() << " " << request.getPath() << "\n";
-    // _streamer = new FileStreamer(fullPath, request.getHeader("Connection"));
-    // _httpResponse = new HTTPResponse(request.getHeader("Connection"), _streamer);
