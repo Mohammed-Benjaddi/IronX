@@ -19,13 +19,16 @@ typedef unsigned char uint8_t;
  */
 class ServerSocket {
     private:
-        int _fd;
+        int         _fd;
         std::string _host;
-        uint16_t _port;
+        uint16_t    _port;
+        int         _clientId;
     public:
-        ServerSocket(const std::string&, uint16_t);
+        ServerSocket(const std::string&, uint16_t, int);
         ~ServerSocket();
 
+        std::string getIP() const;
+        int     getClusterId() const;
         int     getFd() const;
         void    setFd(int);
         void    create_sock();

@@ -32,7 +32,6 @@ int main() {
     // const std::string raw_request = ss.str();
 
     ServerLauncher  launcher;
-
     try {
             launcher.launch(config);
             Multiplexer     mux(launcher.getSockets(), config);
@@ -40,7 +39,6 @@ int main() {
     } catch (const std::exception &e) {
             std::cerr << "Error Launching Server: " << e.what() << std::endl;
     }
-
     return (0);
 }
 

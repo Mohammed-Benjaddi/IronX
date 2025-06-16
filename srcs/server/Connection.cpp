@@ -7,8 +7,11 @@ Connection::Connection()
     : _fd(-1), _readBuffer(""), _writeBuffer(""), _closed(false), _config(NULL), _streamer(NULL), _httpResponse(NULL), _headersParsed(false), _expectedBodyLength(0) {};
 
 
-Connection::Connection(int fd, int epoll_fd, WebServerConfig* config)
-    : _fd(fd), _epoll_fd(epoll_fd), _readBuffer(""), _writeBuffer(""), _connectionHeader(""), _headersPart(""), _closed(false), _config(config), _streamer(NULL), _httpResponse(NULL), _headersParsed(false), _expectedBodyLength(0) {};
+Connection::Connection(int fd, int epoll_fd, WebServerConfig* config, int serverClusterId)
+    : _fd(fd), _epoll_fd(epoll_fd), _readBuffer(""), _writeBuffer(""), _connectionHeader(""), _headersPart(""), _closed(false), _config(config), _streamer(NULL), _httpResponse(NULL), _headersParsed(false), _expectedBodyLength(0), _serverClusterId(serverClusterId) {
+
+        
+    };
 
 std::string& Connection::getReadBuffer() {
     return this->_readBuffer;
@@ -35,7 +38,7 @@ std::string& Connection::getWriteBuffer() {
         }
         if (_headersParsed) {
             if ((_expectedBodyLength == 0) || (_readBuffer.size() >= (_headersPart.size() + _expectedBodyLength))) {
-                _httpRequest = new HTTPRequest(_readBuffer, _config, 0);
+                _httpRequest = new HTTPRequest(_readBuffer, _config, _serverClusterId);
                 _httpResponse = new HTTPResponse(_httpRequest);
                 re_armFd();
             } else

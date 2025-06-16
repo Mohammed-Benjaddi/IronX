@@ -41,6 +41,7 @@ void    Multiplexer::dispatch_event(const struct epoll_event &event) {
         handle_new_connection(fd);
     } else {
         handle_client_event(fd, event_flags);
+        // exit(0);
         std::cout << "Client event on fd: " << fd << std::endl;
     }
 }
@@ -48,7 +49,6 @@ void    Multiplexer::dispatch_event(const struct epoll_event &event) {
 void	Multiplexer::run() {
     this->poll_create();
     this->fds_register();
-
     const int MAX_EVENTS = 10;
     struct epoll_event events[MAX_EVENTS];
     while (true) {
@@ -97,16 +97,23 @@ void    Multiplexer::add_fd_to_epoll(int fd, uint32_t events) {
     }
 }
 
+int     Multiplexer::getServerSocketByFd(int fd) {
+    std::cout << "FD TO BE FOUND: " << fd << std::endl;
+    for (size_t i = 0; i < serverSockets.size(); ++i) {
+        if (serverSockets[i].getFd() == fd) {
+            return serverSockets[i].getClusterId();
+        }
+    }
+    return -1;
+}
+
 void    Multiplexer::handle_new_connection(int server_fd) {
     int client_fd = accept_new_client(server_fd);
     make_fd_non_blocking(client_fd);
     add_fd_to_epoll(client_fd, EPOLLIN /*| EPOLLRDHUP | EPOLLOUT*/);
-    activeConnections[client_fd] = Connection(client_fd, epoll_fd, &_config);
-    // std::cout << "Accepted new client: fd = " << client_fd << std::endl;
-}
 
-#include <cerrno>
-#include <cstring> // for strerror()
+    activeConnections[client_fd] = Connection(client_fd, epoll_fd, &_config, getServerSocketByFd(server_fd));
+}
 
 void Multiplexer::handle_client_event(int fd, uint32_t event) {
 	try {
@@ -115,7 +122,6 @@ void Multiplexer::handle_client_event(int fd, uint32_t event) {
             throw Multiplexer::ClientDisconnectedException();
 	    }
 
-        // Fetch Connection object
         Connection &conn = activeConnections.at(fd);
 
         if (event & EPOLLIN)
@@ -123,10 +129,6 @@ void Multiplexer::handle_client_event(int fd, uint32_t event) {
         
         if (event & EPOLLOUT)
             conn.handleWrite();
-
-        // Optional cleanup logic
-        // if (conn.isClosed())
-        //     epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL);
 
 	} catch (const std::exception &e) {
         std::cerr << "Client with fd " << fd << " had a critical event: " << e.what() << std::endl;

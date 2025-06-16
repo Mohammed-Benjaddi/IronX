@@ -6,7 +6,7 @@
  * binding it to a host/port
  * start listening for incoming conenctions
 */
-ServerSocket::ServerSocket(const std::string& ip, uint16_t port) : _fd(-1), _host(ip), _port(port)  {
+ServerSocket::ServerSocket(const std::string& ip, uint16_t port, int clusterId) : _fd(-1), _host(ip), _port(port), _clientId(clusterId) {
 	//? 1. Create a socket
 		this->create_sock();
 	//? 2. Set socket to non-blocking
@@ -27,6 +27,14 @@ ServerSocket::~ServerSocket() {
 int		ServerSocket::getFd() const { return this->_fd; }
 
 void	ServerSocket::setFd(int fd) { this->_fd = fd; };
+
+std::string		ServerSocket::getIP() const {
+	return this->_host;
+}
+
+int		ServerSocket::getClusterId() const {
+	return _clientId;
+}
 
 void	ServerSocket::create_sock() {
 	int server_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -58,6 +66,7 @@ void	ServerSocket::non_block() {
 		throw std::runtime_error("Port Socket reuse failure !");
 	}
 }
+
 //! to be handled ---- failure of one 
 void	ServerSocket::bind_socket() {
 //? 1. Set up address structure

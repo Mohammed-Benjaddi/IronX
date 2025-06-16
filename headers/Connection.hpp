@@ -18,7 +18,7 @@
 class Connection {
     public:
         Connection();
-        Connection(int, int, WebServerConfig*);
+        Connection(int, int, WebServerConfig*, int serverClusterId);
         // ~Connection();
         // Connection& operator=(const Connection& other);
         std::string&    getReadBuffer();
@@ -44,5 +44,7 @@ class Connection {
         bool            _headersParsed;
         size_t          _expectedBodyLength;
         bool            _completedBuffer;
+        int             _serverClusterId;
+        
         // Connection& operator=(const Connection& other);
 };
