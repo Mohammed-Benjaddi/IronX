@@ -7,6 +7,14 @@
 #include "../headers/HTTPResponse.hpp"
 #include "../headers/HTTPRequest.hpp"
 
+#define BLUE "\u001b[34m";
+
+#define RED "\u001b[31m";
+
+#define PINK "\033[95m";
+
+#define LIME "\033[92m";
+
 class Connection {
     public:
         Connection();
@@ -15,7 +23,7 @@ class Connection {
         // Connection& operator=(const Connection& other);
         std::string&    getReadBuffer();
         std::string&    getWriteBuffer();
-        HTTPResponse*   getResponse();
+        void            parseContentLength();
         void            handleRead();
         void            handleWrite();
         bool            isClosed() const;
@@ -27,10 +35,14 @@ class Connection {
         std::string     _readBuffer;
         std::string     _writeBuffer;
         std::string     _connectionHeader;
+        std::string     _headersPart;
         bool            _closed;
         WebServerConfig *_config;
         FileStreamer    *_streamer;
         HTTPResponse    *_httpResponse;
         HTTPRequest     *_httpRequest;
+        bool            _headersParsed;
+        size_t          _expectedBodyLength;
+        bool            _completedBuffer;
         // Connection& operator=(const Connection& other);
 };

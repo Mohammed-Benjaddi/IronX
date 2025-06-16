@@ -4,12 +4,12 @@
 #include "../../headers/FileStreamer.hpp"
 
 Connection::Connection()
-    : _fd(-1), _readBuffer(""), _writeBuffer(""), _closed(false), _config(NULL), _streamer(NULL), _httpResponse(NULL) {};
+    : _fd(-1), _readBuffer(""), _writeBuffer(""), _closed(false), _config(NULL), _streamer(NULL), _httpResponse(NULL), _headersParsed(false), _expectedBodyLength(0) {};
 
 
 // ! To be changed only serving static file now !!
 Connection::Connection(int fd, int epoll_fd, WebServerConfig* config)
-    : _fd(fd), _epoll_fd(epoll_fd), _readBuffer(""), _writeBuffer(""), _connectionHeader(""), _closed(false), _config(config), _streamer(NULL), _httpResponse(NULL) {};
+    : _fd(fd), _epoll_fd(epoll_fd), _readBuffer(""), _writeBuffer(""), _connectionHeader(""), _headersPart(""), _closed(false), _config(config), _streamer(NULL), _httpResponse(NULL), _headersParsed(false), _expectedBodyLength(0) {};
 
 std::string& Connection::getReadBuffer() {
     return this->_readBuffer;
@@ -20,24 +20,56 @@ std::string& Connection::getWriteBuffer() {
 }
 
 void Connection::handleRead() {
-    //! tmp buffer - CHUNK -
-
     char buffer[4096];
     ssize_t bytes_read = recv(_fd, buffer, sizeof(buffer), 0);
 
     if (bytes_read > 0) {
         _readBuffer.append(buffer, bytes_read);
+        std::cout << "\033[92m" << "READING::::::: at a time" << std::endl;
+        std::cout << "\033[92m" << "Current SIZE: " << _readBuffer.size() << std::endl;
+                std::cout << "\033[95m" << bytes_read << std::endl;
+
+        if (!_headersParsed) {
+            size_t pos = _readBuffer.find("\r\n\r\n");
+            if (pos != std::string::npos) {
+                _headersPart = _readBuffer.substr(0, pos + 4);
+                _headersParsed = true;
+                parseContentLength(); // Sets _expectedBodyLength
+                std::cout << "\033[31m" << "[Headers parsed]\n" << _headersPart; // Assuming RED is defined as "\033[31m"
+                std::cout << "\033[34m" << "[Expected Body Length] " << _expectedBodyLength << "\n"; // Assuming BLUE is defined as "\033[34m"
+                // Handle case: no body required
+                if (_expectedBodyLength == 0) {
+                    _httpRequest = new HTTPRequest(_readBuffer, _config, 0);
+                    _httpResponse = new HTTPResponse(_httpRequest);
+                    re_armFd();
+                    return ;
+                }
+            }
+        }
+
+        // If headers parsed and we have full request (headers + body)
+        if (_headersParsed && _readBuffer.size() >= (_headersPart.size() + _expectedBodyLength)) {
+            std::cout << "\033[31m" <<  "========" << std::endl;
+            std::cout << "\033[31m" << "========" << std::endl;
+            std::cout << "TOTAL UPLOAD SIZE" << _headersPart.size() + _expectedBodyLength << std::endl;
+            std::cout << "_readBUFFER SIZE " << _readBuffer.size() << std::endl;
+            // exit(0);
+            _httpRequest = new HTTPRequest(_readBuffer, _config, 0);
+            _httpResponse = new HTTPResponse(_httpRequest);
+            re_armFd();
+            return ;
+        }
+        // Still need more body data
         re_armFd();
     } else if (bytes_read == 0) {
-        std::cout << "Full request received:\n" << _readBuffer << "\n";
-        _httpRequest = new HTTPRequest(_readBuffer, _config, 0);
-        _httpResponse = new HTTPResponse(_httpRequest);
-        re_armFd();
-    } else if (bytes_read < 0) {
-        return;
-    } else {
         _closed = true;
         throw Multiplexer::ClientDisconnectedException();
+    } else {
+        if (errno != EAGAIN && errno != EWOULDBLOCK) {
+            _closed = true;
+            throw Multiplexer::ClientDisconnectedException();
+        }
+        // Else: try again later
     }
 }
 
@@ -102,7 +134,19 @@ bool	Connection::isClosed()	const {
     return _closed;
 }
 
+void Connection::parseContentLength() {
+    if (_headersPart.find("POST") == std::string::npos)
+        return;
 
+    size_t start = _headersPart.find("Content-Length:");
+    if (start == std::string::npos)
+        return;
+
+    start += std::string("Content-Length:").size();
+    size_t end = _headersPart.find("\r\n", start);
+    std::string value = _headersPart.substr(start, end - start);
+    _expectedBodyLength = std::atol(value.c_str());
+}
 
 
     // exit(1);
