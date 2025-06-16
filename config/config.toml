@@ -4,7 +4,8 @@
 # ======================
 # GLOBAL CONFIGURATION
 # ======================
-[  global    ]
+[  global   ] 
+
 # Requirement: "Set the maximum allowed size for client request bodies."
 # Explanation: Maximum upload size in bytes (1MB default)
 max_body_size = 1048576
@@ -14,7 +15,8 @@ max_body_size = 54632
 # Requirement: "Set up default error pages."
 # Explanation: Maps HTTP error codes to custom error pages
 [default_error_pages]
-4000 = "/errors/400.html" # Bad Request
+
+4000 = "" # Bad Request
 403 = "/errors/403.html" # Forbidden
 404 = "/errors/404.html" # Not Found
 500 = "/errors/500.html" # Internal Server Error
@@ -27,9 +29,9 @@ max_body_size = 54632
 
 # Requirement: "The first server for a host:port will be the default for this host:port"
 # Explanation: This is the default server for 0.0.0.0:8080 (no server_names needed)
-[[servers]]aaaaa
+[[servers]]
 # Requirement: "Choose the port and host of each 'server'."
-host = "0.0.0.0" # Listen on all available network interfaces
+host = "" # Listen on all available network interfaces
 port = [8080, 4242, 1923] # Listen on port 8080
 # Requirement: "Set up the server_names or not."
 # Explanation: Optional list of domain names this server responds to

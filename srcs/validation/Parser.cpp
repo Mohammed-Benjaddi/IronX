@@ -6,7 +6,7 @@
 /*   By: ael-maaz <ael-maaz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 17:38:54 by ael-maaz          #+#    #+#             */
-/*   Updated: 2025/06/16 22:04:45 by ael-maaz         ###   ########.fr       */
+/*   Updated: 2025/06/16 23:51:21 by ael-maaz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -486,6 +486,20 @@ void parseTOML(const std::string& filepath, WebServerConfig& config)
             //----------------------------------------------------------
             // 1) starting a new [[servers.routes]] block
             //----------------------------------------------------------
+			if (line.compare(0, 2, "[[") == 0) {
+				if (line.size() < 4 || line.substr(line.size() - 2) != "]]")
+					throw std::runtime_error("Malformed section header: " + line);
+				if (line.find("]]", 2) != line.size() - 2)
+					throw std::runtime_error("Unexpected characters after closing ]] in: " + line);
+			} else {
+				if (line.size() < 3 || line.back() != ']')
+					throw std::runtime_error("Malformed section header: " + line);
+				if (line.find(']', 1) != line.size() - 1)
+					throw std::runtime_error("Unexpected characters after closing ] in: " + line);
+				if (line.find('[', 1) != std::string::npos)
+					throw std::runtime_error("Unexpected '[' inside single‑bracket section: " + line);
+    		}
+			
             if (line.compare(0,2,"[[") == 0 &&
                 line.find("servers.routes") != std::string::npos)
             {
@@ -527,6 +541,16 @@ void parseTOML(const std::string& filepath, WebServerConfig& config)
                 inRoute = false;
 
                 currentSection = trim(line.substr(1, line.size()-2)); // strip [ ]
+				if (currentSection == "global") {
+					if (seenGlobalBlock)
+						throw std::runtime_error("Duplicate [global] block");
+					seenGlobalBlock = true;
+				} else if (currentSection == "default_error_pages") {
+					if (seenDefaultErrorPagesBlock)
+						throw std::runtime_error("Duplicate [default_error_pages] block");
+					seenDefaultErrorPagesBlock = true;
+				}
+
                 continue;
             }
         }
@@ -544,9 +568,6 @@ void parseTOML(const std::string& filepath, WebServerConfig& config)
         //------------------------------------------------------------------
         if      (currentSection == "global")
         {
-			if (seenGlobalBlock)
-            	throw std::runtime_error("Duplicate [global] block");
-			seenGlobalBlock = true;
             if (key == "max_body_size")
                 maxBodySize = static_cast<size_t>(strtoul(val.c_str(), 0, 10));
 			else
@@ -554,13 +575,23 @@ void parseTOML(const std::string& filepath, WebServerConfig& config)
         }
         else if (currentSection == "default_error_pages")
         {
-			if (seenDefaultErrorPagesBlock)
-            	throw std::runtime_error("Duplicate [default_error_pages] block");
-			seenDefaultErrorPagesBlock = true;
+
             int code = atoi(key.c_str());
-            if (!val.empty() && val[0] == '"')
-                val = val.substr(1, val.size()-2);        // strip quotes
-            errorPages[code] = val;
+            if (val.empty())
+        		throw std::runtime_error("Empty string not permitted");
+
+			if (val[0] != '"' || val[val.size() - 1] != '"')
+				throw std::runtime_error("Error page value must be enclosed in double quotes");
+
+    		// Ensure there is only one quoted string and nothing after the closing quote
+			size_t closingQuote = val.find('"', 1); // find second quote
+			if (closingQuote != val.size() - 1)
+				throw std::runtime_error("Unexpected content after closing quote in error page path");
+
+			// Strip the quotes
+			val = val.substr(1, val.size() - 2);
+
+			errorPages[code] = val;
         }
         //------------------------------------------------------------------
         // 2) SERVER‑LEVEL keys  (host, port, hostnames)
@@ -568,7 +599,22 @@ void parseTOML(const std::string& filepath, WebServerConfig& config)
         else if (currentCluster && !inRoute)
         {
             if      (key == "host")
+			{
+				if (val.empty())
+        		throw std::runtime_error("Empty string not permitted");
+
+			if (val[0] != '"' || val[val.size() - 1] != '"')
+				throw std::runtime_error("Error page value must be enclosed in double quotes");
+
+    		// Ensure there is only one quoted string and nothing after the closing quote
+			size_t closingQuote = val.find('"', 1); // find second quote
+			if (closingQuote != val.size() - 1)
+				throw std::runtime_error("Unexpected content after closing quote in error page path");
+
+			// Strip the quotes
+				val = val.substr(1, val.size() - 2);
                 currentCluster->setHost(val.substr(0, val.size())); // strip quotes
+			}
             else if (key == "port")
                 currentCluster->setPorts(parseIntList(val));
             else if (key == "hostnames")
@@ -579,12 +625,28 @@ void parseTOML(const std::string& filepath, WebServerConfig& config)
         //------------------------------------------------------------------
         else if (currentCluster && inRoute)
         {
+			if(key == "path" || key == "root" || key == "upload_dir"||key == "redirect"||key == "interpreter")
+			{
+				if (val.empty())
+        		throw std::runtime_error("Empty string not permitted");
+
+				if (val[0] != '"' || val[val.size() - 1] != '"')
+					throw std::runtime_error("Error page value must be enclosed in double quotes");
+
+    		// Ensure there is only one quoted string and nothing after the closing quote
+				size_t closingQuote = val.find('"', 1); // find second quote
+				if (closingQuote != val.size() - 1)
+					throw std::runtime_error("Unexpected content after closing quote in error page path");
+
+				// Strip the quotes
+				val = val.substr(1, val.size() - 2);
+			}
             if      (key == "path")
-                currentRoutePath = val.substr(0, val.size());   // strip quotes
+                currentRoutePath = val;//.substr(0, val.size());   // strip quotes
             else if (key == "root")
-                currentRoute.setRootDir(val.substr(0, val.size()));
+                currentRoute.setRootDir(val/*.substr(0, val.size())*/);
             else if (key == "index") {
-                std::vector<std::string> tmp(1, val.substr(0, val.size()));
+                std::vector<std::string> tmp(1, val/* .substr(0, val.size()) */);
                 currentRoute.setIndexFiles(tmp);
             }
             else if (key == "methods") {
@@ -594,9 +656,9 @@ void parseTOML(const std::string& filepath, WebServerConfig& config)
             else if (key == "autoindex")
                 currentRoute.setAutoindex(val == "true");
             else if (key == "upload_dir")
-                currentRoute.setUploadDir(val.substr(0, val.size()));
+                currentRoute.setUploadDir(val/* .substr(0, val.size()) */);
             else if (key == "redirect")
-                currentRoute.setRedirect(val.substr(0, val.size()));
+                currentRoute.setRedirect(val/* .substr(0, val.size()) */);
             else if (key == "extensions") {
                 CGIConfig cgi = currentRoute.getCGIConfig();
                 cgi.setExtensions(parseStringList(val));
@@ -604,7 +666,7 @@ void parseTOML(const std::string& filepath, WebServerConfig& config)
             }
             else if (key == "interpreter") {
                 CGIConfig cgi = currentRoute.getCGIConfig();
-                cgi.setInterpreter(val.substr(0, val.size()));
+                cgi.setInterpreter(val/* .substr(0, val.size()) */);
                 currentRoute.setCGIConfig(cgi);
             }
         }
