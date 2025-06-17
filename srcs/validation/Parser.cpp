@@ -6,7 +6,7 @@
 /*   By: ael-maaz <ael-maaz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 17:38:54 by ael-maaz          #+#    #+#             */
-/*   Updated: 2025/06/16 23:51:21 by ael-maaz         ###   ########.fr       */
+/*   Updated: 2025/06/17 21:20:59 by ael-maaz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -480,6 +480,9 @@ void parseTOML(const std::string& filepath, WebServerConfig& config)
 		size_t pos  = line.find("#");
 		if(pos != std::string::npos)
 			line.erase(pos);
+		line = trim(line);
+		if (line.empty())               // everything before # was whitespace
+			continue;
         // --------- SECTION HEADERS ----------------------------------
         if (line[0] == '[')
         {
@@ -549,7 +552,11 @@ void parseTOML(const std::string& filepath, WebServerConfig& config)
 					if (seenDefaultErrorPagesBlock)
 						throw std::runtime_error("Duplicate [default_error_pages] block");
 					seenDefaultErrorPagesBlock = true;
+				}else
+				{
+					throw std::runtime_error("Invalid Section header");
 				}
+					
 
                 continue;
             }
@@ -558,7 +565,7 @@ void parseTOML(const std::string& filepath, WebServerConfig& config)
         // --------- KEY‑VALUE line -----------------------------------
         size_t eq = line.find('=');
         if (eq == std::string::npos) 
-			throw std::runtime_error("Invalid line");            // malformed / skip
+			throw std::runtime_error("Invalid line" + line);            // malformed / skip
 
         std::string key = trim(line.substr(0, eq));
         std::string val = trim(line.substr(eq + 1));

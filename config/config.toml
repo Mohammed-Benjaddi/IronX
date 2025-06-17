@@ -4,7 +4,7 @@
 # ======================
 # GLOBAL CONFIGURATION
 # ======================
-[  global   ] 
+[  global ]  
 
 # Requirement: "Set the maximum allowed size for client request bodies."
 # Explanation: Maximum upload size in bytes (1MB default)
@@ -36,6 +36,7 @@ port = [8080, 4242, 1923] # Listen on port 8080
 # Requirement: "Set up the server_names or not."
 # Explanation: Optional list of domain names this server responds to
 hostnames = ["example.com", "www.example.com"  ]
+[[global]]
 
 # ======================
 # ROUTE CONFIGURATIONS
@@ -52,6 +53,8 @@ autoindex = false 			# Requirement: "Enable or disable directory listing"
 
 # Requirement: "Execute CGI based on certain file extension"
 # /cgi route is set to handle requests with the HTTP mo
+
+#[[test]]
 
 [[servers.routes]]
 path = "/cgi-bin"
@@ -85,7 +88,7 @@ hostnames = ["api.example.com", "beta.example.com"]
 path = "/"
 #root = "/var/www/api"
 index = "api.php"
-methods = ["GET", "POST", "DELETE"]
+methods = ["GET", "POST", "bunda"]
 
 [[servers.routes]]
 path = "/cgi"
