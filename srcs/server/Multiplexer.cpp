@@ -9,7 +9,6 @@ void	Multiplexer::poll_create() {
     }
 }
 
-
 void	Multiplexer::fds_register() {
     //* for each ServerSocket (listen)
     for (size_t i = 0; i < serverSockets.size(); ++i) {
@@ -37,14 +36,38 @@ void    Multiplexer::dispatch_event(const struct epoll_event &event) {
     int fd = event.data.fd;
     uint32_t event_flags = event.events;
 
+    // cleanupExpiredSessions();
+
     if (is_server_socket(fd)) {
         handle_new_connection(fd);
     } else {
         handle_client_event(fd, event_flags);
         // exit(0);
-        std::cout << "Client event on fd: " << fd << std::endl;
+       std::cout << "Client event on fd: " << fd << std::endl;
     }
 }
+
+bool    Multiplexer::isSessionIdValid(const std::string &sessionId) {
+    return sessionIds.find(sessionId) != sessionIds.end();
+}
+
+
+//? Would check if : a session is expired ---- an id is valid (Already exists)
+// void    Multiplexer::cleanupExpiredSessions() {
+//     std::map<std::string, Cookie>::iterator it = sessionIds.begin(); 
+//     std::time_t now = std::time(0);
+
+//     for (; it != sessionIds.end(); ++it) {
+//         Cookie &cookie = it->second;
+//         // std::tm expirationDate = cookie.getExpirationDate();
+//         if (std::difftime(std::mktime(&expirationDate), now) <= 0) {
+//            std::cout << "Session ID: " << it->first << " has expired." << std::endl;
+//             sessionIds.erase(it);
+//         } else {
+//            std::cout << "Session ID: " << it->first << " is still valid." << std::endl;
+//         }
+//     };
+// }
 
 void	Multiplexer::run() {
     this->poll_create();
@@ -98,7 +121,6 @@ void    Multiplexer::add_fd_to_epoll(int fd, uint32_t events) {
 }
 
 int     Multiplexer::getServerSocketByFd(int fd) {
-    std::cout << "FD TO BE FOUND: " << fd << std::endl;
     for (size_t i = 0; i < serverSockets.size(); ++i) {
         if (serverSockets[i].getFd() == fd) {
             return serverSockets[i].getClusterId();
@@ -125,7 +147,7 @@ void Multiplexer::handle_client_event(int fd, uint32_t event) {
         Connection &conn = activeConnections.at(fd);
 
         if (event & EPOLLIN)
-            conn.handleRead();
+            conn.handleRead(sessionIds);
         
         if (event & EPOLLOUT)
             conn.handleWrite();

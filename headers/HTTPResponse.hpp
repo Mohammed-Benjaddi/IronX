@@ -17,13 +17,12 @@ public:
     // Constructors
     HTTPResponse();
     HTTPResponse(HTTPRequest* request);
+    HTTPResponse(HTTPRequest* request, std::string cookies);
     ~HTTPResponse();
 
     std::string getNextChunk();
     bool isComplete() const;
     std::string getConnectionHeader();
-    
-    void    handleDeletion();
 
     size_t  getFileSize(std::string path) const;
     void    setStatus(int code, const std::string& message);
@@ -36,9 +35,7 @@ public:
     int     getStatusCode() const;
     std::string getStatusMessage() const;
     std::map<std::string, std::string> getHeaders() const;
-
-    // void build_OK_Response(HTTPRequest* request);
-    // void buildResponse(HTTPRequest* request);          
+       
     void buildAutoIndexResponse(HTTPRequest*);
 
     static std::string getMimeType(const std::string& path);
@@ -60,8 +57,6 @@ private:
     bool                            _headersSent;
     bool                            _complete;
 
-    // MIME types
     static std::map<std::string, std::string> _mimeTypes;
-    // static std::map<std::string, std::string> initMimeTypes();
 };
 

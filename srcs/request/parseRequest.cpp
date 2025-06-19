@@ -3,7 +3,7 @@
 
 int checkAllowedMethods(HTTPRequest &request) {
   const std::map<std::string, Route>& routes = request.getConfig()->getClusters()[request.getClientId()].getRoutes();
-  // std::cout << "req ---> " << request.getRootDir() + request.getPath() << std::endl;
+  //std::cout << "req ---> " << request.getRootDir() + request.getPath() << std::endl;
   std::map<std::string, Route>::const_iterator route_it = routes.find(request.getPath());
   if(route_it != routes.end()) {
     const std::set<std::string> &allowedMethod  = route_it->second.getAllowedMethods();
@@ -11,7 +11,7 @@ int checkAllowedMethods(HTTPRequest &request) {
     std::set<std::string>::iterator it = allowedMethod.begin();
 
     while(it != allowedMethod.end()) {
-      std::cout << "===> " << *it->begin() << std::endl;
+     std::cout << "===> " << *it->begin() << std::endl;
       it++;
     }
 
@@ -22,7 +22,7 @@ int checkAllowedMethods(HTTPRequest &request) {
         return -1;
     }
   } else {
-    // std::cout << "+++ location not found" << std::endl;
+    //std::cout << "+++ location not found" << std::endl;
     // request.setStatusCode(404);
     // request.setStatusMessage("Not Found");
     // request.setPath(request.getRootDir() + "/errors/404.html");
@@ -46,7 +46,7 @@ bool URIHasUnallowedChar(std::string uri) {
   
   for(size_t i = 0; i < uri.size(); i++) {
     if(std::find(allowedChars.begin(), allowedChars.end(), uri[i]) == allowedChars.end()) {
-        std::cout << "unallowed char ---> " << uri[i] << std::endl;
+       std::cout << "unallowed char ---> " << uri[i] << std::endl;
         return true;
     }
   }
@@ -60,7 +60,7 @@ int parse( HTTPRequest &request, const std::string &raw_request) {
 
   request.setErrorPages(request.getConfig()->getErrorPages());
   if (getcwd(buffer, sizeof(buffer)) != NULL) {
-    std::cout << "=====> " << std::string(buffer) << std::endl;
+   std::cout << "=====> " << std::string(buffer) << std::endl;
     request.setRootDir(std::string(buffer) + "/www");
   }
   else
@@ -104,11 +104,11 @@ bool checkRequestURI(HTTPRequest &request, std::string uri) {
 
 int find_method_uri(HTTPRequest &request, const std::string &line) {
   std::stringstream sstream(line);
-  // std::cout << "line ===> " << line << std::endl;
+  //std::cout << "line ===> " << line << std::endl;
   std::string method, uri, httpVersion;
   sstream >> method >> uri >> httpVersion;
   if(!checkRequestURI(request, uri)) {
-    std::cout << "URI is not correct" << std::endl;
+   std::cout << "URI is not correct" << std::endl;
     return -1;
   }
   
@@ -122,15 +122,16 @@ int find_method_uri(HTTPRequest &request, const std::string &line) {
   }
   if(uri[uri.length() - 1] == '/' && uri.size() == 1) {
     uri = uri.substr(0, uri.length() - 1);
-    // std::cout << "new path ==> " << (uri.empty() ? "only slash" : uri) << std::endl;
-    // std::cout << "|" << uri << "|" << std::endl;
+    //std::cout << "new path ==> " << (uri.empty() ? "only slash" : uri) << std::endl;
+    //std::cout << "|" << uri << "|" << std::endl;
     uri = "/";
   } else {
     size_t size = uri.size() - 1;
-    if(uri[size] == '/')
+    if (uri[size] == '/')
       size--;
+      // ! -------------------------- !/ Exception thrown ?
     uri = uri.substr(1, size);
-    // std::cout << "uri +++ " << uri << std::endl;
+    //std::cout << "uri +++ " << uri << std::endl;
     // exit(0);
   }
   request.setMethod(method);
@@ -166,67 +167,67 @@ std::string trim(const std::string& str) {
 
 
 std::vector<FormFile> parseMultipartFormData(const std::string &body, const std::string &boundary) {
-    // std::cout << "-----------------------------------------" << std::endl;
-    // std::cout << body << std::endl;
-    // std::cout << "-----------------------------------------" << std::endl;
+    //std::cout << "-----------------------------------------" << std::endl;
+    //std::cout << body << std::endl;
+    //std::cout << "-----------------------------------------" << std::endl;
 
-    // std::cout << "boundary: " << boundary << std::endl;
+    //std::cout << "boundary: " << boundary << std::endl;
     std::vector<FormFile> files;
-    // std::cout << "body: " << body << std::endl;
+    //std::cout << "body: " << body << std::endl;
     std::string delimiter = "------" + boundary;
-    // std::cout << "boundary end: " << boundary[boundary.length() - 1] << std::endl;
+    //std::cout << "boundary end: " << boundary[boundary.length() - 1] << std::endl;
     size_t pos = 0;
     size_t end = 0;
 
-    // std::cout << "delimiter ==> " << delimiter << std::endl;
+    //std::cout << "delimiter ==> " << delimiter << std::endl;
 
     while ((pos = body.find(delimiter, pos)) != std::string::npos) {
-      // std::cout << "***** here" << std::endl;
+      //std::cout << "***** here" << std::endl;
 
         pos += delimiter.length();
         if (body.substr(pos, 2) == "--") break;
         if (body[pos] == '\r') ++pos;
         if (body[pos] == '\n') ++pos;
 
-        // std::cout << "pos: " << body.substr(43) << std::endl;
+        //std::cout << "pos: " << body.substr(43) << std::endl;
         // end = body.find("\r\n\r\n", pos);
         end = body.find("\r\n\r", pos);
         if (end == std::string::npos) break;
-        std::cout << "-------------------------------------------------------------------------------------------------" << std::endl;
+       std::cout << "-------------------------------------------------------------------------------------------------" << std::endl;
         // if (end == std::string::npos) end = body.length();
         
         std::string header = body.substr(pos, end - pos);
         pos = end + 4;
 
-        std::cout << "header ----> " << header << std::endl;
-        std::cout << " | pos ---> " << pos  << std::endl;
-        std::cout << "delimiter ====> " << delimiter << std::endl;
+       std::cout << "header ----> " << header << std::endl;
+       std::cout << " | pos ---> " << pos  << std::endl;
+       std::cout << "delimiter ====> " << delimiter << std::endl;
 
 
-        // std::cout << body.substr(140) << std::endl;
+        //std::cout << body.substr(140) << std::endl;
         end = body.find(delimiter, pos);
         // end = body.find("------WebKitFormBoundary1RCrsGDY0yGTkASE", pos);
 
-        // std::cout << std::string("------WebKitFormBoundary1RCrsGDY0yGTkASE").length() << std::endl;
-        // std::cout << delimiter.length() << std::endl;
+        //std::cout << std::string("------WebKitFormBoundary1RCrsGDY0yGTkASE").length() << std::endl;
+        //std::cout << delimiter.length() << std::endl;
 
         
 
         // if("------WebKitFormBoundary1RCrsGDY0yGTkASE" == delimiter)
-          // std::cout << "+++++++ equal" << std::endl;
-        // std::cout << "clear ==> " << end << std::endl;
+          //std::cout << "+++++++ equal" << std::endl;
+        //std::cout << "clear ==> " << end << std::endl;
         if (end == std::string::npos) break;
         // if (end == std::string::npos) end = body.length();
-        std::cout << "============================================================================" << std::endl;
-        // std::cout << "body ===> " << body.length() << "| pos ===> " << pos << std::endl;
-        std::cout << "============================================================================" << std::endl;
+       std::cout << "============================================================================" << std::endl;
+        //std::cout << "body ===> " << body.length() << "| pos ===> " << pos << std::endl;
+       std::cout << "============================================================================" << std::endl;
 
 
-        // std::cout << "header ====> " << header << std::endl; 
+        //std::cout << "header ====> " << header << std::endl; 
 
         std::vector<char> content = trim_crlf(body.substr(pos, end - pos));
 
-        // std::cout << "content: " << content << " | header: " << header << std::endl;
+        //std::cout << "content: " << content << " | header: " << header << std::endl;
 
         std::istringstream headerStream(header);
         std::string line;
@@ -236,7 +237,7 @@ std::vector<FormFile> parseMultipartFormData(const std::string &body, const std:
         // 
         while (std::getline(headerStream, line)) {
             if (line.find("Content-Disposition:") != std::string::npos) {
-              // std::cout << "line ----> " << line << std::endl;
+              //std::cout << "line ----> " << line << std::endl;
                 size_t namePos = line.find("name=\"");
                 if (namePos != std::string::npos) {
                     namePos += 6;
@@ -250,7 +251,7 @@ std::vector<FormFile> parseMultipartFormData(const std::string &body, const std:
                     file.filename = line.substr(filenamePos, endFilename - filenamePos);
                     isFile = true;
                 } else {
-                  // std::cout << "----------------> else executed" << std::endl;
+                  //std::cout << "----------------> else executed" << std::endl;
                 }
             } else if (line.find("Content-Type:") != std::string::npos) {
                 size_t typePos = line.find(":");
@@ -262,16 +263,16 @@ std::vector<FormFile> parseMultipartFormData(const std::string &body, const std:
             }
         }
 
-        std::cout << "here +++++++++++++++++++++++++++++++++++++++++" << std::endl;
+       std::cout << "here +++++++++++++++++++++++++++++++++++++++++" << std::endl;
 
         if (isFile) {
-          // std::cout << "file" << std::endl;
+          //std::cout << "file" << std::endl;
           // exit(0);
           // file.data.push_back((char)0xFF);
           // file.data.push_back((char)0xD8);
           // file.data.push_back((char)0xFF);
           // file.data.push_back((char)0xE0);
-          for(size_t i = 0; i < content.size(); i++)
+          for (size_t i = 1; i < content.size(); i++)
               file.data.push_back(content[i]);
           files.push_back(file);
         }
@@ -279,19 +280,19 @@ std::vector<FormFile> parseMultipartFormData(const std::string &body, const std:
         pos = end;
     }
 
-    // std::cout << "form size ---> " << files.size() << std::endl;
+    //std::cout << "form size ---> " << files.size() << std::endl;
     // for (size_t i = 0; i < files.size(); ++i) {
-    //     std::cout << "File " << i + 1 << ":\n";
-    //     std::cout << "  Name: " << files[i].name << "\n";
-    //     std::cout << "  Filename: " << files[i].filename << "\n";
-    //     std::cout << "  Content-Type: " << files[i].contentType << "\n";
-    //     std::cout << "  Data size: " << files[i].data.size() << " bytes\n";
-    //     // std::cout << "  Data preview: " << files[i].data.substr(0, 50) << "\n";
-    //     std::cout << "Data preview: ";
+    //    std::cout << "File " << i + 1 << ":\n";
+    //    std::cout << "  Name: " << files[i].name << "\n";
+    //    std::cout << "  Filename: " << files[i].filename << "\n";
+    //    std::cout << "  Content-Type: " << files[i].contentType << "\n";
+    //    std::cout << "  Data size: " << files[i].data.size() << " bytes\n";
+    //     //std::cout << "  Data preview: " << files[i].data.substr(0, 50) << "\n";
+    //    std::cout << "Data preview: ";
     //     for(size_t j = 0; j < files[i].data.size(); j++) {
-    //         std::cout << files[i].data[j];
+    //        std::cout << files[i].data[j];
     //     }
-    //     std::cout << std::endl;
+    //    std::cout << std::endl;
     // }
 
     return files;
@@ -324,6 +325,6 @@ std::string extractDirectory(const std::string& location)
         }
         return extractDirectory(trimmed);
     }
-    std::cout << "-------------> here" << std::endl;
+   std::cout << "-------------> here" << std::endl;
     return location.substr(0, lastSlash);
 }

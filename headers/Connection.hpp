@@ -2,10 +2,12 @@
 
 #include <iostream>
 #include <filesystem>
+#include <map>
 #include "../headers/WebServerConfig.hpp"
 #include "../headers/FileStreamer.hpp"
 #include "../headers/HTTPResponse.hpp"
 #include "../headers/HTTPRequest.hpp"
+#include "../headers/Cookie.hpp"
 
 #define BLUE "\u001b[34m";
 
@@ -14,6 +16,8 @@
 #define PINK "\033[95m";
 
 #define LIME "\033[92m";
+
+#define BROWN "\033[33m";
 
 class Connection {
     public:
@@ -24,7 +28,8 @@ class Connection {
         std::string&    getReadBuffer();
         std::string&    getWriteBuffer();
         void            parseContentLength();
-        void            handleRead();
+        void            parseCookie(std::map<std::string, Cookie> &);
+        void            handleRead(std::map<std::string, Cookie> &);
         void            handleWrite();
         bool            isClosed() const;
         void	        reset();
@@ -45,6 +50,8 @@ class Connection {
         size_t          _expectedBodyLength;
         bool            _completedBuffer;
         int             _serverClusterId;
+        bool            _hasCookie;
+        std::string     _cookieHeader;
         
         // Connection& operator=(const Connection& other);
 };

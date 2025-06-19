@@ -17,13 +17,6 @@ protected:
     std::string statusMessage;          // "OK", "Not Found"
 public:
     virtual ~IHTTPMessage() {}
-    bool has_header(const std::string& name) const;
-    std::string get_header(const std::string& name) const;
-    void set_header(const std::string& name, const std::string& value);
-
-    // Body and connection info
-    size_t content_length() const;
-    bool keep_alive() const;
 
     // Serialize to raw bytes
     virtual std::vector<uint8_t> to_bytes() const = 0;

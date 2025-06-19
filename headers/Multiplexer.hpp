@@ -5,6 +5,8 @@
 #include <sys/epoll.h>
 #include "ServerSocket.hpp"
 #include "Connection.hpp"
+#include "Cookie.hpp"
+#include <set>
 
 class   Multiplexer {
     private:
@@ -14,6 +16,7 @@ class   Multiplexer {
         std::vector<ServerSocket> serverSockets;
         int epoll_fd;
         WebServerConfig& _config;
+        std::map<std::string, Cookie> sessionIds;
     public:
         Multiplexer(const std::vector<ServerSocket> &socks, WebServerConfig& config) 
             : serverSockets(socks), epoll_fd(-1), _config(config) {};

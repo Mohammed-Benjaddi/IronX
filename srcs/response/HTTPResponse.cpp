@@ -15,9 +15,24 @@ HTTPResponse::HTTPResponse()
 HTTPResponse::HTTPResponse(HTTPRequest* request)
     : _statusCode(200), _statusMessage("OK"), _connectionType("keep-alive"),
       _streamer(NULL), _request(request), _bodyPos(0), _headersSent(false), _complete(false) {
-    
+
+
     if (request->getMethod() == "DELETE" || request->getMethod() == "POST") {
-        std::cout << "Status Code : " << request->getStatusCode() << std::endl;
+       std::cout << "Status Code : " << request->getStatusCode() << std::endl;
+        setStandardHeaders(this, "text/plain", 0, "close", request->getStatusCode(), request->getStatusMessage());
+    } else if (!request->getStatusCode())
+        build_OK_Response(request, this);
+      else
+        buildResponse(request, this);
+}
+
+HTTPResponse::HTTPResponse(HTTPRequest* request, std::string cookies)
+    : _statusCode(200), _statusMessage("OK"), _connectionType("keep-alive"),
+      _streamer(NULL), _request(request), _bodyPos(0), _headersSent(false), _complete(false) {
+    setHeader("Set-Cookie", cookies);
+    std::cout << _headers.at("Set-Cookie") << "\033[95m" << std::endl;
+    if (request->getMethod() == "DELETE" || request->getMethod() == "POST") {
+       std::cout << "Status Code : " << request->getStatusCode() << std::endl;
         setStandardHeaders(this, "text/plain", 0, "close", request->getStatusCode(), request->getStatusMessage());
     } else if (!request->getStatusCode())
         build_OK_Response(request, this);
@@ -102,6 +117,7 @@ std::string HTTPResponse::getNextChunk() {
     }
 
     if (_bodyPos < _body.size()) {
+        std::cout << "ZEBB 1" << std::endl;
         std::string chunk = _body.substr(_bodyPos, 8192);
         _bodyPos += chunk.size();
         if (_bodyPos >= _body.size()) {
@@ -130,8 +146,6 @@ std::string HTTPResponse::getNextChunk() {
 
     make a function that gets you the relative path from route default
 */
- 
-
 
 void HTTPResponse::buildAutoIndexResponse(HTTPRequest *request) {
 

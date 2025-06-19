@@ -2,7 +2,7 @@
 
 CGI::CGI(HTTPRequest &_request, Route &_route) : request(_request), route(_route)
 {
-    std::cout << "++++++ " << request.getRootDir() + "/" + request.getPath() << std::endl;
+   std::cout << "++++++ " << request.getRootDir() + "/" + request.getPath() << std::endl;
     script_path = request.getRootDir() + "/" + request.getPath();
     request_method = request.getMethod();
     query_string = request.getQuery();
@@ -10,7 +10,7 @@ CGI::CGI(HTTPRequest &_request, Route &_route) : request(_request), route(_route
     request_body = "body must be here";
     script_output = "";
     setupEnvironment();
-    std::cout << "query ---> " << query_string << std::endl;
+   std::cout << "query ---> " << query_string << std::endl;
 }
 
 void CGI::setupEnvironment()
@@ -81,10 +81,10 @@ void CGI::executeCGI()
         request.setStatusCode(500);
         request.setStatusMessage("Internal Server");
         request.setPath(request.getErrorPages(request.getStatusCode()));
-        std::cout << "* CGI: creation failed" << std::endl;
+       std::cout << "* CGI: creation failed" << std::endl;
     }
 
-    std::cout << "script_path ----> " << script_path << std::endl;
+   std::cout << "script_path ----> " << script_path << std::endl;
 
     pid_t pid = fork();
 
@@ -97,7 +97,7 @@ void CGI::executeCGI()
         request.setStatusCode(500);
         request.setStatusMessage("Internal Server");
         request.setPath(request.getErrorPages(request.getStatusCode()));
-        std::cout << "* CGI: Fork() failed" << std::endl;
+       std::cout << "* CGI: Fork() failed" << std::endl;
     }
 
     if (pid == 0)
@@ -120,7 +120,7 @@ void CGI::executeCGI()
         args[1] = const_cast<char *>(interpreter[1].c_str());
         args[2] = const_cast<char *>(interpreter[2].c_str());
         args[3] = NULL;
-        // std::cout << "---------> " << interpreter << " | " <<
+        //std::cout << "---------> " << interpreter << " | " <<
         //     py << " | " << script_path << std::endl;
         // exit(0);
         execve(interpreter[0].c_str(), args, env_array);
@@ -153,19 +153,19 @@ void CGI::executeCGI()
         waitpid(pid, &status, 0);
 
         if (WIFEXITED(status) && WEXITSTATUS(status) == 0) {
-            std::cout << "the script executed successfully" << std::endl;
+           std::cout << "the script executed successfully" << std::endl;
             script_output = output;
             request.setStatusCode(200);
             request.setStatusMessage("Ok");
         }
         else {
-            std::cout << "---------> something went wrong" << std::endl;
-            std::cout << "Exit status: " << WEXITSTATUS(status) << std::endl;
-            std::cout << "Script output: [" << output << "]" << std::endl;
+           std::cout << "---------> something went wrong" << std::endl;
+           std::cout << "Exit status: " << WEXITSTATUS(status) << std::endl;
+           std::cout << "Script output: [" << output << "]" << std::endl;
             request.setStatusCode(500);
             request.setStatusMessage("Internal Server");
             request.setPath(request.getErrorPages(request.getStatusCode()));
-            std::cout << "* CGI: script execution failed" << std::endl;
+           std::cout << "* CGI: script execution failed" << std::endl;
         }
     }
 }

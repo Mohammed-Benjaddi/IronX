@@ -2,9 +2,15 @@ const postJobButton = document.getElementById('post-job-button');
 const deleteJobButton = document.getElementById('delete-job-button');
 const getJobButton = document.getElementById('get-job-button');
 const fileInput = document.getElementById('file-upload');
+const bgSelect = document.getElementById('background-select');
 let postTargetPath = null;
 
 const baseUrl = `${window.location.protocol}//${window.location.hostname}:${window.location.port}`;
+
+window.onload = () => {
+    const saved = getCookie('bgColor');
+    if (saved) document.body.style.background = saved;
+  };
 
 function getStatusMessage(status) {
     const code = parseInt(status);
@@ -55,7 +61,7 @@ function showResponseInfo(status, headers, isError = false) {
     headersElement.classList.add('typing');
 
     // Play pager sound
-    // document.getElementById('pager-beep')?.play();
+    document.getElementById('pager-beep')?.play();
 }
 
 
@@ -158,7 +164,7 @@ fileInput.addEventListener('change', async (e) => {
     try {
         const res = await fetch(`${baseUrl}/${postTargetPath}`, {
             method: 'POST',
-            body: formData,
+            body: formData, // FormData automatically sets the correct Content-Type
         });
 
         if (!res.ok) {
@@ -181,3 +187,37 @@ fileInput.addEventListener('change', async (e) => {
         fileInput.value = '';  // reset file input
     }
 });
+
+bgSelect.addEventListener('change', () => {
+    const imageUrl = bgSelect.value;
+    document.body.style.background = `url('${imageUrl}') no-repeat center center fixed`;
+    document.body.style.backgroundSize = 'cover';
+    setCookie('bgColor', imageUrl, 86400);
+  });
+
+function setCookie(name, value, seconds) {
+    document.cookie = `${name}=${value}; max-age=${seconds}; path=/`;
+}
+
+  function setBackground(color) {
+    document.body.style.background = color;
+    setCookie('bgColor', color, 86400);
+  }
+  
+  function getCookie(name) {
+    const cookies = document.cookie.split('; ');
+    for (const c of cookies) {
+        const [key, val] = c.split('=');
+        if (key === name) return decodeURIComponent(val);
+    }
+    return null;
+}
+
+window.onload = () => {
+    const bg = getCookie('bgColor');
+    if (bg) {
+        document.body.style.background = `url('${bg}') no-repeat center center fixed`;
+        document.body.style.backgroundSize = 'cover';
+        console.log('[BG] Loaded from cookie:', bg);
+    }
+};

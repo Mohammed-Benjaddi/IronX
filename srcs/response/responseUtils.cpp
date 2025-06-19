@@ -94,7 +94,7 @@ std::string getRelativePath(const std::string& path, const std::string& rootPath
 
     relative = relative.substr(0, relative.size() - 11);
 
-    std::cout << "relative path: " << relative << "\n";
+   std::cout << "relative path: " << relative << "\n";
     return relative;
 }
 

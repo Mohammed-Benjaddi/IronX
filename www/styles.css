@@ -3,7 +3,7 @@
 
 body {
   font-family: 'Arial Black', sans-serif;
-  background: url('https://i.ibb.co/qLCqrqLH/Chat-GPT-Image-26-mai-2025-20-h-18-min-00-s.png') no-repeat center center fixed;
+  background: url('...') no-repeat center center fixed;
   background-size: cover;
   color: #e2dfd2;
   margin: 0;
@@ -89,6 +89,30 @@ td a:hover {
 }
 
 .gta-btn:hover {
+  background-color: #333;
+  color: #ff4040;
+  border-color: #ff4040;
+  box-shadow: 0 0 15px #ff4040, inset 0 0 10px #000;
+}
+
+.gta-select {
+  background-color: #1a1a1a;
+  color: #d0c97d;
+  font-size: 1rem;
+  font-family: 'Arial Black', sans-serif;
+  border: 2px solid #555;
+  padding: 0.5rem 1rem;
+  box-shadow: 0 0 12px #000;
+  transition: all 0.3s ease;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  cursor: pointer;
+  width: 100%;
+  max-width: 300px;
+}
+
+.gta-select:hover {
   background-color: #333;
   color: #ff4040;
   border-color: #ff4040;
