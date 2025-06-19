@@ -28,8 +28,8 @@ class Connection {
         std::string&    getReadBuffer();
         std::string&    getWriteBuffer();
         void            parseContentLength();
-        void            parseCookie(std::map<std::string, Cookie> &);
-        void            handleRead(std::map<std::string, Cookie> &);
+        void            parseCookie();
+        void            handleRead();
         void            handleWrite();
         bool            isClosed() const;
         void	        reset();

@@ -46,8 +46,7 @@ std::string generateSessionId() {
 }
 
 
-void Connection::parseCookie(std::map<std::string, Cookie> &sessionIds) {
-    (void)sessionIds;
+void Connection::parseCookie() {
     const std::string bgCookieName = "bgColor";
     const std::string defaultBgUrl = "https://i.ibb.co/Gf7Nnfk2/team.png";
 
@@ -77,7 +76,7 @@ void Connection::parseCookie(std::map<std::string, Cookie> &sessionIds) {
 }
 
 
-void Connection::handleRead(std::map<std::string, Cookie> &sessionIds) {
+void Connection::handleRead() {
     char buffer[8192];
     ssize_t bytes_read = recv(_fd, buffer, sizeof(buffer), 0);
 
@@ -88,7 +87,7 @@ void Connection::handleRead(std::map<std::string, Cookie> &sessionIds) {
             if (pos != std::string::npos) {
                 _headersPart = _readBuffer.substr(0, pos + 4);
                 _headersParsed = true;
-                parseCookie(sessionIds);
+                parseCookie();
                 parseContentLength();
             }
         }

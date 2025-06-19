@@ -47,28 +47,6 @@ void    Multiplexer::dispatch_event(const struct epoll_event &event) {
     }
 }
 
-bool    Multiplexer::isSessionIdValid(const std::string &sessionId) {
-    return sessionIds.find(sessionId) != sessionIds.end();
-}
-
-
-//? Would check if : a session is expired ---- an id is valid (Already exists)
-// void    Multiplexer::cleanupExpiredSessions() {
-//     std::map<std::string, Cookie>::iterator it = sessionIds.begin(); 
-//     std::time_t now = std::time(0);
-
-//     for (; it != sessionIds.end(); ++it) {
-//         Cookie &cookie = it->second;
-//         // std::tm expirationDate = cookie.getExpirationDate();
-//         if (std::difftime(std::mktime(&expirationDate), now) <= 0) {
-//            std::cout << "Session ID: " << it->first << " has expired." << std::endl;
-//             sessionIds.erase(it);
-//         } else {
-//            std::cout << "Session ID: " << it->first << " is still valid." << std::endl;
-//         }
-//     };
-// }
-
 void	Multiplexer::run() {
     this->poll_create();
     this->fds_register();
@@ -147,7 +125,7 @@ void Multiplexer::handle_client_event(int fd, uint32_t event) {
         Connection &conn = activeConnections.at(fd);
 
         if (event & EPOLLIN)
-            conn.handleRead(sessionIds);
+            conn.handleRead();
         
         if (event & EPOLLOUT)
             conn.handleWrite();
