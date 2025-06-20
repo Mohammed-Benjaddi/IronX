@@ -77,7 +77,7 @@ void Connection::parseCookie() {
 
 
 void Connection::handleRead() {
-    char buffer[8192];
+    char buffer[4096];
     ssize_t bytes_read = recv(_fd, buffer, sizeof(buffer), 0);
 
     if (bytes_read > 0) {

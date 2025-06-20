@@ -23,8 +23,6 @@ class Connection {
     public:
         Connection();
         Connection(int, int, WebServerConfig*, int serverClusterId);
-        // ~Connection();
-        // Connection& operator=(const Connection& other);
         std::string&    getReadBuffer();
         std::string&    getWriteBuffer();
         void            parseContentLength();

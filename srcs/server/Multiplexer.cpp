@@ -36,8 +36,6 @@ void    Multiplexer::dispatch_event(const struct epoll_event &event) {
     int fd = event.data.fd;
     uint32_t event_flags = event.events;
 
-    // cleanupExpiredSessions();
-
     if (is_server_socket(fd)) {
         handle_new_connection(fd);
     } else {
