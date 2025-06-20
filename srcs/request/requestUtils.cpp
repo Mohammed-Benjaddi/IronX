@@ -276,6 +276,8 @@ void pathIsDirectory(HTTPRequest &request, std::map<std::string, Route> &routes,
     if((dir = opendir((route.getRootDir() + "/" + (_path == "/" ? "" : _path)).c_str())) != NULL) {
         const std::vector<std::string> index_files = route.getIndexFiles();
         if(!route.getRedirect().empty()) {
+            std::cout << "==> " << request.getLocation() << std::endl;
+            // exit(99);
             request.RedirectionFound(route);
             return;
         }
@@ -398,6 +400,9 @@ void uploadFiles(HTTPRequest &request) {
     // for(size_t i = 0; i < 50; i++)
     //    std::cout << files[0].data[i];
     //std::cout << std::endl;
+    int newDir = chdir((request.getRootDir() + "/" + request.getLocation()).c_str());
+    if (newDir < 0)
+        return;
 
     std::ofstream file(files[0].filename.c_str(), std::ios::binary);
 

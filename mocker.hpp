@@ -204,12 +204,12 @@ void mocker(WebServerConfig &wsc) {
 
     // Route 4: /old-site
     Route route4;
-    route4.setRedirect("/nw-site");
+    route4.setRedirect("/");
     
     std::set<std::string> methods4;
     methods4.insert("GET");
     route4.setAllowedMethods(methods4);
-    route4.setRootDir("home/nab/Desktop/webserve-42/www");
+    route4.setRootDir(path);
 
     routes1.insert(std::make_pair("/old-site", route4));
 
