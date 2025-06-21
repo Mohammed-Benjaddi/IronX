@@ -6,6 +6,10 @@ HTTPRequest::HTTPRequest(const std::string &raw_request, WebServerConfig *_confi
     if (parse(*this, raw_request) == -1)
         return;
 
+    std::cout << "-----------\n";
+    std::cout << raw_request.size() << "\n";
+    std::cout << "-----------\n";
+
     if (checkAllowedMethods(*this) == -1)
 
         return;

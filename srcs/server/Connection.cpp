@@ -93,8 +93,16 @@ void Connection::handleRead() {
         }
         if (_headersParsed) {
             if ((_expectedBodyLength == 0) || (_readBuffer.size() >= (_headersPart.size() + _expectedBodyLength))) {
-                _httpRequest = new HTTPRequest(_readBuffer, _config, _serverClusterId);
-                std::cout << "\033[92m" << _readBuffer << " " << _httpRequest->getPath() << "\n" << LIME;
+                // std::cout << _readBuffer.size() - _headersPart.size() << " bytes received.\n";
+                // std::cout << "\n--------=========----------\n";
+                // std::cout << _expectedBodyLength << " bytes expected, " 
+                        //   << _readBuffer.size() - _headersPart.size() << " bytes received.\n";
+
+                // std::string copy(_readBuffer.substr(_headersPart.size()));
+                // std::cout << "\033[92m" << "HHHHHHHHHHHHHH:  " <<  copy.size() << "\033[92m\n";
+                
+                _httpRequest = new HTTPRequest(_readBuffer + "\n", _config, _serverClusterId);
+                // std::cout << "\033[92m" << _readBuffer << " " << _httpRequest->getPath() << "\n" << LIME;
                 _httpResponse = new HTTPResponse(_httpRequest, _cookieHeader);
                 re_armFd();
             } else

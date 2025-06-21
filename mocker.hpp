@@ -204,7 +204,7 @@ void mocker(WebServerConfig &wsc) {
 
     // Route 4: /old-site
     Route route4;
-    route4.setRedirect("/");
+    route4.setRedirect("/new-site");
     
     std::set<std::string> methods4;
     methods4.insert("GET");

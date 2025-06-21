@@ -389,7 +389,7 @@ void uploadFiles(HTTPRequest &request) {
    std::cout << "upload files here ----> " << std::endl;
     std::vector<FormFile> files = request.getFormFiles();
 
-    if(files.empty()) {
+    if (files.empty()) {
        std::cout << "empty form" << std::endl;
         return;
     }
