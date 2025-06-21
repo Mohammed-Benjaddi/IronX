@@ -354,7 +354,7 @@ void HTTPRequest::RedirectionFound(Route &route) {
     std::string a = getPath(), b = getLocation();
     setPath(route.getRedirect());
     setLocation(getPath());
-    // setStatusCode(301);
+    setStatusCode(301);
     setStatusMessage("Moved Permanently");
     setMethod("GET");
     std::cout << "* before ---> " << a << " | " << b << std::endl;

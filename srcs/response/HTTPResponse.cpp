@@ -18,7 +18,7 @@ HTTPResponse::HTTPResponse(HTTPRequest* request)
 
 
     if (request->getMethod() == "DELETE" || request->getMethod() == "POST") {
-       std::cout << "Status Code : " << request->getStatusCode() << std::endl;
+    //    std::cout << "Status Code : " << request->getStatusCode() << std::endl; 
         setStandardHeaders(this, "text/plain", 0, "close", request->getStatusCode(), request->getStatusMessage());
     } else if (!request->getStatusCode())
         build_OK_Response(request, this);
@@ -29,10 +29,11 @@ HTTPResponse::HTTPResponse(HTTPRequest* request)
 HTTPResponse::HTTPResponse(HTTPRequest* request, std::string cookies)
     : _statusCode(200), _statusMessage("OK"), _connectionType("keep-alive"),
       _streamer(NULL), _request(request), _bodyPos(0), _headersSent(false), _complete(false) {
+
     setHeader("Set-Cookie", cookies);
     std::cout << _headers.at("Set-Cookie") << "\033[95m" << std::endl;
+    std::cout << "Status Code : " << request->getStatusCode() << std::endl; 
     if (request->getMethod() == "DELETE" || request->getMethod() == "POST") {
-       std::cout << "Status Code : " << request->getStatusCode() << std::endl;
         setStandardHeaders(this, "text/plain", 0, "close", request->getStatusCode(), request->getStatusMessage());
     } else if (!request->getStatusCode())
         build_OK_Response(request, this);
@@ -45,7 +46,7 @@ HTTPResponse::~HTTPResponse() {
     if (!_tempFilePath.empty()) {
         remove(_tempFilePath.c_str());
         _tempFilePath.clear();
-    }
+    }                                                              
 }
 
 // Set status line

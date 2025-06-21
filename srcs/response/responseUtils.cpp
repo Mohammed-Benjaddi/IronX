@@ -44,7 +44,7 @@ std::string toString(int value) {
 }
 
 void build_OK_Response(HTTPRequest* req, HTTPResponse* res) {
-    setStandardHeaders(res, res->getMimeType(req->getPath()), getFileSize(req->getPath()), "keep-alive" ,200, "OK");
+    setStandardHeaders(res, res->getMimeType(req->getPath()), getFileSize(req->getPath()), "keep-alive" , 200, "OK");
     res->setHeader("Accept-Ranges",  "bytes");
     res->setStreamer(new FileStreamer(req->getPath(), res->getConnectionHeader()));
 }
@@ -69,6 +69,10 @@ void buildResponse(HTTPRequest* req, HTTPResponse* res) {
         case 9999:
             setStandardHeaders(res, "text/html", size, "close", 200, "OK");
             res->buildAutoIndexResponse(req);
+            res->setStreamer(new FileStreamer(req->getPath(), res->getConnectionHeader()));
+            break;
+        case 301:
+            setStandardHeaders(res, "text/html", size, "close", 301, "Moved Permanently");
             res->setStreamer(new FileStreamer(req->getPath(), res->getConnectionHeader()));
             break;
         default:
