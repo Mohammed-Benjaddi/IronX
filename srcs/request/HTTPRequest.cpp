@@ -2,7 +2,7 @@
 
 HTTPRequest::HTTPRequest(const std::string &raw_request, WebServerConfig *_config, int _clientId) : IHTTPMessage(), config(_config), clientId(_clientId)
 {
-
+    this->cgi = NULL;
     if (parse(*this, raw_request) == -1)
         return;
 
@@ -106,6 +106,7 @@ void HTTPRequest::setErrorPages(const std::map<int, std::string> &error_pages)
     this->error_pages = error_pages;
 }
 
+
 // ---------------------------------------------------
 
 WebServerConfig *HTTPRequest::getConfig() const
@@ -140,6 +141,7 @@ std::string HTTPRequest::getHeader(const std::string &key) const
         return it->second;
     return "";
 }
+
 
 // std::string findHeader(HTTPRequest &request, std::string key) {
 //   std::map<std::string, std::string> headers = request.getHeaders();
@@ -324,7 +326,6 @@ void HTTPRequest::executeCGI(Route &route)
             //! add POST implementation here
            std::cout << "root ---> " << getRootDir() << std::endl;
             cgi = new CGI(*this, route);
-            (void)cgi;
             cgi->executeCGI();
             // exit(0);
         }
@@ -370,7 +371,7 @@ void HTTPRequest::handlePOST(std::map<std::string, Route> &routes, Route &route)
    std::cout << getBody();
     if (isDirExist(getPath(), route.getRootDir())) {
        std::cout << "path is directory" << std::endl;
-        if(contentType.rfind("application/x-www-form-urlencoded") != std::string::npos) {
+        if (contentType.rfind("application/x-www-form-urlencoded") != std::string::npos) {
             setStatusCode(400);
             setStatusMessage("Bad Request");
             setPath(getErrorPages(getStatusCode()));
@@ -387,3 +388,5 @@ void HTTPRequest::handlePOST(std::map<std::string, Route> &routes, Route &route)
         pathIsFile(*this, routes, route);
     }
 }
+
+CGI* HTTPRequest::getCGI() const { return cgi; }

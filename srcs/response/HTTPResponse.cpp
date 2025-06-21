@@ -11,24 +11,9 @@ HTTPResponse::HTTPResponse()
     _headers["Content-Type"] = "text/plain"; // default
 }
 
-// Constructor using a request — fallback to OK or error response
-HTTPResponse::HTTPResponse(HTTPRequest* request)
-    : _statusCode(200), _statusMessage("OK"), _connectionType("keep-alive"),
-      _streamer(NULL), _request(request), _bodyPos(0), _headersSent(false), _complete(false) {
-
-
-    if (request->getMethod() == "DELETE" || request->getMethod() == "POST") {
-    //    std::cout << "Status Code : " << request->getStatusCode() << std::endl; 
-        setStandardHeaders(this, "text/plain", 0, "close", request->getStatusCode(), request->getStatusMessage());
-    } else if (!request->getStatusCode())
-        build_OK_Response(request, this);
-      else
-        buildResponse(request, this);
-}
-
 HTTPResponse::HTTPResponse(HTTPRequest* request, std::string cookies)
     : _statusCode(200), _statusMessage("OK"), _connectionType("keep-alive"),
-      _streamer(NULL), _request(request), _bodyPos(0), _headersSent(false), _complete(false) {
+      _streamer(NULL), _request(request), _body("") ,_bodyPos(0), _headersSent(false), _complete(false) {
 
     setHeader("Set-Cookie", cookies);
     std::cout << _headers.at("Set-Cookie") << "\033[95m" << std::endl;
@@ -97,9 +82,10 @@ std::string HTTPResponse::getNextChunk() {
         for (std::map<std::string, std::string>::const_iterator it = _headers.begin(); it != _headers.end(); ++it)
             oss << it->first << ": " << it->second << "\r\n";
         oss << "\r\n";
+        if (!_body.empty() && !_streamer)
+            oss << _body;
         return oss.str();
     }
-
     if (_streamer) {
         std::string chunk = _streamer->getNextChunk(8192);
         if (_streamer->isEOF()) {
@@ -118,7 +104,6 @@ std::string HTTPResponse::getNextChunk() {
     }
 
     if (_bodyPos < _body.size()) {
-        std::cout << "ZEBB 1" << std::endl;
         std::string chunk = _body.substr(_bodyPos, 8192);
         _bodyPos += chunk.size();
         if (_bodyPos >= _body.size()) {
@@ -134,19 +119,6 @@ std::string HTTPResponse::getNextChunk() {
     _complete = true;
     return "";
 }
-
-
-//!  BASE ROUTE new-site   */
-/*
-    location: ->>>>/new-site
-    path: ->>>>/home/nab/Desktop/webserve-42/www/new-site/index.html
-    root: ->>>>/home/nab/Desktop/webserve-42/www
-    Base Case :
-    in each each entry should be : location + path divided remove Root part 
-        we stay with : /new-site + entry
-
-    make a function that gets you the relative path from route default
-*/
 
 void HTTPResponse::buildAutoIndexResponse(HTTPRequest *request) {
 

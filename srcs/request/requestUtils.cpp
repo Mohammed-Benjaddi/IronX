@@ -385,7 +385,7 @@ bool isDirectoryEmpty(std::string path) {
 
 
 void uploadFiles(HTTPRequest &request) {
-    (void) request;
+    // (void) request;
    std::cout << "upload files here ----> " << std::endl;
     std::vector<FormFile> files = request.getFormFiles();
 

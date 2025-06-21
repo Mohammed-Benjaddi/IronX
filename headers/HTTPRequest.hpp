@@ -52,7 +52,6 @@ private:
     std::string location;
     std::map<int, std::string> error_pages;
     CGI *cgi;
-
 public:
     HTTPRequest(const std::string &, WebServerConfig *, int );
     HTTPRequest(const std::string &, WebServerConfig *, int , HTTPResponse *);
@@ -76,8 +75,9 @@ public:
 
     void setLocation(const std::string& location);
     void setErrorPages(const std::map<int, std::string>& error_pages);
-
+    // void setIsCGI(bool isCGI);
     // Getters
+    CGI* getCGI() const;
     WebServerConfig *getConfig() const;
     std::string getMethod() const;
     std::string getPath() const;
@@ -96,6 +96,7 @@ public:
     bool isBodyFound() const;
     std::vector<FormFile> &getFormFiles();
     std::string getFileExtension();
+    // bool isCGI() const;
 
     virtual std::vector<uint8_t> to_bytes() const;
 

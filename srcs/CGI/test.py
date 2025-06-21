@@ -11,7 +11,7 @@ cgitb.enable()
 
 def main():
     # Print Content-Type header (required!)
-    print("Content-Type: text/html")
+    # print("Content-Type: text/html")
     print("")  # Empty line separates headers from body
     
     # Get environment variables set by the web server

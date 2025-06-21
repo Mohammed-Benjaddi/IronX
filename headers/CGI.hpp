@@ -34,5 +34,8 @@ class CGI {
     char** createEnvArray();
     void freeEnvArray(char** env_array);
     std::vector<std::string> getInterpreter(const std::string& script_path);
+    std::string getScriptOutput() {
+        return script_output;
+    }
     void executeCGI();
 };
