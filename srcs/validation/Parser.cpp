@@ -6,7 +6,7 @@
 /*   By: ael-maaz <ael-maaz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 17:38:54 by ael-maaz          #+#    #+#             */
-/*   Updated: 2025/06/17 21:20:59 by ael-maaz         ###   ########.fr       */
+/*   Updated: 2025/06/22 20:40:04 by ael-maaz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,183 +58,6 @@ std::vector<std::string> Parser::ReadLines()
 	return lines;
 }
 
-// void Parser::parseLines(WebServerConfig& conf)
-// {
-// 	(void) conf;
-// 	std::vector<std::string> data_lines;
-// 	std::vector<std::string> labels;
-// 	bool label_flag = false;
-// 	std::string label;
-// 	for(size_t i = 0; i < this->lines.size();i++)
-// 	{
-// 		std::cout <<this->lines[i] << std::endl;
-// 		if(this->lines[i][0] == '[')
-// 		{
-// 			label_flag = true;
-// 			if(this->lines[i][1] == '[')
-// 			{
-// 				size_t pos = this->lines[i].find(']');
-// 				if(pos == std::string::npos || (this->lines[i][pos+1] != ']') || ((pos + 1) != this->lines[i].size() - 1))		
-// 					throw std::runtime_error("Invalid syntax");
-// 				else
-// 				{
-// 					label = this->lines[i].substr(2,pos - 2);
-// 					label = trim(label);
-// 					std::cout << "label line: " <<label << std::endl;
-// 					if(checkBracketLabel(trim(label)) == "bad")
-// 						throw std::runtime_error("Invalid label");
-// 					// else
-// 					// 	std::cout << "Something else\n";
-// 						//fillConfFile
-						
-// 				}
-// 			}
-// 			else
-// 			{
-				
-// 				size_t pos = this->lines[i].find(']');
-// 				if(pos == std::string::npos || pos != this->lines[i].size() - 1)
-// 				{					
-// 					throw std::runtime_error("Invalid syntax");
-// 				}
-// 				else
-// 				{
-// 					label = this->lines[i].substr(1,pos - 1);
-// 					label = trim(label);
-// 					std::cout << "label line: " <<label << std::endl;
-// 					if(checkLabel(trim(label)) == "bad")
-// 						throw std::runtime_error("Invalid label");
-// 					std::string target = trim(label);
-
-// 					std::vector<std::string>::iterator it = std::find(labels.begin(), labels.end(), target);
-
-// 					if (it != labels.end())
-// 					{
-// 						std::cout << labels.back() << std::endl;
-// 						throw std::runtime_error("Duplicate labels");
-// 					}
-// 					labels.push_back(trim(label));
-											
-// 				}
-// 			}
-// 		}
-// 		else
-// 		{
-// 			std::string line = this->lines[i];
-// 			std::stringstream ss(line);
-// 			std::string key, value;
-// 			// std::cout << "data line: "<< this->lines[i] << std::endl;
-			
-// 			if (std::getline(ss, key, '=') && std::getline(ss, value))
-// 			{
-// 				std::cout << "Key: \"" << trim(key) << "\"\n";
-// 				std::cout << "Value: " << trim(value) << "\n";
-// 				testKey(key,value,label);
-// 				std::cout << "here\n";
-// 			}
-// 			else
-// 			{
-// 				std::cerr << "Malformed line, missing '='\n";
-// 				throw std::runtime_error("Invalid Syntax");
-// 			}
-			
-// 		}
-// 	}
-// }
-
-
-
-
-
-
-
-// void Parser::parseLines(WebServerConfig& conf)
-// {
-// 	(void) conf;
-// 	std::vector<std::string> data_lines;
-// 	std::vector<std::string> labels;
-// 	bool label_flag = false;
-// 	std::string label;
-// 	for(size_t i = 0; i < this->lines.size();i++)
-// 	{
-// 		std::cout <<this->lines[i] << std::endl;
-// 		if(this->lines[i][0] == '[')
-// 		{
-// 			label_flag = true;
-// 			if(this->lines[i][1] == '[')
-// 			{
-// 				size_t pos = this->lines[i].find(']');
-// 				if(pos == std::string::npos || (this->lines[i][pos+1] != ']') || ((pos + 1) != this->lines[i].size() - 1))		
-// 					throw std::runtime_error("Invalid syntax");
-// 				else
-// 				{
-// 					label = this->lines[i].substr(2,pos - 2);
-// 					label = trim(label);
-// 					std::cout << "label line: " <<label << std::endl;
-// 					if(checkBracketLabel(trim(label)) == "bad")
-// 						throw std::runtime_error("Invalid label");
-// 					// else
-// 					// 	std::cout << "Something else\n";
-// 						//fillConfFile
-						
-// 				}
-// 			}
-// 			else
-// 			{
-				
-// 				size_t pos = this->lines[i].find(']');
-// 				if(pos == std::string::npos || pos != this->lines[i].size() - 1)
-// 				{					
-// 					throw std::runtime_error("Invalid syntax");
-// 				}
-// 				else
-// 				{
-// 					label = this->lines[i].substr(1,pos - 1);
-// 					label = trim(label);
-// 					std::cout << "label line: " <<label << std::endl;
-// 					if(checkLabel(trim(label)) == "bad")
-// 						throw std::runtime_error("Invalid label");
-// 					std::string target = trim(label);
-
-// 					std::vector<std::string>::iterator it = std::find(labels.begin(), labels.end(), target);
-
-// 					if (it != labels.end())
-// 					{
-// 						std::cout << labels.back() << std::endl;
-// 						throw std::runtime_error("Duplicate labels");
-// 					}
-// 					labels.push_back(trim(label));
-											
-// 				}
-// 			}
-// 		}
-// 		else
-// 		{
-// 			std::string line = this->lines[i];
-// 			std::stringstream ss(line);
-// 			std::string key, value;
-// 			// std::cout << "data line: "<< this->lines[i] << std::endl;
-			
-// 			if (std::getline(ss, key, '=') && std::getline(ss, value))
-// 			{
-// 				std::cout << "Key: \"" << trim(key) << "\"\n";
-// 				std::cout << "Value: " << trim(value) << "\n";
-// 				testKey(key,value,label);
-// 				std::cout << "here\n";
-// 			}
-// 			else
-// 			{
-// 				std::cerr << "Malformed line, missing '='\n";
-// 				throw std::runtime_error("Invalid Syntax");
-// 			}
-			
-// 		}
-// 	}
-// }
-
-
-
-
 
 
 bool isWhitespace(char c) {
@@ -248,26 +71,6 @@ std::string trim(const std::string& str) {
 	while (end > start && isWhitespace(str[end - 1])) --end;
 	return str.substr(start, end - start);
 }
-
-// std::vector<std::string> parseStringList(const std::string& value) {
-// 	std::vector<std::string> result;
-// 	std::string temp;
-// 	bool inQuotes = false;
-// 	for (size_t i = 0; i < value.length(); ++i) {
-// 		char c = value[i];
-// 		if (c == '"') {
-// 			inQuotes = !inQuotes;
-// 			if (!inQuotes && !temp.empty()) {
-// 				result.push_back(temp);
-// 				temp.clear();
-// 			}
-// 		} else if (inQuotes) {
-// 			temp += c;
-// 		}
-// 	}
-// 	return result;
-// }
-
 
 
 std::vector<std::string> parseStringList(const std::string& value) {
@@ -335,24 +138,6 @@ std::vector<std::string> parseStringList(const std::string& value) {
 
 	return result;
 }
-
-// std::vector<uint16_t> parseIntList(const std::string& value) {
-// 	std::vector<uint16_t> result;
-// 	std::string num;
-// 	for (size_t i = 0; i < value.length(); ++i) {
-// 		if (isdigit(value[i])) num += value[i];
-// 		else if (!num.empty()) {
-// 			result.push_back(static_cast<uint16_t>(atoi(num.c_str())));
-// 			num.clear();
-// 		}
-// 	}
-// 	if (!num.empty())
-// 		result.push_back(static_cast<uint16_t>(atoi(num.c_str())));
-// 	return result;
-// }
-
-
-
 
 
 std::vector<uint16_t> parseIntList(const std::string& value) {
@@ -434,6 +219,16 @@ std::vector<uint16_t> parseIntList(const std::string& value) {
 	return result;
 }
 
+void commitRoute(Cluster* c, const std::string& path, const Route& r)
+{
+    if (!c)
+        throw std::runtime_error("Route block is missing a \"path\" key");
+    if (path.empty())
+        throw std::runtime_error("Route defined outside of [[servers]] block");
+
+    c->getRoutes()[path] = r;  // or c->addRoute(path, r);
+}
+
 
 void parseTOML(const std::string& filepath, WebServerConfig& config)
 {
@@ -453,20 +248,7 @@ void parseTOML(const std::string& filepath, WebServerConfig& config)
     std::map<int, std::string>  errorPages;
     size_t                      maxBodySize = 1048576; // default 1 MB
 
-    //------------------------------------------------------------------
-    // helper lambda to commit the buffered route (if any) to its cluster
-    //------------------------------------------------------------------
 
-    const struct CommitRoute {
-        static void exec(Cluster* c, const std::string& path, const Route& r)
-        {
-            if (!c)
-			    throw std::runtime_error("Route block is missing a \"path\" key");
-            if (path.empty())
-			    throw std::runtime_error("Route defined outside of [[servers]] block");
-            c->getRoutes()[path] = r;    // or c->addRoute(path,r);
-        }
-    } commitRoute;
 	bool seenGlobalBlock = false;              // NEW
 	bool seenDefaultErrorPagesBlock = false;
     //---------------------------------- --------------------------------
@@ -508,7 +290,7 @@ void parseTOML(const std::string& filepath, WebServerConfig& config)
             {
                 // commit the previous route (if we were already in one)
                 if (inRoute)
-                    commitRoute.exec(currentCluster, currentRoutePath, currentRoute);
+                    commitRoute(currentCluster, currentRoutePath, currentRoute);
 
                 // start a fresh route
                 currentRoute       = Route();
@@ -525,7 +307,7 @@ void parseTOML(const std::string& filepath, WebServerConfig& config)
             {
                 // commit any route that was still open
                 if (inRoute)
-                    commitRoute.exec(currentCluster, currentRoutePath, currentRoute);
+                    commitRoute(currentCluster, currentRoutePath, currentRoute);
                 inRoute = false;
 
                 clusters.push_back(Cluster());        // create & select it
@@ -540,7 +322,7 @@ void parseTOML(const std::string& filepath, WebServerConfig& config)
             {
                 // commit any open route *before* switching section
                 if (inRoute)
-                    commitRoute.exec(currentCluster, currentRoutePath, currentRoute);
+                    commitRoute(currentCluster, currentRoutePath, currentRoute);
                 inRoute = false;
 
                 currentSection = trim(line.substr(1, line.size()-2)); // strip [ ]
@@ -649,11 +431,11 @@ void parseTOML(const std::string& filepath, WebServerConfig& config)
 				val = val.substr(1, val.size() - 2);
 			}
             if      (key == "path")
-                currentRoutePath = val;//.substr(0, val.size());   // strip quotes
+                currentRoutePath = val;
             else if (key == "root")
-                currentRoute.setRootDir(val/*.substr(0, val.size())*/);
+                currentRoute.setRootDir(val);
             else if (key == "index") {
-                std::vector<std::string> tmp(1, val/* .substr(0, val.size()) */);
+                std::vector<std::string> tmp(1, val);
                 currentRoute.setIndexFiles(tmp);
             }
             else if (key == "methods") {
@@ -663,9 +445,9 @@ void parseTOML(const std::string& filepath, WebServerConfig& config)
             else if (key == "autoindex")
                 currentRoute.setAutoindex(val == "true");
             else if (key == "upload_dir")
-                currentRoute.setUploadDir(val/* .substr(0, val.size()) */);
+                currentRoute.setUploadDir(val);
             else if (key == "redirect")
-                currentRoute.setRedirect(val/* .substr(0, val.size()) */);
+                currentRoute.setRedirect(val);
             else if (key == "extensions") {
                 CGIConfig cgi = currentRoute.getCGIConfig();
                 cgi.setExtensions(parseStringList(val));
@@ -673,7 +455,7 @@ void parseTOML(const std::string& filepath, WebServerConfig& config)
             }
             else if (key == "interpreter") {
                 CGIConfig cgi = currentRoute.getCGIConfig();
-                cgi.setInterpreter(val/* .substr(0, val.size()) */);
+                cgi.setInterpreter(val);
                 currentRoute.setCGIConfig(cgi);
             }
         }
@@ -683,7 +465,7 @@ void parseTOML(const std::string& filepath, WebServerConfig& config)
     // commit the last open route / cluster after EOF
     //------------------------------------------------------------------
     if (inRoute)
-        commitRoute.exec(currentCluster, currentRoutePath, currentRoute);
+        commitRoute(currentCluster, currentRoutePath, currentRoute);
 
     // move data into WebServerConfig
     config.setMaxBodySize(maxBodySize);
@@ -770,6 +552,9 @@ void printConfigs(const WebServerConfig& conf)
     }
 }
 
+
+
+
 int Parser::MainParser(std::string path)
 {
 	WebServerConfig conf;
@@ -777,12 +562,8 @@ int Parser::MainParser(std::string path)
 	{
 		OpenTomlFile(path);
 		parseTOML(path, conf);
-		// std::cout << conf.getMaxBodySize() <<std::endl;
-		// std::map<int, std::string> error_pages = conf.getErrorPages();
-		// for (std::map<int, std::string>::const_iterator it = error_pages.begin(); it != error_pages.end(); ++it) {
-		// 	std::cout << "Error " << it->first << " -> " << it->second << std::endl;
-		// }
 		printConfigs(conf);
+		
 
 		// this->lines = ReadLines();
 		// parseLines(conf);

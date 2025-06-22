@@ -36,7 +36,6 @@ port = [8080, 4242, 1923] # Listen on port 8080
 # Requirement: "Set up the server_names or not."
 # Explanation: Optional list of domain names this server responds to
 hostnames = ["example.com", "www.example.com"  ]
-[[global]]
 
 # ======================
 # ROUTE CONFIGURATIONS
