@@ -16,7 +16,7 @@ HTTPResponse::HTTPResponse(HTTPRequest* request, std::string cookies)
       _streamer(NULL), _request(request), _body("") ,_bodyPos(0), _headersSent(false), _complete(false) {
 
     setHeader("Set-Cookie", cookies);
-    if (request->getMethod() == "DELETE") {
+    if (request->getMethod() == "DELETE" || (request->getMethod() == "POST" && !request->getCGI())){
         setStandardHeaders(this, "text/plain", 0, "close", request->getStatusCode(), request->getStatusMessage());
     } else if (!request->getStatusCode())
         build_OK_Response(request, this);
