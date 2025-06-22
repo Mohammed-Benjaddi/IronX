@@ -16,9 +16,7 @@ HTTPResponse::HTTPResponse(HTTPRequest* request, std::string cookies)
       _streamer(NULL), _request(request), _body("") ,_bodyPos(0), _headersSent(false), _complete(false) {
 
     setHeader("Set-Cookie", cookies);
-    std::cout << _headers.at("Set-Cookie") << "\033[95m" << std::endl;
-    std::cout << "Status Code : " << request->getStatusCode() << std::endl; 
-    if (request->getMethod() == "DELETE" || request->getMethod() == "POST") {
+    if (request->getMethod() == "DELETE") {
         setStandardHeaders(this, "text/plain", 0, "close", request->getStatusCode(), request->getStatusMessage());
     } else if (!request->getStatusCode())
         build_OK_Response(request, this);
@@ -31,7 +29,7 @@ HTTPResponse::~HTTPResponse() {
     if (!_tempFilePath.empty()) {
         remove(_tempFilePath.c_str());
         _tempFilePath.clear();
-    }                                                              
+    }                                                         
 }
 
 // Set status line

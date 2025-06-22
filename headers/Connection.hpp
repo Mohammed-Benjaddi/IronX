@@ -3,6 +3,7 @@
 #include <iostream>
 #include <filesystem>
 #include <map>
+#include <algorithm>
 #include "../headers/WebServerConfig.hpp"
 #include "../headers/FileStreamer.hpp"
 #include "../headers/HTTPResponse.hpp"
@@ -23,8 +24,10 @@ class Connection {
     public:
         Connection();
         Connection(int, int, WebServerConfig*, int serverClusterId);
-        std::string&    getReadBuffer();
-        std::string&    getWriteBuffer();
+        // std::string&    getReadBuffer();
+        std::string&        getWriteBuffer();
+        std::vector<char>&  getReadBuffer();
+        // std::vector<char>& getWriteBuffer();
         void            parseContentLength();
         void            parseCookie();
         void            handleRead();
@@ -35,8 +38,10 @@ class Connection {
     private:
         int             _fd;
         int             _epoll_fd;
-        std::string     _readBuffer;
+        // std::string     _readBuffer;
+        std::vector<char> _readBuffer;
         std::string     _writeBuffer;
+        // std::vector<char> _writeBuffer;
         std::string     _connectionHeader;
         std::string     _headersPart;
         bool            _closed;

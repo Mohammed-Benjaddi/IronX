@@ -61,9 +61,9 @@ void buildResponse(HTTPRequest* req, HTTPResponse* res) {
         res->setBody(req->getCGI()->getScriptOutput());
         std::cout << "CGI script output: " << req->getCGI()->getScriptOutput() << "\n";
         return ;
-    } else if (req->getCGI() && req->getStatusCode() != 200) {
+    } else if (req->getCGI() && req->getStatusCode() == 500) {
             res->setHeader("Content-Type", "text/html");
-            res->setHeader("Content-Length", "0");
+            res->setHeader("Content-Length", "97");
             res->setHeader("Connection", "close");
             res->setStatus(500, "Internal Server Error");
             res->setBody("<html><body><h1>500 Internal Server Error</h1><p>CGI script failed to execute.</p></body></html>");

@@ -11,7 +11,6 @@ HTTPRequest::HTTPRequest(const std::string &raw_request, WebServerConfig *_confi
     std::cout << "-----------\n";
 
     if (checkAllowedMethods(*this) == -1)
-
         return;
     handleRequest();
 }

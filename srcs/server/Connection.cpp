@@ -4,19 +4,39 @@
 #include "../../headers/FileStreamer.hpp"
 
 Connection::Connection()
-    : _fd(-1), _readBuffer(""), _writeBuffer(""), _closed(false), _config(NULL), _streamer(NULL), _httpResponse(NULL), _headersParsed(false), _expectedBodyLength(0) {};
-
+    : _fd(-1),
+      _epoll_fd(-1),
+      _readBuffer(),
+      _writeBuffer(),
+      _connectionHeader(""),
+      _headersPart(""),
+      _closed(false),
+      _config(NULL),
+      _streamer(NULL),
+      _httpResponse(NULL),
+      _httpRequest(NULL),
+      _headersParsed(false),
+      _expectedBodyLength(0),
+      _completedBuffer(false),
+      _serverClusterId(0),
+      _hasCookie(false),
+      _cookieHeader("")
+{}
 
 Connection::Connection(int fd, int epoll_fd, WebServerConfig* config, int serverClusterId)
-    : _fd(fd), _epoll_fd(epoll_fd), _readBuffer(""), _writeBuffer(""), _connectionHeader(""), _headersPart(""), _closed(false), _config(config), _streamer(NULL), _httpResponse(NULL), _headersParsed(false), _expectedBodyLength(0), _serverClusterId(serverClusterId) {
-};
+    : _fd(fd),_epoll_fd(epoll_fd),_readBuffer(),_writeBuffer(),_connectionHeader(""),_headersPart(""),_closed(false),_config(config),_streamer(NULL),_httpResponse(NULL),_httpRequest(NULL),_headersParsed(false),_expectedBodyLength(0),_completedBuffer(false),_serverClusterId(serverClusterId),_hasCookie(false),_cookieHeader("")
+{}
 
-std::string& Connection::getReadBuffer() {
-    return this->_readBuffer;
-}
+// std::string& Connection::getReadBuffer() {
+//     return this->_readBuffer;
+// }
 
 std::string& Connection::getWriteBuffer() {
     return this->_writeBuffer;
+}
+
+std::vector<char>& Connection::getReadBuffer() {
+    return this->_readBuffer;
 }
 
 void Connection::parseContentLength() {
@@ -81,39 +101,46 @@ void Connection::handleRead() {
     ssize_t bytes_read = recv(_fd, buffer, sizeof(buffer), 0);
 
     if (bytes_read > 0) {
-        _readBuffer.append(buffer, bytes_read);
+        // Append new data to the read buffer
+        _readBuffer.insert(_readBuffer.end(), buffer, buffer + bytes_read);
+
+        // If headers haven't been parsed yet, look for the delimiter
         if (!_headersParsed) {
-            size_t pos = _readBuffer.find("\r\n\r\n");
-            if (pos != std::string::npos) {
-                _headersPart = _readBuffer.substr(0, pos + 4);
+            const std::string delimiter = "\r\n\r\n";
+            std::vector<char>::iterator it = std::search(
+                _readBuffer.begin(),
+                _readBuffer.end(),
+                delimiter.begin(),
+                delimiter.end()
+            );
+
+            if (it != _readBuffer.end()) {
+                size_t pos = std::distance(_readBuffer.begin(), it);
+                _headersPart = std::string(_readBuffer.begin(), _readBuffer.begin() + pos + delimiter.size());
                 _headersParsed = true;
                 parseCookie();
                 parseContentLength();
             }
         }
+
+        // If headers are parsed, check for complete body
         if (_headersParsed) {
             if ((_expectedBodyLength == 0) || (_readBuffer.size() >= (_headersPart.size() + _expectedBodyLength))) {
-                // std::cout << _readBuffer.size() - _headersPart.size() << " bytes received.\n";
-                // std::cout << "\n--------=========----------\n";
-                // std::cout << _expectedBodyLength << " bytes expected, " 
-                        //   << _readBuffer.size() - _headersPart.size() << " bytes received.\n";
-
-                // std::string copy(_readBuffer.substr(_headersPart.size()));
-                // std::cout << "\033[92m" << "HHHHHHHHHHHHHH:  " <<  copy.size() << "\033[92m\n";
-                
-                _httpRequest = new HTTPRequest(_readBuffer + "\n", _config, _serverClusterId);
-                // std::cout << "\033[92m" << _readBuffer << " " << _httpRequest->getPath() << "\n" << LIME;
+            //! Turning Vector into string for HTTPRequest
+                std::string requestData(_readBuffer.begin(), _readBuffer.end());
+                _httpRequest = new HTTPRequest(requestData, _config, _serverClusterId);
                 _httpResponse = new HTTPResponse(_httpRequest, _cookieHeader);
                 re_armFd();
-            } else
-                return ;
+            } else {
+                return;
+            }
         }
     } else {
         _closed = true;
         throw Multiplexer::ClientDisconnectedException();
     }
+    re_armFd();
 }
-
 void Connection::re_armFd() {
     struct epoll_event ev;
     ev.data.fd = _fd;

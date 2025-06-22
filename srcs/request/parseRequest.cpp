@@ -74,7 +74,7 @@ int parse( HTTPRequest &request, const std::string &raw_request) {
   //     return -1;
   // }
   std::getline(ss, line);
-  if(find_method_uri(request, line) == -1)
+  if (find_method_uri(request, line) == -1)
     return -1;
   while (std::getline(ss, line)) {
     request.setHeaders(line);
@@ -85,7 +85,7 @@ int parse( HTTPRequest &request, const std::string &raw_request) {
 
 bool checkRequestURI(HTTPRequest &request, std::string uri) {
   // 400 Bad request
-  if(URIHasUnallowedChar(uri)) {
+  if (URIHasUnallowedChar(uri)) {
       request.setStatusCode(400);
       request.setStatusMessage("Bad request");
       request.setPath(request.getErrorPages(400));

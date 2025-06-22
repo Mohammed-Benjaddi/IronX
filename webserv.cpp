@@ -35,6 +35,7 @@ int main() {
             launcher.launch(config);
             Multiplexer     mux(launcher.getSockets(), config);
             mux.run();
+
     } catch (const std::exception &e) {
             std::cerr << "Error Launching Server: " << e.what() << std::endl;
     }
