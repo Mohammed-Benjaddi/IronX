@@ -181,6 +181,7 @@ void mocker(WebServerConfig &wsc) {
     CGIConfig cgi1;
     std::vector<std::string> extensions1;
     extensions1.push_back(".py");
+    extensions1.push_back(".php");
     cgi1.setExtensions(extensions1);
     cgi1.setInterpreter("/usr/bin/env");
     route2.setCGIConfig(cgi1);

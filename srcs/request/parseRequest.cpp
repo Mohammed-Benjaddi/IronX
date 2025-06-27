@@ -53,31 +53,41 @@ bool URIHasUnallowedChar(std::string uri) {
   return false;
 }
 
-int parse( HTTPRequest &request, const std::string &raw_request) {
+int parse( HTTPRequest &request, std::vector<char> &req) {
   std::string line;
-  std::stringstream ss(raw_request);
-  char buffer[BUFSIZ];
-
+  const char *delimiter = "\r\n\r\n";
+  std::vector<char>::iterator it = std::search(
+    req.begin(), req.end(),
+    delimiter, delimiter + 4
+  );
+  if (it == req.end())
+    return -1;
+  std::string headers(req.begin(), it);
+  std::stringstream ss(headers);
   request.setErrorPages(request.getConfig()->getErrorPages());
+  char buffer[BUFSIZ];
   if (getcwd(buffer, sizeof(buffer)) != NULL) {
-   std::cout << "=====> " << std::string(buffer) << std::endl;
+    std::cout << "=====> " << std::string(buffer) << std::endl;
     request.setRootDir(std::string(buffer) + "/www");
   }
   else
       request.setRootDir("");
-
-  // 413 error code if the request body larger than client max body in config file
-  // if(ss.str().length() > request.getConfig()->getMaxBodySize()) {
-  //     request.setStatusCode(413);
-  //     request.setStatusMessage("Request Entity Too Large");
-  //     request.setPath(request.getRootDir() + "/errors/413.html");
-  //     return -1;
-  // }
   std::getline(ss, line);
   if (find_method_uri(request, line) == -1)
     return -1;
+  
   while (std::getline(ss, line)) {
     request.setHeaders(line);
+  }
+  
+  std::vector<char>::iterator bodyStart = it + 4; // skip \r\n\r\n
+  if (bodyStart < req.end()) {
+    std::vector<char> body(bodyStart, req.end());
+    request.setBody(body);
+  } else {
+    // Optional: set empty body if nothing present
+    std::vector<char> emptyBody;
+    request.setBody(emptyBody);
   }
 
   return 1;
@@ -104,16 +114,15 @@ bool checkRequestURI(HTTPRequest &request, std::string uri) {
 
 int find_method_uri(HTTPRequest &request, const std::string &line) {
   std::stringstream sstream(line);
-  //std::cout << "line ===> " << line << std::endl;
+  std::cout << "line ===> " << line << std::endl;
+  // exit(99);
   std::string method, uri, httpVersion;
   sstream >> method >> uri >> httpVersion;
   if(!checkRequestURI(request, uri)) {
-   std::cout << "URI is not correct" << std::endl;
+    std::cout << "URI is not correct" << std::endl;
     return -1;
   }
-  
   request.setLocation(uri);
-  
   size_t queryPos = uri.find('?');
   if (queryPos != std::string::npos) {
       request.setQuery(uri.substr(queryPos + 1));
@@ -136,6 +145,10 @@ int find_method_uri(HTTPRequest &request, const std::string &line) {
   }
   request.setMethod(method);
   request.setPath(uri);
+  std::cout << "\n\n\nhandle request : " << request.getPath() << "uri: " << uri << "\n\n\n" << std::endl;
+
+  // std::cout << "get path ---> " << request.getPath() << std::endl;
+  // exit(99);
   request.setHTTPVersion(httpVersion);
   return 1;
 }
@@ -165,136 +178,68 @@ std::string trim(const std::string& str) {
     return str.substr(start, end - start);
 }
 
-
-std::vector<FormFile> parseMultipartFormData(const std::string &body, const std::string &boundary) {
-    //std::cout << "-----------------------------------------" << std::endl;
-    //std::cout << body << std::endl;
-    //std::cout << "-----------------------------------------" << std::endl;
-
-    //std::cout << "boundary: " << boundary << std::endl;
+std::vector<FormFile> parseMultipartFormData(const std::vector<char> &body, const std::string &boundary) {
+    std::cout << "boundary: " << boundary << std::endl;
     std::vector<FormFile> files;
-    //std::cout << "body: " << body << std::endl;
-    std::string delimiter = "------" + boundary;
-    //std::cout << "boundary end: " << boundary[boundary.length() - 1] << std::endl;
-    size_t pos = 0;
-    size_t end = 0;
-
-    //std::cout << "delimiter ==> " << delimiter << std::endl;
-
-    while ((pos = body.find(delimiter, pos)) != std::string::npos) {
-      //std::cout << "***** here" << std::endl;
-
-        pos += delimiter.length();
-        if (body.substr(pos, 2) == "--") break;
-        if (body[pos] == '\r') ++pos;
-        if (body[pos] == '\n') ++pos;
-
-        //std::cout << "pos: " << body.substr(43) << std::endl;
-        // end = body.find("\r\n\r\n", pos);
-        end = body.find("\r\n\r", pos);
-        if (end == std::string::npos) break;
-       std::cout << "-------------------------------------------------------------------------------------------------" << std::endl;
-        // if (end == std::string::npos) end = body.length();
-        
-        std::string header = body.substr(pos, end - pos);
-        pos = end + 4;
-
-       std::cout << "header ----> " << header << std::endl;
-       std::cout << " | pos ---> " << pos  << std::endl;
-       std::cout << "delimiter ====> " << delimiter << std::endl;
-
-
-        //std::cout << body.substr(140) << std::endl;
-        end = body.find(delimiter, pos);
-        // end = body.find("------WebKitFormBoundary1RCrsGDY0yGTkASE", pos);
-
-        //std::cout << std::string("------WebKitFormBoundary1RCrsGDY0yGTkASE").length() << std::endl;
-        //std::cout << delimiter.length() << std::endl;
-
-        
-
-        // if("------WebKitFormBoundary1RCrsGDY0yGTkASE" == delimiter)
-          //std::cout << "+++++++ equal" << std::endl;
-        //std::cout << "clear ==> " << end << std::endl;
-        if (end == std::string::npos) break;
-        // if (end == std::string::npos) end = body.length();
-       std::cout << "============================================================================" << std::endl;
-        //std::cout << "body ===> " << body.length() << "| pos ===> " << pos << std::endl;
-       std::cout << "============================================================================" << std::endl;
-
-
-        //std::cout << "header ====> " << header << std::endl; 
-
-        std::vector<char> content = trim_crlf(body.substr(pos, end - pos));
-
-        //std::cout << "content: " << content << " | header: " << header << std::endl;
-
-        std::istringstream headerStream(header);
+    std::string boundaryMarker = "--" + boundary;
+    std::string endMarker = boundaryMarker + "--";
+    std::vector<char>::const_iterator pos = body.begin();
+    while (pos != body.end()) {
+        std::vector<char>::const_iterator partStart = std::search(pos, body.end(), boundaryMarker.begin(), boundaryMarker.end());
+        if (partStart == body.end())
+            break;
+        partStart += boundaryMarker.size();
+        if ((body.end() - partStart) >= 2 && partStart[0] == '-' && partStart[1] == '-')
+            break;
+        if ((body.end() - partStart) >= 2 && partStart[0] == '\r' && partStart[1] == '\n')
+            partStart += 2;
+        std::vector<char>::const_iterator headerEnd = std::search(partStart, body.end(), 
+                                                                  "\r\n\r\n", "\r\n\r\n" + 4);
+        if (headerEnd == body.end())
+            break;
+        std::string headerStr(partStart, headerEnd);
+        std::istringstream hss(headerStr);
         std::string line;
         FormFile file;
-        bool isFile = false;
-        
-        // 
-        while (std::getline(headerStream, line)) {
+        while (std::getline(hss, line)) {
+            if (!line.empty() && line[line.size() - 1] == '\r')
+                line.erase(line.size() - 1);
             if (line.find("Content-Disposition:") != std::string::npos) {
-              //std::cout << "line ----> " << line << std::endl;
                 size_t namePos = line.find("name=\"");
                 if (namePos != std::string::npos) {
-                    namePos += 6;
-                    size_t endName = line.find("\"", namePos);
-                    file.name = line.substr(namePos, endName - namePos);
+                    size_t nameEnd = line.find("\"", namePos + 6);
+                    if (nameEnd != std::string::npos)
+                        file.name = line.substr(namePos + 6, nameEnd - (namePos + 6));
                 }
                 size_t filenamePos = line.find("filename=\"");
                 if (filenamePos != std::string::npos) {
-                    filenamePos += 10;
-                    size_t endFilename = line.find("\"", filenamePos);
-                    file.filename = line.substr(filenamePos, endFilename - filenamePos);
-                    isFile = true;
-                } else {
-                  //std::cout << "----------------> else executed" << std::endl;
+                    size_t filenameEnd = line.find("\"", filenamePos + 10);
+                    if (filenameEnd != std::string::npos)
+                        file.filename = line.substr(filenamePos + 10, filenameEnd - (filenamePos + 10));
                 }
             } else if (line.find("Content-Type:") != std::string::npos) {
                 size_t typePos = line.find(":");
                 if (typePos != std::string::npos) {
                     file.contentType = line.substr(typePos + 1);
-                    while (file.contentType.size() > 0 && file.contentType[0] == ' ')
+                    // Trim leading space
+                    if (!file.contentType.empty() && file.contentType[0] == ' ')
                         file.contentType = file.contentType.substr(1);
                 }
             }
         }
-
-       std::cout << "here +++++++++++++++++++++++++++++++++++++++++" << std::endl;
-
-        if (isFile) {
-          //std::cout << "file" << std::endl;
-          // exit(0);
-          // file.data.push_back((char)0xFF);
-          // file.data.push_back((char)0xD8);
-          // file.data.push_back((char)0xFF);
-          // file.data.push_back((char)0xE0);
-          for (size_t i = 1; i < content.size(); i++)
-              file.data.push_back(content[i]);
-          files.push_back(file);
+        std::vector<char>::const_iterator contentStart = headerEnd + 4; // skip \r\n\r\n
+        std::vector<char>::const_iterator nextBoundary = std::search(contentStart, body.end(), 
+                                                                      boundaryMarker.begin(), boundaryMarker.end());
+        std::vector<char>::const_iterator contentEnd = nextBoundary;
+        if (contentEnd >= body.begin() + 2 && *(contentEnd - 2) == '\r' && *(contentEnd - 1) == '\n') {
+            contentEnd -= 2;
         }
-
-        pos = end;
+        if (!file.filename.empty()) {
+            file.data.assign(contentStart, contentEnd);
+            files.push_back(file);
+        }
+        pos = nextBoundary;
     }
-
-    //std::cout << "form size ---> " << files.size() << std::endl;
-    // for (size_t i = 0; i < files.size(); ++i) {
-    //    std::cout << "File " << i + 1 << ":\n";
-    //    std::cout << "  Name: " << files[i].name << "\n";
-    //    std::cout << "  Filename: " << files[i].filename << "\n";
-    //    std::cout << "  Content-Type: " << files[i].contentType << "\n";
-    //    std::cout << "  Data size: " << files[i].data.size() << " bytes\n";
-    //     //std::cout << "  Data preview: " << files[i].data.substr(0, 50) << "\n";
-    //    std::cout << "Data preview: ";
-    //     for(size_t j = 0; j < files[i].data.size(); j++) {
-    //        std::cout << files[i].data[j];
-    //     }
-    //    std::cout << std::endl;
-    // }
-
     return files;
 }
 

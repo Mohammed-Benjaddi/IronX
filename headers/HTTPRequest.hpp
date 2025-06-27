@@ -42,7 +42,7 @@ private:
     std::string path;
     std::string httpVersion;
     std::map<std::string, std::string> headers;
-    std::string body;
+    std::vector<char> body;
     std::string query;
     std::string fileContent;
     bool bodyFound;
@@ -54,6 +54,7 @@ private:
     CGI *cgi;
 public:
     HTTPRequest(const std::string &, WebServerConfig *, int );
+    HTTPRequest(std::vector<char> &raw_request, WebServerConfig *_config, int _clientId);
     HTTPRequest(const std::string &, WebServerConfig *, int , HTTPResponse *);
     ~HTTPRequest();
 
@@ -63,7 +64,7 @@ public:
     void setHTTPVersion(const std::string& version);
     void setHeader(const std::string& key, const std::string& value);
     void setHeaders(std::string line);
-    void setBody(const std::string& body);
+    void setBody(const std::vector<char> &body);
     void setQuery(const std::string& query);
     void setFileContent(const std::string& fileContent);
     void setClientId(int _clientId);
@@ -83,7 +84,7 @@ public:
     std::string getPath() const;
     std::string getHTTPVersion() const;
     std::string getHeader(const std::string& key) const;
-    std::string getBody() const;
+    std::vector<char> getBody() const;
     std::map<std::string, std::string> getHeaders() const;
     std::string getHeaderValue(const std::string& key) const;
     std::string getQuery() const;

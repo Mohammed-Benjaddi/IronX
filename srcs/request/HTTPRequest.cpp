@@ -1,15 +1,11 @@
 #include "HTTPRequest.hpp"
 
-HTTPRequest::HTTPRequest(const std::string &raw_request, WebServerConfig *_config, int _clientId) : IHTTPMessage(), config(_config), clientId(_clientId)
-{
-    this->cgi = NULL;
-    if (parse(*this, raw_request) == -1)
-        return;
-
+HTTPRequest::HTTPRequest(std::vector<char> &raw_request, WebServerConfig *_config, int _clientId) : IHTTPMessage(), config(_config), clientId(_clientId) {
     std::cout << "-----------\n";
-    std::cout << raw_request.size() << "\n";
-    std::cout << "-----------\n";
-
+    std::cout << "size: " << raw_request.size() << "\n";
+    std::cout << "-----------\n";    
+    if(parse(*this, raw_request) == -1)
+        return;        
     if (checkAllowedMethods(*this) == -1)
         return;
     handleRequest();
@@ -24,29 +20,10 @@ void HTTPRequest::setMethod(const std::string &method) {
 void HTTPRequest::setHeaders(std::string line)
 {
     size_t pos = line.find(':');
-    if (!isBodyFound() && pos == std::string::npos)
-    {
-        // if(!isBodyFound()) {
-        setBodyFound(true);
-        setBody("");
-        return;
-        // }
-    }
-    else if (!isBodyFound() && pos != std::string::npos)
-    {
+    if (pos != std::string::npos) {
         std::string key = line.substr(0, pos);
         std::string value = line.substr(pos + 1);
         setHeader(key, value);
-    }
-    else
-    {
-        // if(!line.length()) {
-        //     exit(0);
-        // }
-        //std::cout << "line =====> " << line.length() << std::endl;
-        line += "\r\n";
-        setBody(getBody() + line);
-        //std::cout << "line ----> " << line << std::endl;
     }
 }
 
@@ -65,7 +42,7 @@ void HTTPRequest::setHeader(const std::string &key, const std::string &value)
     headers[key] = value;
 }
 
-void HTTPRequest::setBody(const std::string &body)
+void HTTPRequest::setBody(const std::vector<char> &body)
 {
     this->body = body;
 }
@@ -141,7 +118,6 @@ std::string HTTPRequest::getHeader(const std::string &key) const
     return "";
 }
 
-
 // std::string findHeader(HTTPRequest &request, std::string key) {
 //   std::map<std::string, std::string> headers = request.getHeaders();
 //   std::map<std::string, std::string>::const_iterator it = headers.find(key);
@@ -150,7 +126,7 @@ std::string HTTPRequest::getHeader(const std::string &key) const
 //   return "";
 // }
 
-std::string HTTPRequest::getBody() const
+std::vector<char> HTTPRequest::getBody() const
 {
     return body;
 }
@@ -200,17 +176,29 @@ void HTTPRequest::setRootDir(std::string rootDir)
     this->rootDir = rootDir;
 }
 
-std::string HTTPRequest::getBoundary() const
-{
-    std::string content_type = getHeader("Content-Type");
-    int index = content_type.rfind("WebKitFormBoundary");
-    //std::cout << "index ----> " << index << std::endl;
-    std::string boundary = "";
-    if (index != -1) {
-        boundary = content_type.substr(index);
+
+// ? "----WebKitFormBoundary9cvF8eER4QLomYfB"
+std::string HTTPRequest::getBoundary() const {
+    const std::string& content_type = getHeader("Content-Type");
+    std::string key = "boundary=";
+    size_t pos = content_type.find(key);
+    if (pos == std::string::npos)
+        return "";
+    pos += key.length();
+    std::string boundary = content_type.substr(pos);
+    if (!boundary.empty() && boundary[0] == '"') {
+        boundary.erase(0, 1); // Remove opening quote
+        size_t end_quote = boundary.find('"');
+        if (end_quote != std::string::npos)
+            boundary = boundary.substr(0, end_quote);
+    } else {
+        size_t end = boundary.find_first_of(" ;");
+        if (end != std::string::npos)
+            boundary = boundary.substr(0, end);
     }
-    return trim(boundary);
+    return boundary;
 }
+
 
 std::vector<FormFile> &HTTPRequest::getFormFiles()
 {
@@ -244,7 +232,6 @@ void HTTPRequest::setFileExtension(const std::string &path)
         return;
     }
 
-    //std::cout << "**** " << filename.substr(dotPos + 1) << std::endl
     fileExtension = filename.substr(dotPos + 1);
 }
 
@@ -256,15 +243,12 @@ std::string HTTPRequest::getFileExtension()
 int HTTPRequest::setRoutesInfo(std::map<std::string, Route> &routes, Route &route)
 {
     routes = config->getClusters()[clientId].getRoutes();
-    //std::cout << "location: " << (getLocation() == "/new-site" ? "yes" : "no") << std::endl;
-    //std::cout << "* * * location: " << getLocation() << std::endl;
     std::map<std::string, Route>::const_iterator it_route = routes.find(getLocation());
     if (it_route == routes.end() && getLocation() != "/favicon.ico")
     {
         setStatusCode(404);
         setStatusMessage("Not Found");
         setPath(getErrorPages(getStatusCode()));
-        //std::cout << "waaaa3 ===> " << getLocation() << std::endl;
         return -1;
     }
     else
@@ -281,7 +265,6 @@ void HTTPRequest::handleRequest()
     std::map<std::string, Route> routes;
 
     if (setRoutesInfo(routes, route) == -1)
-
         return;
     setFileExtension(getPath());
     if (getMethod() == "GET")
@@ -290,43 +273,26 @@ void HTTPRequest::handleRequest()
         handlePOST(routes, route);
     else if (getMethod() == "DELETE")
         handleDELETE(routes, route);
-    //std::cout << "full path ===> " << getRootDir() + getPath() << std::endl;
 }
 
 void HTTPRequest::executeCGI(Route &route)
 {
-
-   std::cout << "a CGI file found" << std::endl;
     if (getMethod() == "DELETE")
-    {
-       std::cout << "a file must be deleted" << std::endl;
         deleteRequestedFile(*this, "/" + route.getRootDir() + getPath(), "");
-    } else {
+    else {
         CGIConfig cgiConfig = route.getCGIConfig();
         std::string path = getPath();
         std::vector<std::string> extensions = cgiConfig.getExtensions();
-        // if(!getQuery().empty()) {
-        //     size_t q = path.find(getQuery());
-        //     if(q != std::string::npos)
-        //         path = path.substr(0, q - 1); 
-        // }
         std::string path_ext = path.substr(path.rfind("."));
         std::vector<std::string>::iterator it = std::find(extensions.begin(), extensions.end(), path_ext);
-       std::cout << "path ext: " << path_ext << std::endl;
-       std::cout << "ext size ---> " << extensions.size() << std::endl;
-        // exit(0);
         if (it == extensions.end())
         {
-           std::cout << "-----> extensions not found" << std::endl;
             setStatusCode(404);
             setStatusMessage("Not Found");
             setPath(getErrorPages(getStatusCode()));
         } else {
-            //! add POST implementation here
-           std::cout << "root ---> " << getRootDir() << std::endl;
             cgi = new CGI(*this, route);
             cgi->executeCGI();
-            // exit(0);
         }
     }
 }
@@ -342,10 +308,7 @@ void HTTPRequest::handleGet(std::map<std::string, Route> &routes, Route &route)
 void HTTPRequest::handleDELETE(std::map<std::string, Route> &routes, Route &route)
 {
     if (isDirExist(getPath(), route.getRootDir()))
-    {
-       std::cout << "path is directory" << std::endl;
         DELETEDirectory(*this, routes, route, getPath());
-    }
     else
         pathIsFile(*this, routes, route);
 }
@@ -357,30 +320,27 @@ void HTTPRequest::RedirectionFound(Route &route) {
     setStatusCode(301);
     setStatusMessage("Moved Permanently");
     setMethod("GET");
-    std::cout << "* before ---> " << a << " | " << b << std::endl;
-    std::cout << "* after ---> " << getPath() << " | " << getLocation() << std::endl;
-    // exit(99);
     handleRequest();
 }
 
 void HTTPRequest::handlePOST(std::map<std::string, Route> &routes, Route &route)
 {
-   std::cout << "POST method" << std::endl;
     std::string contentType = getHeader("Content-Type");
-   std::cout << getBody();
     if (isDirExist(getPath(), route.getRootDir())) {
-       std::cout << "path is directory" << std::endl;
         if (contentType.rfind("application/x-www-form-urlencoded") != std::string::npos) {
             setStatusCode(400);
             setStatusMessage("Bad Request");
             setPath(getErrorPages(getStatusCode()));
             return;
         }
+        if(getBody().empty())
+            exit(0);
         std::vector<FormFile> formFiles = parseMultipartFormData(getBody(), getBoundary());
         setFormFile(formFiles);
 
         if (getFormFiles().empty()) {
            std::cout << "no form files" << std::endl;
+           return;
         }
         uploadFiles(*this);
     } else {

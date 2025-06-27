@@ -81,10 +81,10 @@ void CGI::executeCGI()
         request.setStatusCode(500);
         request.setStatusMessage("Internal Server");
         request.setPath(request.getErrorPages(request.getStatusCode()));
-       std::cout << "* CGI: creation failed" << std::endl;
+        std::cout << "* CGI: creation failed" << std::endl;
     }
 
-   std::cout << "script_path ----> " << script_path << std::endl;
+    std::cout << "script_path ----> " << script_path << std::endl;
 
     pid_t pid = fork();
 
@@ -97,34 +97,25 @@ void CGI::executeCGI()
         request.setStatusCode(500);
         request.setStatusMessage("Internal Server");
         request.setPath(request.getErrorPages(request.getStatusCode()));
-       std::cout << "* CGI: Fork() failed" << std::endl;
+        std::cout << "* CGI: Fork() failed" << std::endl;
     }
 
     if (pid == 0)
     {
         close(pipe_fd[0]);
         close(stdin_pipe[1]);
-
-        dup2(pipe_fd[1], STDOUT_FILENO);
+        dup2(pipe_fd[1], 1);
         close(pipe_fd[1]);
-
-        dup2(stdin_pipe[0], STDIN_FILENO);
+        dup2(stdin_pipe[0], 0);
         close(stdin_pipe[0]);
-
         char **env_array = createEnvArray();
-
         std::vector<std::string> interpreter = getInterpreter(script_path);
-        // std::string py = "python3";
-        char *args[3];
+        char *args[4];
         args[0] = const_cast<char *>(interpreter[0].c_str());
         args[1] = const_cast<char *>(interpreter[1].c_str());
         args[2] = const_cast<char *>(interpreter[2].c_str());
         args[3] = NULL;
-        //std::cout << "---------> " << interpreter << " | " <<
-        //     py << " | " << script_path << std::endl;
-        // exit(0);
         execve(interpreter[0].c_str(), args, env_array);
-
         std::cerr << "CGI execution failed" << std::endl;
         exit(1);
     }
