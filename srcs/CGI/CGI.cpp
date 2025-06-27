@@ -2,7 +2,7 @@
 
 CGI::CGI(HTTPRequest &_request, Route &_route) : request(_request), route(_route)
 {
-   std::cout << "++++++ " << request.getRootDir() + "/" + request.getPath() << std::endl;
+//    std::cout << "++++++ " << request.getRootDir() + "/" + request.getPath() << std::endl;
     script_path = request.getRootDir() + "/" + request.getPath();
     request_method = request.getMethod();
     query_string = request.getQuery();
@@ -10,7 +10,7 @@ CGI::CGI(HTTPRequest &_request, Route &_route) : request(_request), route(_route
     request_body = "body must be here";
     script_output = "";
     setupEnvironment();
-   std::cout << "query ---> " << query_string << std::endl;
+//    std::cout << "query ---> " << query_string << std::endl;
 }
 
 void CGI::setupEnvironment()

@@ -43,60 +43,68 @@ std::string toString(int value) {
     return oss.str();
 }
 
-void build_OK_Response(HTTPRequest* req, HTTPResponse* res) {
-    setStandardHeaders(res, res->getMimeType(req->getPath()), getFileSize(req->getPath()), "keep-alive" , 200, "OK");
-    res->setHeader("Accept-Ranges",  "bytes");
-    res->setStreamer(new FileStreamer(req->getPath(), res->getConnectionHeader()));
+bool    handleCGI(HTTPRequest *req, HTTPResponse *res) {
+    if (req->getCGI()) {
+        req->getCGI()->executeCGI();
+        if (req->getCGI()) {
+            res->setStatus(200, "OK");
+            res->setHeader("Content-Type", "text/html");
+            res->setHeader("Content-Length", toString(req->getCGI()->getScriptOutput().size()));
+            res->setHeader("Connection", "close");
+            res->setBody(req->getCGI()->getScriptOutput());
+        } else {
+            res->setStatus(500, "Internal Server Error");
+            res->setHeader("Content-Type", "text/html");
+            res->setHeader("Content-Length", "97");
+            res->setHeader("Connection", "close");
+            res->setBody("<html><body><h1>500 Internal Server Error</h1><p>CGI script failed to execute.</p></body></html>");
+        }
+        return true;
+    }
+    return false;
 }
 
 void buildResponse(HTTPRequest* req, HTTPResponse* res) {
     int status = req->getStatusCode();
     int size = getFileSize(req->getPath());
 
-    if (req->getCGI() && req->getStatusCode() == 200) {
-        res->setHeader("Content-Type", "text/html");
+    if (handleCGI(req, res) ) {
+        return;
+    }
+
+    std::string connection = "keep-alive";
+    std::string contentType = "text/html";
+
+    if (status == 9999) {
+        res->setStatus(200, "OK");
+        res->setHeader("Content-Type", contentType);
         res->setHeader("Content-Length", toString(size));
-        res->setHeader("Connection", "close");
-        res->setStatus(status, req->getStatusMessage());
-        res->setBody(req->getCGI()->getScriptOutput());
-        std::cout << "CGI script output: " << req->getCGI()->getScriptOutput() << "\n";
-        return ;
-    } else if (req->getCGI() && req->getStatusCode() == 500) {
-            res->setHeader("Content-Type", "text/html");
-            res->setHeader("Content-Length", "97");
-            res->setHeader("Connection", "close");
-            res->setStatus(500, "Internal Server Error");
-            res->setBody("<html><body><h1>500 Internal Server Error</h1><p>CGI script failed to execute.</p></body></html>");
+        res->setHeader("Connection", connection);
+        res->buildAutoIndexResponse(req);
+        res->setStreamer(new FileStreamer(req->getPath(), connection));
+        return;
+    }
+
+    switch (status) {
+        case 404:
+        case 403:
+        case 405:
+        case 301:
+        case 200:
+            res->setStatus(status, req->getStatusMessage());
+            res->setHeader("Content-Type", contentType);
+            res->setHeader("Content-Length", toString(size));
+            res->setHeader("Connection", connection);
+            res->setStreamer(new FileStreamer(req->getPath(), connection));
             return;
     }
 
-        switch (status) {
-        case 404:
-            setStandardHeaders(res, "text/html", size, "keep-alive", 404, "Not Found");
-            res->setStreamer(new FileStreamer(req->getPath(), res->getConnectionHeader()));
-            break;
-        case 403:
-            setStandardHeaders(res, "text/html", size , "close", 403, "Forbidden");
-            res->setStreamer(new FileStreamer(req->getPath(), res->getConnectionHeader()));
-            break;
-        case 405:
-            setStandardHeaders(res, "text/html", size, "close", 405, "Method Not Allowed");
-            res->setStreamer(new FileStreamer(req->getPath(), res->getConnectionHeader()));
-            break;
-        case 9999:
-            setStandardHeaders(res, "text/html", size, "close", 200, "OK");
-            res->buildAutoIndexResponse(req);
-            res->setStreamer(new FileStreamer(req->getPath(), res->getConnectionHeader()));
-            break;
-        case 301:
-            setStandardHeaders(res, "text/html", size, "close", 301, "Moved Permanently");
-            res->setStreamer(new FileStreamer(req->getPath(), res->getConnectionHeader()));
-            break;
-        default:
-            setStandardHeaders(res, "text/html", size, "close", 500, "Internal Server Error");
-    }
-
+    res->setStatus(500, "Internal Server Error");
+    res->setHeader("Content-Type", connection);
+    res->setHeader("Content-Length", toString(size));
+    res->setHeader("Connection", "close");
 }
+
 
 void setStandardHeaders(HTTPResponse* res, const std::string& contentType, 
     size_t contentLength, const std::string& connection, int statusCode, std::string statusMessage) {
@@ -116,6 +124,6 @@ std::string getRelativePath(const std::string& path, const std::string& rootPath
 
     relative = relative.substr(0, relative.size() - 11);
 
-   std::cout << "relative path: " << relative << "\n";
+    std::cout << "relative path: " << relative << "\n";
     return relative;
 }

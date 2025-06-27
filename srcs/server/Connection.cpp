@@ -126,10 +126,7 @@ void Connection::handleRead() {
         // If headers are parsed, check for complete body
         if (_headersParsed) {
             if ((_expectedBodyLength == 0) || (_readBuffer.size() >= (_headersPart.size() + _expectedBodyLength))) {
-            //! Turning Vector into string for HTTPRequest
-                std::string requestData(_readBuffer.begin(), _readBuffer.end());
                 _httpRequest = new HTTPRequest(_readBuffer, _config, _serverClusterId);
-                // _httpRequest = new HTTPRequest(requestData, _config, _serverClusterId);
                 _httpResponse = new HTTPResponse(_httpRequest, _cookieHeader);
                 re_armFd();
             } else {

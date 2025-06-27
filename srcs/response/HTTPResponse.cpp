@@ -3,26 +3,22 @@
 
 std::map<std::string, std::string> HTTPResponse::_mimeTypes = initMimeTypes();
 
-// Default constructor for manual building
-HTTPResponse::HTTPResponse()
-    : _statusCode(200), _statusMessage("OK"), _connectionType("keep-alive"),
-      _streamer(NULL), _bodyPos(0), _headersSent(false), _complete(false) {
-    _headers["Connection"] = _connectionType;
-    _headers["Content-Type"] = "text/plain"; // default
-}
-
 HTTPResponse::HTTPResponse(HTTPRequest* request, std::string cookies)
     : _statusCode(200), _statusMessage("OK"), _connectionType("keep-alive"),
       _streamer(NULL), _request(request), _body("") ,_bodyPos(0), _headersSent(false), _complete(false) {
 
+    if (request->getStatusCode() == 0) {
+        request->setStatusCode(200);
+        request->setStatusMessage("OK");
+    }
+    
     setHeader("Set-Cookie", cookies);
     if (request->getMethod() == "DELETE" || (request->getMethod() == "POST" && !request->getCGI())){
         setStandardHeaders(this, "text/plain", 0, "close", request->getStatusCode(), request->getStatusMessage());
-    } else if (!request->getStatusCode())
-        build_OK_Response(request, this);
-      else
+    } else
         buildResponse(request, this);
 }
+
 
 HTTPResponse::~HTTPResponse() {
     delete _streamer;
