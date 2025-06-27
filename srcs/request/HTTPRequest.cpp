@@ -333,8 +333,8 @@ void HTTPRequest::handlePOST(std::map<std::string, Route> &routes, Route &route)
             setPath(getErrorPages(getStatusCode()));
             return;
         }
-        if(getBody().empty())
-            exit(0);
+        // if(getBody().empty())
+        //     exit(0);
         std::vector<FormFile> formFiles = parseMultipartFormData(getBody(), getBoundary());
         setFormFile(formFiles);
 
