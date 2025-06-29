@@ -7,6 +7,7 @@
 // #include <cstdint>
 #include <iostream>
 #include <stdint.h>
+#include <stdexcept>
 
 //? CGI settings
 class CGIConfig {
@@ -82,4 +83,3 @@ class WebServerConfig {
         const std::map<int, std::string>& getErrorPages() const;
         const std::vector<Cluster>& getClusters() const;
 };
-

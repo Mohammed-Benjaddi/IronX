@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>WebServ: AutoIndex</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.cdnfonts.com/css/pricedown');
+    @import url('https://fonts.cdnfonts.com/css/arial');
+
+    body {
+      font-family: 'Arial Black', sans-serif;
+      background: url('https://i.ibb.co/qLCqrqLH/Chat-GPT-Image-26-mai-2025-20-h-18-min-00-s.png') no-repeat center center fixed;
+      background-size: cover;
+      color: #e2dfd2;
+    }
+
+    .overlay {
+      background: linear-gradient(rgba(0,0,0,0.9), rgba(20, 20, 20, 0.95));
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+
+    .content {
+      position: relative;
+      z-index: 1;
+      max-width: 800px;
+      margin: 10rem auto;
+      padding: 2rem;
+    }
+
+    h1 {
+      font-family: 'Pricedown Bl', sans-serif;
+      font-size: 5rem;
+      text-align: center;
+      color: #fff;
+      text-shadow: 3px 3px 0 #000, 5px 5px 0 #000;
+      margin-bottom: 2rem;
+      animation: flicker 2.5s infinite;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 2rem;
+    }
+
+    th, td {
+      padding: 1rem;
+      border-bottom: 1px solid #555;
+      text-align: left;
+    }
+
+    th {
+      font-weight: bold;
+      color: #d0c97d;
+    }
+
+    td a {
+      color: #ffdd57;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    td a:hover {
+      color: #ff4040;
+    }
+
+    .gta-btn {
+      margin-top: 2rem;
+      background-color: #1a1a1a;
+      color: #d0c97d;
+      font-size: large;
+      font-family: 'Arial Black', sans-serif;
+      border: 2px solid #555;
+      padding: 0.75rem 1.5rem;
+      text-transform: uppercase;
+      font-weight: bold;
+      box-shadow: 0 0 12px #000;
+      transition: all 0.3s ease;
+      display: inline-block;
+    }
+
+    .gta-btn:hover {
+      background-color: #333;
+      color: #ff4040;
+      border-color: #ff4040;
+      box-shadow: 0 0 15px #ff4040, inset 0 0 10px #000;
+    }
+
+    @keyframes flicker {
+      0%, 18%, 22%, 25%, 55%, 100% {
+        opacity: 1;
+      }
+      19%, 21%, 24%, 56% {
+        opacity: 0.4;
+      }
+    }
+  </style>
+</head>
+<body class="relative min-h-screen flex items-center justify-center px-6">
+
+  <div class="overlay"></div>
+
+  <div class="content">
+    <h1>📁 AutoIndex</h1>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Last Modified</th>
+          <th>Size</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><a href="/files/">📂 files/</a></td>
+          <td>2025-05-28 17:00</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td><a href="/files/report.pdf">📄 report.pdf</a></td>
+          <td>2025-05-28 16:40</td>
+          <td>1.2 MB</td>
+        </tr>
+        <tr>
+          <td><a href="/files/song.mp3">🎵 song.mp3</a></td>
+          <td>2025-05-28 16:30</td>
+          <td>5.8 MB</td>
+        </tr>
+        <tr>
+          <td><a href="/files/image.png">🖼️ image.png</a></td>
+          <td>2025-05-28 16:00</td>
+          <td>2.3 MB</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <a href="/" class="gta-btn">⬅ BACK TO HOME</a>
+  </div>
+
+</body>
+</html>

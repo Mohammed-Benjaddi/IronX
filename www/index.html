@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>WebServ: Liberty Error</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body class="relative min-h-screen flex flex-col items-center justify-center p-8">
+  <div class="overlay"></div>
+
+  <div class="content">
+    <h1>🚧 WEBSERV </h1>
+
+    <!-- <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+      <img src="https://cdn.intra.42.fr/users/22ad347ba537c6e9280cd6b1bbdb4063/ael-maaz.jpg" alt="Gang 1" class="w-full h-48 object-cover image-frame" />
+      <img src="https://cdn.intra.42.fr/users/1f9bef1830faef4b351858e05266fb47/nhayoun.jpg" alt="Gang 2" class="w-full h-48 object-cover image-frame" />
+      <img src="https://cdn.intra.42.fr/users/1f85e4da99676341d0b2703f2cd5f5b2/mben-jad.jpg" alt="Gang 3" class="w-full h-48 object-cover image-frame" />
+    </div> -->
+    <div class="mt-8">
+      <label for="background-select" class="block text-xl font-bold mb-2 text-yellow-400">🎮 Select Background:</label>
+      <select id="background-select" class="gta-select">
+        <option value="https://i.ibb.co/7xvLjxVW/team.png">🖼️ Default</option>
+        <option value="https://i.ibb.co/MyL32D7d/bg1.png">🌃 Background 1</option>
+        <option value="https://i.ibb.co/vCtHCMGv/bg2.png">🖥 Background 2</option>
+        <option value="https://i.ibb.co/bRK6wt7r/bg3.png">🌇 Background 3</option>
+      </select>
+    </div>
+    <div class="flex flex-col md:flex-row gap-6 justify-center ">
+      <button class="gta-btn" id="get-job-button">🚨 GET STUFF</button>
+      <button class="gta-btn" id="post-job-button">💾 POST JOB</button>
+      <button class="gta-btn" id="delete-job-button">💣 DELETE EVIDENCE</button>
+      <!-- <button class="gta-btn" id="put-job-button"> PUT </button> -->
+      <input type="file" id="file-upload" style="display: none;" />
+    </div>
+    <div id="response-panel" class="pager mt-8 p-4 text-lime-300 font-mono rounded-lg w-full max-w-2xl hidden">
+      <h3 class="text-xl font-bold mb-2">📟 RESPONSE PAGER</h3>
+      <p id="response-status" class="mb-2"></p>
+      <pre id="response-headers" class="whitespace-pre-wrap text-sm"></pre>
+    </div>
+  <audio id="pager-beep" src="/pager.mp3" preload="auto"></audio>
+  <script src="tools.js"></script>
+</body>
+</html>

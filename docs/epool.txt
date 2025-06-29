@@ -1,0 +1,107 @@
+epoll scalable i/o event notification mechanism
+efficietly monitor multiple fds for i/o events
+
+#include <sys/epoll.h>
+
+-> Works with 3 main sys calls
+
+    int     epoll_create(int size)
+    int     epoll_ctl(int epfd, int op, int fd, struct epoll_event *event)
+    int     epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)
+
+Why epoll is perfect
+
+select 
+- unneficcient and uses o(n) scaning through all the fds
+reinitialize the fd set before each calls
+    x - fd limit FD_SETSIZE 1024
+    x - o(n) compex ... checks every fd in set
+    x - overhead requires coying the fd set between user and kernel space on every call
+
+poll
+    x - returns all fds even if only a few are active
+    x - performance degrade
+    x - use an array of struct pollfd
+
+epoll
+    - o(1) event detection - no linear scanning
+    - handles millions of fds efficienetly (scalable)
+    - No FD limit (only contrained by system resources)
+    - no need to reset FDS on evry call
+
+- epoll fd is the central object that will monitor everything
+
+epoll returns a fd referring to the new epoll instance
+fd is used for all dubsequent calls to the epoll intarface
+when no longer requiered when all fds referring to an epoll instane have been close
+kernel destroys the instance and releases the associated resources
+
+epoll_wait uis not about your registered sockets
+its about the sockets that ahve something ready right now 
+epoll_ctl --- register sockets to watch
+epoll_wait --- ask epoll whiich socket is ready
+
+
+epoll_wait will fill an array of epoll_events with only the fds that are ready 
+there could be multiple fds ready at once
+MAX_EVENTS defines how many siockets to giev at a time
+
+==============================================================================================
+
+1. register soickets using epoll
+2. epoll stores this fd _+ data association inside the kernel
+
+epoll wait works onlt when one or more sockets are ready (new connections or new data arrived)
+it fills out the array of erpoll_events array with up to MAX_EVENTS ready events
+
+
+for each ready fd added using epoll_ctl
+    events[i].events --- bitmask of what happened EPOLLIN ready to read ---- EPOLLOUT ready to write
+    events[i].data ----- copiued verbatim from what you gave in epoll_ctl before
+
+epoll_wait() waits until soimething happens
+it gives back the sockets that are ready and for each one
+    it also gioves backl the data liekm fd stored when registered
+
+struct epoll_event {
+    uint32_t events;   // Events to watch for (e.g., EPOLLIN, EPOLLOUT)
+    epoll_data_t data; // User data
+};
+
+typedef union epoll_data {
+    void    *ptr;
+    int      fd;
+    uint32_t u32;
+    uint64_t u64;
+}   epoll_data_t;
+
+========================
+
+once we have an fd thats ready
+    we should figure out
+        - is this fd one of my listening server sockets (new client connection)
+        - or is this fd an existing client
+        
+        
+========================
+
+
+New connections knowck on server socket
+
+code does accept by creating a new fd for that client
+
+so :
+    - Only server sockets receive new connections
+    -  Once accepted we get a new client fd which is seperate from the serve socket
+    
+    - After accepting the client we registered a new fd with epoll
+    Epoll Both watches
+        - server listening sockets
+        - Active client sockets
+        
+When epoll_wait marks an fd ready
+- Is this fd one of my server sockets : must be a new incoming conneciton
+- Is this fd not one of my server sockets : must be an already accepted client
+        
+
+==============================

@@ -1,0 +1,46 @@
+📄 Dynamic Upload: Uploaded files saved only after complete transfer.
+
+🚀 Non-blocking: Transfers are parallel and non-blocking.
+
+🏠 Virtual Hosting: Different domains/ports are treated independently.
+
+🔥 CGI Handling: Execute server-side scripts based on extension.
+
+📂 Dynamic Folder Creation: New folders created on finished uploads/downloads.
+
+🧪 Mock Testing: Simulate real HTTP traffic during development using raw files.
+
+🔒 Request Validation: Requests validated against allowed methods and max body size.
+
+Classes :
+    - ServerLauncher:
+    Managing and initializing a server of server instances
+    handles incoming requests in a disributed or load 
+    balancer manner
+    Server Socket:
+        
+    
+
+
+
+Architecture:
+    -> Each IP, PPORT pair needs its own socket
+    socket binds to a unique (host, port) pair
+    
+    -> One server socket per unique (IP, Port) combination
+        not per virtual server
+        each host, port would get its own server socket
+        Multiple clusters can share the same socket if they're on the same
+        host,port and routing is done later based on HostL headers
+        
+    -> Concerning backlog listen syscall 
+    backlog is the maximum number of connections 
+    
+    What happens when a connection is "treated"?
+    Once a connection is accepted by accept():
+    
+    It is removed from the backlog.
+    
+    A new socket is created for communication.
+    
+    The original listening socket stays open to accept more.
