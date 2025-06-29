@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Parser.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ael-maaz <ael-maaz@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nhayoun <nhayoun@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 17:38:54 by ael-maaz          #+#    #+#             */
-/*   Updated: 2025/06/22 20:40:04 by ael-maaz         ###   ########.fr       */
+/*   Updated: 2025/06/29 14:50:39 by nhayoun          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -555,18 +555,13 @@ void printConfigs(const WebServerConfig& conf)
 
 
 
-int Parser::MainParser(std::string path)
+int Parser::MainParser(std::string path, WebServerConfig &conf)
 {
-	WebServerConfig conf;
 	try
 	{
 		OpenTomlFile(path);
 		parseTOML(path, conf);
 		printConfigs(conf);
-		
-
-		// this->lines = ReadLines();
-		// parseLines(conf);
 	}
 	catch(std::exception& e)
 	{

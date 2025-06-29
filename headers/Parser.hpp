@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Parser.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ael-maaz <ael-maaz@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nhayoun <nhayoun@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 17:38:56 by ael-maaz          #+#    #+#             */
-/*   Updated: 2025/06/12 20:37:45 by ael-maaz         ###   ########.fr       */
+/*   Updated: 2025/06/29 14:50:24 by nhayoun          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ class Parser {
 		Parser();
 		~Parser();
 		int OpenTomlFile(std::string& path);
-		int MainParser(std::string path);
+		int MainParser(std::string path, WebServerConfig &);
 		std::ifstream infile;
 		std::vector<std::string> lines;
 		std::vector<std::string> ReadLines();
