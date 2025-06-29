@@ -5,7 +5,7 @@ std::map<std::string, std::string> HTTPResponse::_mimeTypes = initMimeTypes();
 
 HTTPResponse::HTTPResponse(HTTPRequest* request, std::string cookies)
     : _statusCode(200), _statusMessage("OK"), _connectionType("keep-alive"),
-      _streamer(NULL), _request(request), _body("") ,_bodyPos(0), _headersSent(false), _complete(false) ,_hasCookie(false) {
+      _streamer(NULL), _request(request), _body("") ,_bodyPos(0), _headersSent(false), _complete(false) {
 
     if (request->getStatusCode() == 0) {
         request->setStatusCode(200);

@@ -217,3 +217,4 @@ void	Connection::reset() {
 bool	Connection::isClosed()	const {
     return _closed;
 }
+----------------------------878065858640528636601654--
