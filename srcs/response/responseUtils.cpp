@@ -84,11 +84,6 @@ void buildResponse(HTTPRequest* req, HTTPResponse* res) {
         res->setStreamer(new FileStreamer(req->getPath(), connection));
         return;
     }
-
-    // ! * warning : this condition must be deleted
-    if(status == 404) 
-        exit(99);
-
     switch (status) {
         case 404:
         case 403:
