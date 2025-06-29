@@ -1,9 +1,9 @@
 #include "HTTPRequest.hpp"
 
 HTTPRequest::HTTPRequest(std::vector<char> &raw_request, WebServerConfig *_config, int _clientId) : IHTTPMessage(), config(_config), clientId(_clientId), cgi(NULL) {
-    std::cout << "-----------\n";
-    std::cout << "size: " << raw_request.size() << "\n";
-    std::cout << "-----------\n";    
+    //std::cout << "-----------\n";
+    //std::cout << "size: " << raw_request.size() << "\n";
+    //std::cout << "-----------\n";    
     if (parse(*this, raw_request) == -1)
         return;        
     if (checkAllowedMethods(*this) == -1)
@@ -339,7 +339,7 @@ void HTTPRequest::handlePOST(std::map<std::string, Route> &routes, Route &route)
         setFormFile(formFiles);
 
         if (getFormFiles().empty()) {
-           std::cout << "no form files" << std::endl;
+           //std::cout << "no form files" << std::endl;
            return;
         }
         uploadFiles(*this);

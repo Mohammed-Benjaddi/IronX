@@ -105,6 +105,21 @@ void buildResponse(HTTPRequest* req, HTTPResponse* res) {
     res->setHeader("Connection", "close");
 }
 
+void printResponse(HTTPResponse* res, HTTPRequest* req) {
+    if (!res || !req) {
+        std::cerr << "printResponse: NULL pointer!\n";
+        return;
+    }
+    
+    std::cout << "\033[1;33m== HTTP Response ==\033[0m\n";
+    
+    std::cout << "\033[1;33mHTTP/1.1 " << req->getStatusCode() << " " << req->getStatusMessage() << "\033[0m\n";
+    std::cout << "\033[1;33mContent-Type: " << res->getMimeType(req->getPath()) << "\033[0m\n";
+    std::cout << "\033[1;33mContent-Length: " << res->getHeaders().at("Content-Length") << "\033[0m\n";
+    std::cout << "\033[1;33mConnection: " << res->getHeaders().at("Connection") << "\033[0m\n";
+    if (!res->getHeaders().at("Set-Cookie").empty())
+        std::cout << "\033[1;33mSet-Cookie: " << res->getHeaders().at("Set-Cookie") << "\033[0m\n";
+}
 
 void setStandardHeaders(HTTPResponse* res, const std::string& contentType, 
     size_t contentLength, const std::string& connection, int statusCode, std::string statusMessage) {
@@ -124,6 +139,6 @@ std::string getRelativePath(const std::string& path, const std::string& rootPath
 
     relative = relative.substr(0, relative.size() - 11);
 
-    std::cout << "relative path: " << relative << "\n";
+    //std::cout << "relative path: " << relative << "\n";
     return relative;
 }

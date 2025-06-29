@@ -15,7 +15,7 @@ FileStreamer::FileStreamer(const std::string& path, std::string connection) :
      _path(path), _offset(0), _eof(false), _connectionHeader(connection), _rangeStart(0),
      _rangeEnd(0), _isPartial(true)
 {   
-   std::cout << "File Streamer - Opening file: " << path << std::endl;
+   //std::cout << "File Streamer - Opening file: " << path << std::endl;
     _fd = open(path.c_str(), O_RDONLY | O_NONBLOCK);
     if (_fd == -1)
         throw FileFailure();

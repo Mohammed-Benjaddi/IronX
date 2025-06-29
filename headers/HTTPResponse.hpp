@@ -27,6 +27,7 @@ public:
     size_t  getFileSize(std::string path) const;
     void    setStatus(int code, const std::string& message);
     void    setHeader(const std::string& key, const std::string& value);
+    std::map<std::string, std::string> getHeaders() const;
     void    setConnection(const std::string& connection);
 
     void    setBody(const std::string& body);              
@@ -34,8 +35,6 @@ public:
 
     int     getStatusCode() const;
     std::string getStatusMessage() const;
-    std::map<std::string, std::string> getHeaders() const;
-       
     void buildAutoIndexResponse(HTTPRequest*);
 
     static std::string getMimeType(const std::string& path);

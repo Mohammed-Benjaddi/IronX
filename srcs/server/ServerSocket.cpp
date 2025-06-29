@@ -19,7 +19,7 @@ ServerSocket::ServerSocket(const std::string& ip, uint16_t port, int clusterId) 
 
 ServerSocket::~ServerSocket() {
 	// if (this->_fd != -1) {
-	// 	// std::cout << "Server Socket Destroyed due to failure of one!" << std::endl;
+	// 	// //std::cout << "Server Socket Destroyed due to failure of one!" << std::endl;
 	// 	close(_fd);
 	// }
 };
@@ -82,12 +82,12 @@ void	ServerSocket::bind_socket() {
 
 	addr.sin_port = htons(this->_port); // port to network byte order
 	//? 2. bind socket
-	//std::cout << "Attempting to bind " << this->_host << ":" << this->_port << std::endl;
+	////std::cout << "Attempting to bind " << this->_host << ":" << this->_port << std::endl;
 	if (bind(this->_fd, (struct sockaddr*)&addr, sizeof(addr)) == -1) {
 		close(this->getFd());
 		throw std::runtime_error("bind() failed");
 	}
-	//std::cout << "Socket bound to port " << this->_port << std::endl;
+	////std::cout << "Socket bound to port " << this->_port << std::endl;
 }
 
 void	ServerSocket::init_listen() {
@@ -98,7 +98,7 @@ void	ServerSocket::init_listen() {
 		close(this->_fd);
 		throw std::runtime_error("listen() failed");
 	}
-	//std::cout << "Socket is now listening on " << this->_host << ":" << this->_port << std::endl;
+	////std::cout << "Socket is now listening on " << this->_host << ":" << this->_port << std::endl;
 }
 
 const char *ServerSocket::SocketCreationFailure::what() const throw() {

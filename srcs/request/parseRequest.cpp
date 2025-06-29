@@ -3,7 +3,7 @@
 
 int checkAllowedMethods(HTTPRequest &request) {
   const std::map<std::string, Route>& routes = request.getConfig()->getClusters()[request.getClientId()].getRoutes();
-  //std::cout << "req ---> " << request.getRootDir() + request.getPath() << std::endl;
+  ////std::cout << "req ---> " << request.getRootDir() + request.getPath() << std::endl;
   std::map<std::string, Route>::const_iterator route_it = routes.find(request.getPath());
   if(route_it != routes.end()) {
     const std::set<std::string> &allowedMethod  = route_it->second.getAllowedMethods();
@@ -11,7 +11,7 @@ int checkAllowedMethods(HTTPRequest &request) {
     std::set<std::string>::iterator it = allowedMethod.begin();
 
     while(it != allowedMethod.end()) {
-     std::cout << "===> " << *it->begin() << std::endl;
+     //std::cout << "===> " << *it->begin() << std::endl;
       it++;
     }
 
@@ -22,7 +22,7 @@ int checkAllowedMethods(HTTPRequest &request) {
         return -1;
     }
   } else {
-    //std::cout << "+++ location not found" << std::endl;
+    ////std::cout << "+++ location not found" << std::endl;
     // request.setStatusCode(404);
     // request.setStatusMessage("Not Found");
     // request.setPath(request.getRootDir() + "/errors/404.html");
@@ -46,7 +46,7 @@ bool URIHasUnallowedChar(std::string uri) {
   
   for(size_t i = 0; i < uri.size(); i++) {
     if(std::find(allowedChars.begin(), allowedChars.end(), uri[i]) == allowedChars.end()) {
-       std::cout << "unallowed char ---> " << uri[i] << std::endl;
+       //std::cout << "unallowed char ---> " << uri[i] << std::endl;
         return true;
     }
   }
@@ -67,7 +67,7 @@ int parse( HTTPRequest &request, std::vector<char> &req) {
   request.setErrorPages(request.getConfig()->getErrorPages());
   char buffer[BUFSIZ];
   if (getcwd(buffer, sizeof(buffer)) != NULL) {
-    std::cout << "=====> " << std::string(buffer) << std::endl;
+    //std::cout << "=====> " << std::string(buffer) << std::endl;
     request.setRootDir(std::string(buffer) + "/www");
   }
   else
@@ -114,12 +114,12 @@ bool checkRequestURI(HTTPRequest &request, std::string uri) {
 
 int find_method_uri(HTTPRequest &request, const std::string &line) {
   std::stringstream sstream(line);
-  std::cout << "line ===> " << line << std::endl;
+  //std::cout << "line ===> " << line << std::endl;
   // exit(99);
   std::string method, uri, httpVersion;
   sstream >> method >> uri >> httpVersion;
   if(!checkRequestURI(request, uri)) {
-    std::cout << "URI is not correct" << std::endl;
+    //std::cout << "URI is not correct" << std::endl;
     return -1;
   }
   request.setLocation(uri);
@@ -131,8 +131,8 @@ int find_method_uri(HTTPRequest &request, const std::string &line) {
   }
   if(uri[uri.length() - 1] == '/' && uri.size() == 1) {
     uri = uri.substr(0, uri.length() - 1);
-    //std::cout << "new path ==> " << (uri.empty() ? "only slash" : uri) << std::endl;
-    //std::cout << "|" << uri << "|" << std::endl;
+    ////std::cout << "new path ==> " << (uri.empty() ? "only slash" : uri) << std::endl;
+    ////std::cout << "|" << uri << "|" << std::endl;
     uri = "/";
   } else {
     size_t size = uri.size() - 1;
@@ -140,14 +140,14 @@ int find_method_uri(HTTPRequest &request, const std::string &line) {
       size--;
       // ! -------------------------- !/ Exception thrown ?
     uri = uri.substr(1, size);
-    //std::cout << "uri +++ " << uri << std::endl;
+    ////std::cout << "uri +++ " << uri << std::endl;
     // exit(0);
   }
   request.setMethod(method);
   request.setPath(uri);
-  std::cout << "\n\n\nhandle request : " << request.getPath() << "uri: " << uri << "\n\n\n" << std::endl;
+  //std::cout << "\n\n\nhandle request : " << request.getPath() << "uri: " << uri << "\n\n\n" << std::endl;
 
-  // std::cout << "get path ---> " << request.getPath() << std::endl;
+  // //std::cout << "get path ---> " << request.getPath() << std::endl;
   // exit(99);
   request.setHTTPVersion(httpVersion);
   return 1;
@@ -179,7 +179,7 @@ std::string trim(const std::string& str) {
 }
 
 std::vector<FormFile> parseMultipartFormData(const std::vector<char> &body, const std::string &boundary) {
-    std::cout << "boundary: " << boundary << std::endl;
+    //std::cout << "boundary: " << boundary << std::endl;
     std::vector<FormFile> files;
     std::string boundaryMarker = "--" + boundary;
     std::string endMarker = boundaryMarker + "--";
@@ -270,6 +270,6 @@ std::string extractDirectory(const std::string& location)
         }
         return extractDirectory(trimmed);
     }
-   std::cout << "-------------> here" << std::endl;
+   //std::cout << "-------------> here" << std::endl;
     return location.substr(0, lastSlash);
 }

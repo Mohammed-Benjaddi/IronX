@@ -11,8 +11,9 @@ HTTPResponse::HTTPResponse(HTTPRequest* request, std::string cookies)
         request->setStatusCode(200);
         request->setStatusMessage("OK");
     }
-    
-    setHeader("Set-Cookie", cookies);
+
+    if (!cookies.empty())
+        setHeader("Set-Cookie", cookies);
     if (request->getMethod() == "DELETE" || (request->getMethod() == "POST" && !request->getCGI())){
         setStandardHeaders(this, "text/plain", 0, "close", request->getStatusCode(), request->getStatusMessage());
     } else
@@ -66,6 +67,10 @@ void HTTPResponse::setHeader(const std::string &key, const std::string &value) {
     _headers[key] = value;
 }
 
+std::map<std::string, std::string> HTTPResponse::getHeaders() const {
+    return _headers;
+}
+
 // Write headers then serve chunk from either file or string
 std::string HTTPResponse::getNextChunk() {
     if (!_headersSent) {
@@ -73,8 +78,12 @@ std::string HTTPResponse::getNextChunk() {
 
         std::ostringstream oss;
         oss << "HTTP/1.1 " << _statusCode << " " << _statusMessage << "\r\n";
-        for (std::map<std::string, std::string>::const_iterator it = _headers.begin(); it != _headers.end(); ++it)
+        for (std::map<std::string, std::string>::const_iterator it = _headers.begin(); it != _headers.end(); ++it) {
+            if (it->first == "Set-Cookie" && it->second.empty())
+                continue;
             oss << it->first << ": " << it->second << "\r\n";
+        }
+
         oss << "\r\n";
         if (!_body.empty() && !_streamer)
             oss << _body;

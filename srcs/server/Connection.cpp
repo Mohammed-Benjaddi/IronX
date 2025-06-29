@@ -24,7 +24,10 @@ Connection::Connection()
 {}
 
 Connection::Connection(int fd, int epoll_fd, WebServerConfig* config, int serverClusterId)
-    : _fd(fd),_epoll_fd(epoll_fd),_readBuffer(),_writeBuffer(),_connectionHeader(""),_headersPart(""),_closed(false),_config(config),_streamer(NULL),_httpResponse(NULL),_httpRequest(NULL),_headersParsed(false),_expectedBodyLength(0),_completedBuffer(false),_serverClusterId(serverClusterId),_hasCookie(false),_cookieHeader("")
+    : _fd(fd),_epoll_fd(epoll_fd),_readBuffer(),_writeBuffer(),_connectionHeader(""),
+    _headersPart(""),_closed(false),_config(config),_streamer(NULL),_httpResponse(NULL),
+    _httpRequest(NULL),_headersParsed(false),_expectedBodyLength(0),_completedBuffer(false),
+    _serverClusterId(serverClusterId),_hasCookie(false),_cookieHeader("")
 {}
 
 // std::string& Connection::getReadBuffer() {
@@ -46,54 +49,66 @@ void Connection::parseContentLength() {
     size_t start = _headersPart.find("Content-Length:");
     if (start == std::string::npos)
         return;
-    std::cout << _headersPart << "\033[95m" << std::endl;
-    // sleep(10);
-    // exit(0);
     start += std::string("Content-Length:").size();
     size_t end = _headersPart.find("\r\n", start);
     std::string value = _headersPart.substr(start, end - start);
     _expectedBodyLength = std::atol(value.c_str());
 }
 
-std::string generateSessionId() {
-    std::string sessionId;
-    static const char alphanum[] =
-        "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-    for (int i = 0; i < 16; ++i) {
-        sessionId += alphanum[rand() % (sizeof(alphanum) - 1)];
-    }
-    return sessionId;
-}
+std::string replaceBgColorUrl(const std::string& setCookieHeader, const std::string& newUrl) {
+    const std::string key = "bgColor=";
+    size_t keyPos = setCookieHeader.find(key);
+    if (keyPos == std::string::npos)
+        return setCookieHeader; // bgColor not found, return unchanged
 
+    size_t valueStart = keyPos + key.length();
+    size_t valueEnd = setCookieHeader.find(";", valueStart);
+    if (valueEnd == std::string::npos)
+        valueEnd = setCookieHeader.length(); // no semicolon found, assume end of string
+
+    // Reconstruct the string with the new URL
+    std::string updated = setCookieHeader.substr(0, valueStart);
+    updated += newUrl;
+    updated += setCookieHeader.substr(valueEnd);
+
+    return updated;
+}
 
 void Connection::parseCookie() {
     const std::string bgCookieName = "bgColor";
-    const std::string defaultBgUrl = "https://i.ibb.co/Gf7Nnfk2/team.png";
+    const std::string _serverBgColorValue = "https://i.ibb.co/Gf7Nnfk2/team.png"; // define locally
 
     size_t cookieStart = _headersPart.find("Cookie:");
+    std::string clientValue;
 
     if (cookieStart != std::string::npos) {
-        std::cout << "\033[33mClient has Cookie\033[0m\n";
         size_t lineEnd = _headersPart.find("\r\n", cookieStart);
         std::string cookieLine = _headersPart.substr(cookieStart + 7, lineEnd - (cookieStart + 7));
 
-
         size_t bgPos = cookieLine.find("bgColor=");
         if (bgPos != std::string::npos) {
-            std::cout << "→ bgColor cookie found, no need to send new one.\n";
-            return;
+            size_t valueStart = bgPos + 8;
+            size_t valueEnd = cookieLine.find(";", valueStart);
+            clientValue = (valueEnd != std::string::npos)
+                          ? cookieLine.substr(valueStart, valueEnd - valueStart)
+                          : cookieLine.substr(valueStart);
         }
-        std::cout << "→ Cookie header found, but bgColor not set.\n";
-    } else {
-        std::cout << "\033[33mClient has NO Cookie\033[0m\n";
     }
 
-    std::cout << "→ Creating new bgColor cookie\n";
-
-    Cookie newCookie(bgCookieName, defaultBgUrl, 86400); 
-    _cookieHeader = newCookie.getHeader();
-    std::cout << "\033[33m" << _cookieHeader << "\033[33m\n";
+    if (clientValue.empty()) {
+        // Client has no cookie at all → set default
+        Cookie newCookie(bgCookieName, _serverBgColorValue, 86400);
+        _cookieHeader = newCookie.getHeader();
+    } else if (clientValue != _serverBgColorValue) {
+        // Client sent a different value → accept it, but update the expiration
+        Cookie newCookie(bgCookieName, clientValue, 86400);
+        _cookieHeader = newCookie.getHeader();
+    } else {
+        // Value matches → do not resend Set-Cookie
+        _cookieHeader = "";
+    }
 }
+
 
 
 void Connection::handleRead() {
@@ -114,21 +129,25 @@ void Connection::handleRead() {
                 delimiter.end()
             );
 
-            if (it != _readBuffer.end()) {
-                size_t pos = std::distance(_readBuffer.begin(), it);
-                _headersPart = std::string(_readBuffer.begin(), _readBuffer.begin() + pos + delimiter.size());
-                _headersParsed = true;
-                parseCookie();
-                parseContentLength();
-            }
+            size_t pos = std::distance(_readBuffer.begin(), it);
+            _headersPart = std::string(_readBuffer.begin(), _readBuffer.begin() + pos + delimiter.size());
+            _headersParsed = true;
+            parseCookie();
+            parseContentLength();
         }
 
         // If headers are parsed, check for complete body
         if (_headersParsed) {
+            std::cout << "\n\033[1;31m******************************\033[0m\n";            
+            std::cout << "\033[1;32m== HTTP REQUEST ==\n" << _headersPart << "\033[0m\n";
             if ((_expectedBodyLength == 0) || (_readBuffer.size() >= (_headersPart.size() + _expectedBodyLength))) {
                 _httpRequest = new HTTPRequest(_readBuffer, _config, _serverClusterId);
                 _httpResponse = new HTTPResponse(_httpRequest, _cookieHeader);
+                printResponse(_httpResponse, _httpRequest);
+                std::cout << "\033[1;31m******************************\033[0m\n\n";
+                // exit(0);
                 re_armFd();
+                //
             } else {
                 return;
             }
@@ -139,6 +158,10 @@ void Connection::handleRead() {
     }
     re_armFd();
 }
+
+
+// 
+
 void Connection::re_armFd() {
     struct epoll_event ev;
     ev.data.fd = _fd;
@@ -156,7 +179,6 @@ void Connection::re_armFd() {
 }
 
 void Connection::handleWrite() {
-    std::cout << "Im writing\n";
     if (_httpResponse && _httpResponse->isComplete() && _writeBuffer.empty()) {
         std::string connType = _httpResponse->getConnectionHeader();
         delete _httpResponse;

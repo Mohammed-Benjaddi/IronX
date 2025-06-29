@@ -10,98 +10,98 @@
 
 // void printConfig(const WebServerConfig& config) {
 //     // Print global settings
-//    std::cout << "=== Global Settings ===\n";
-//    std::cout << "Max Body Size: " << config.getMaxBodySize() << " bytes\n\n";
+//    //std::cout << "=== Global Settings ===\n";
+//    //std::cout << "Max Body Size: " << config.getMaxBodySize() << " bytes\n\n";
 
 //     // Print error pages
-//    std::cout << "=== Error Pages ===\n";
+//    //std::cout << "=== Error Pages ===\n";
 //     const std::map<int, std::string>& error_pages = config.getErrorPages();
 //     for (std::map<int, std::string>::const_iterator it = error_pages.begin(); it != error_pages.end(); ++it) {
-//        std::cout << it->first << ": " << it->second << "\n";
+//        //std::cout << it->first << ": " << it->second << "\n";
 //     }
-//    std::cout << "\n";
+//    //std::cout << "\n";
 
 //     // exit(0);
 //     // Print clusters (servers)
 //     const std::vector<Cluster>& clusters = config.getClusters();
 //     for (size_t i = 0; i < clusters.size(); i++) {
 //         const Cluster& cluster = clusters[i];
-//        std::cout << "=== Cluster #" << (i + 1) << " ===\n";
-//        std::cout << "Host: " << cluster.getHost() << "\n";
+//        //std::cout << "=== Cluster #" << (i + 1) << " ===\n";
+//        //std::cout << "Host: " << cluster.getHost() << "\n";
 
 //         // Print ports
-//        std::cout << "Ports: [";
+//        //std::cout << "Ports: [";
 //         const std::vector<uint16_t>& ports = cluster.getPorts();
 //         for (size_t j = 0; j < ports.size(); j++) {
-//             if (j != 0)std::cout << ", ";
-//            std::cout << ports[j];
+//             if (j != 0)//std::cout << ", ";
+//            //std::cout << ports[j];
 //         }
-//        std::cout << "]\n";
+//        //std::cout << "]\n";
 
 //         // Print hostnames
-//        std::cout << "Hostnames: [";
+//        //std::cout << "Hostnames: [";
 //         const std::vector<std::string>& hostnames = cluster.getHostnames();
 //         for (size_t j = 0; j < hostnames.size(); j++) {
-//             if (j != 0)std::cout << ", ";
-//            std::cout << hostnames[j];
+//             if (j != 0)//std::cout << ", ";
+//            //std::cout << hostnames[j];
 //         }
-//        std::cout << "]\n\n";
+//        //std::cout << "]\n\n";
 
 //         // Print routes
-//        std::cout << "=== Routes ===\n";
+//        //std::cout << "=== Routes ===\n";
 //         const std::map<std::string, Route>& routes = cluster.getRoutes();
 //         for (std::map<std::string, Route>::const_iterator route_it = routes.begin();
 //             route_it != routes.end(); ++route_it) {
 //             const Route& route = route_it->second;
-//            std::cout << "  Route (" << route_it->first << "):\n";
-//            std::cout << "    Root Directory: " << route.getRootDir() << "\n";
+//            //std::cout << "  Route (" << route_it->first << "):\n";
+//            //std::cout << "    Root Directory: " << route.getRootDir() << "\n";
 
 //             // Print index files
 //             const std::vector<std::string>& index_files = route.getIndexFiles();
 //             if (!index_files.empty()) {
-//                std::cout << "    Index Files: [";
+//                //std::cout << "    Index Files: [";
 //                 for (size_t j = 0; j < index_files.size(); j++) {
-//                     if (j != 0)std::cout << ", ";
-//                    std::cout << index_files[j];
+//                     if (j != 0)//std::cout << ", ";
+//                    //std::cout << index_files[j];
 //                 }
-//                std::cout << "]\n";
+//                //std::cout << "]\n";
 //             }
 
 //             // Print allowed methods
-//            std::cout << "    Allowed Methods: [";
+//            //std::cout << "    Allowed Methods: [";
 //             const std::set<std::string>& methods = route.getAllowedMethods();
 //             for (std::set<std::string>::const_iterator method_it = methods.begin();
 //                 method_it != methods.end(); ++method_it) {
-//                 if (method_it != methods.begin())std::cout << ", ";
-//                std::cout << *method_it;
+//                 if (method_it != methods.begin())//std::cout << ", ";
+//                //std::cout << *method_it;
 //             }
-//            std::cout << "]\n";
+//            //std::cout << "]\n";
 
 //             // Print other route settings
-//            std::cout << "    Autoindex: " << (route.isAutoindex() ? "on" : "off") << "\n";
+//            //std::cout << "    Autoindex: " << (route.isAutoindex() ? "on" : "off") << "\n";
 //             if (!route.getRedirect().empty()) {
-//                std::cout << "    Redirect: " << route.getRedirect() << "\n";
+//                //std::cout << "    Redirect: " << route.getRedirect() << "\n";
 //             }
 //             if (!route.getUploadDir().empty()) {
-//                std::cout << "    Upload Directory: " << route.getUploadDir() << "\n";
+//                //std::cout << "    Upload Directory: " << route.getUploadDir() << "\n";
 //             }
 
 //             // Print CGI config if exists
 //             const CGIConfig& cgi = route.getCGIConfig();
 //             const std::vector<std::string>& extensions = cgi.getExtensions();
 //             if (!extensions.empty()) {
-//                std::cout << "    CGI Configuration:\n";
-//                std::cout << "      Extensions: [";
+//                //std::cout << "    CGI Configuration:\n";
+//                //std::cout << "      Extensions: [";
 //                 for (size_t j = 0; j < extensions.size(); j++) {
-//                     if (j != 0)std::cout << ", ";
-//                    std::cout << extensions[j];
+//                     if (j != 0)//std::cout << ", ";
+//                    //std::cout << extensions[j];
 //                 }
-//                std::cout << "]\n";
-//                std::cout << "      Interpreter: " << cgi.getInterpreter() << "\n";
+//                //std::cout << "]\n";
+//                //std::cout << "      Interpreter: " << cgi.getInterpreter() << "\n";
 //             }
-//            std::cout << "\n";
+//            //std::cout << "\n";
 //         }
-//        std::cout << "\n";
+//        //std::cout << "\n";
 //     }
 // }
 
@@ -149,7 +149,7 @@ void mocker(WebServerConfig &wsc) {
         path = std::string(buffer) + "/www";
     else
         path = "";
-   std::cout << "get----> " << route1.getRootDir() << std::endl;
+   //std::cout << "get----> " << route1.getRootDir() << std::endl;
     route1.setRootDir(path);
     
     std::vector<std::string> indexFiles1;
