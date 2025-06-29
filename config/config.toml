@@ -27,7 +27,7 @@ max_body_size = 1048576
 [[servers]]
 # Requirement: "Choose the port and host of each 'server'."
 host = "0.0.0.0" # Listen on all available network interfaces
-port = [8080, 4242, 1923] # Listen on port 8080
+port = [8080] # Listen on port 8080
 # Requirement: "Set up the server_names or not."
 # Explanation: Optional list of domain names this server responds to
 hostnames = ["example.com", "www.example.com"]
@@ -71,7 +71,7 @@ methods = ["GET"]
 # ======================
 [[servers]]
 host = "0.0.0.0"
-port = 8080
+port = [8081]
 # Requirement: "The first server for a host:port will be the default..."
 # Explanation: This server only handles requests with these hostnames
 hostnames = ["api.example.com", "beta.example.com"]

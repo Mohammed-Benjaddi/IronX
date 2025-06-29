@@ -6,13 +6,11 @@
 /*   By: nhayoun <nhayoun@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 17:38:54 by ael-maaz          #+#    #+#             */
-/*   Updated: 2025/06/29 15:34:31 by nhayoun          ###   ########.fr       */
+/*   Updated: 2025/06/29 15:40:59 by nhayoun          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../headers/Parser.hpp"
-
-
 
 Parser::Parser()
 {
@@ -562,7 +560,7 @@ int Parser::MainParser(std::string path, WebServerConfig &conf)
 	{
 		OpenTomlFile(path);
 		parseTOML(path, conf);
-		printConfigs(conf);
+		// printConfigs(conf);
 	}
 	catch(std::exception& e)
 	{
