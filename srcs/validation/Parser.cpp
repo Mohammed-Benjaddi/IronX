@@ -6,7 +6,7 @@
 /*   By: nhayoun <nhayoun@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 17:38:54 by ael-maaz          #+#    #+#             */
-/*   Updated: 2025/06/29 14:50:39 by nhayoun          ###   ########.fr       */
+/*   Updated: 2025/06/29 15:34:31 by nhayoun          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,9 +30,9 @@ int Parser::OpenTomlFile(std::string& path)
 	if(checkExtension(path) == 1)
 		throw std::runtime_error("bad extension");
 	std::string fullpath = "./config/" + path;
-	this->infile.open(fullpath);
+	this->infile.open(fullpath.c_str());
 	path = fullpath;
-	if(!this->infile.is_open())
+	if (!this->infile.is_open())
 	{
 		std::cerr << "Couldnt open config file, Please make sure the config file is present in config folder and read permission is set\n"; 
 		throw std::runtime_error("lol");
@@ -277,7 +277,7 @@ void parseTOML(const std::string& filepath, WebServerConfig& config)
 				if (line.find("]]", 2) != line.size() - 2)
 					throw std::runtime_error("Unexpected characters after closing ]] in: " + line);
 			} else {
-				if (line.size() < 3 || line.back() != ']')
+				if (line.size() < 3 || line[line.size() - 1] != ']')
 					throw std::runtime_error("Malformed section header: " + line);
 				if (line.find(']', 1) != line.size() - 1)
 					throw std::runtime_error("Unexpected characters after closing ] in: " + line);
@@ -366,8 +366,9 @@ void parseTOML(const std::string& filepath, WebServerConfig& config)
         {
 
             int code = atoi(key.c_str());
-            if (val.empty())
+            if (val.empty()) {
         		throw std::runtime_error("Empty string not permitted");
+			}
 
 			if (val[0] != '"' || val[val.size() - 1] != '"')
 				throw std::runtime_error("Error page value must be enclosed in double quotes");

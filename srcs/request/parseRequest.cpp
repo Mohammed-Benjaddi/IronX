@@ -166,17 +166,17 @@ std::vector<char> trim_crlf(const std::string &str) {
     return vec;
 }
 
-std::string trim(const std::string& str) {
-    std::string::size_type start = 0;
-    while (start < str.size() && std::isspace(static_cast<unsigned char>(str[start]))) {
-      ++start;
-    }
-    std::string::size_type end = str.size();
-    while (end > start && std::isspace(static_cast<unsigned char>(str[end - 1]))) {
-        --end;
-    }
-    return str.substr(start, end - start);
-}
+// std::string trim(const std::string& str) {
+//     std::string::size_type start = 0;
+//     while (start < str.size() && std::isspace(static_cast<unsigned char>(str[start]))) {
+//       ++start;
+//     }
+//     std::string::size_type end = str.size();
+//     while (end > start && std::isspace(static_cast<unsigned char>(str[end - 1]))) {
+//         --end;
+//     }
+//     return str.substr(start, end - start);
+// }
 
 std::vector<FormFile> parseMultipartFormData(const std::vector<char> &body, const std::string &boundary) {
     //std::cout << "boundary: " << boundary << std::endl;
