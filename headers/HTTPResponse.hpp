@@ -15,8 +15,6 @@ class HTTPRequest;
 class HTTPResponse {
 public:
     // Constructors
-    HTTPResponse();
-    HTTPResponse(HTTPRequest* request);
     HTTPResponse(HTTPRequest* request, std::string cookies);
     ~HTTPResponse();
 
@@ -37,6 +35,10 @@ public:
     std::string getStatusMessage() const;
     void buildAutoIndexResponse(HTTPRequest*);
 
+    bool hasCookie() const { return _hasCookie; }
+
+    
+
     static std::string getMimeType(const std::string& path);
 
 private:
@@ -55,6 +57,7 @@ private:
 
     bool                            _headersSent;
     bool                            _complete;
+    bool                            _hasCookie;
 
     static std::map<std::string, std::string> _mimeTypes;
 };

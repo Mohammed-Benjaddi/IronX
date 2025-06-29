@@ -117,8 +117,9 @@ void printResponse(HTTPResponse* res, HTTPRequest* req) {
     std::cout << "\033[1;33mContent-Type: " << res->getMimeType(req->getPath()) << "\033[0m\n";
     std::cout << "\033[1;33mContent-Length: " << res->getHeaders().at("Content-Length") << "\033[0m\n";
     std::cout << "\033[1;33mConnection: " << res->getHeaders().at("Connection") << "\033[0m\n";
-    if (!res->getHeaders().at("Set-Cookie").empty())
+    if (res->hasCookie()) {
         std::cout << "\033[1;33mSet-Cookie: " << res->getHeaders().at("Set-Cookie") << "\033[0m\n";
+    }
 }
 
 void setStandardHeaders(HTTPResponse* res, const std::string& contentType, 

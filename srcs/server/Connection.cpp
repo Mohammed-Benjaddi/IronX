@@ -116,25 +116,26 @@ void Connection::handleRead() {
     ssize_t bytes_read = recv(_fd, buffer, sizeof(buffer), 0);
 
     if (bytes_read > 0) {
-        // Append new data to the read buffer
         _readBuffer.insert(_readBuffer.end(), buffer, buffer + bytes_read);
 
-        // If headers haven't been parsed yet, look for the delimiter
         if (!_headersParsed) {
             const std::string delimiter = "\r\n\r\n";
             std::vector<char>::iterator it = std::search(
-                _readBuffer.begin(),
-                _readBuffer.end(),
-                delimiter.begin(),
-                delimiter.end()
-            );
+            _readBuffer.begin(),
+            _readBuffer.end(),
+            delimiter.begin(),
+            delimiter.end()
+        );
 
-            size_t pos = std::distance(_readBuffer.begin(), it);
-            _headersPart = std::string(_readBuffer.begin(), _readBuffer.begin() + pos + delimiter.size());
-            _headersParsed = true;
+         size_t pos = std::distance(_readBuffer.begin(), it);
+        _headersPart = std::string(_readBuffer.begin(), _readBuffer.begin() + pos + delimiter.size());
+        _headersParsed = true;
+
+        if (_headersPart.find("Cookie:") != std::string::npos) {
+            _hasCookie = true;
             parseCookie();
-            parseContentLength();
         }
+        parseContentLength();
 
         // If headers are parsed, check for complete body
         if (_headersParsed) {
@@ -158,9 +159,7 @@ void Connection::handleRead() {
     }
     re_armFd();
 }
-
-
-// 
+}
 
 void Connection::re_armFd() {
     struct epoll_event ev;
@@ -182,7 +181,7 @@ void Connection::handleWrite() {
     if (_httpResponse && _httpResponse->isComplete() && _writeBuffer.empty()) {
         std::string connType = _httpResponse->getConnectionHeader();
         delete _httpResponse;
-        _httpResponse = NULL;    
+        _httpResponse = NULL;     
 		reset();
         re_armFd();
         return ;

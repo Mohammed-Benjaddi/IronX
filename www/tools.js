@@ -188,12 +188,11 @@ fileInput.addEventListener('change', async (e) => {
     }
 });
 
-bgSelect.addEventListener('change', () => {
-    const imageUrl = bgSelect.value;
-    document.body.style.background = `url('${imageUrl}') no-repeat center center fixed`;
-    document.body.style.backgroundSize = 'cover';
-    setCookie('bgColor', imageUrl, 86400);
-  });
+bgSelect.addEventListener("change", () => {
+    const selectedUrl = bgSelect.value;
+    document.body.style.backgroundImage = `url('${selectedUrl}')`;
+    document.cookie = `bgColor=${selectedUrl}; max-age=86400; path=/`;
+});
 
 function setCookie(name, value, seconds) {
     document.cookie = `${name}=${value}; max-age=${seconds}; path=/`;
