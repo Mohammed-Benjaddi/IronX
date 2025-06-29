@@ -3,76 +3,27 @@
 #include "headers/ServerLauncher.hpp"
 #include "headers/Multiplexer.hpp"
 #include "mocker.hpp"
+#include "./headers/Parser.hpp"
 
-#include <sstream>
-
-int main() {
+int main(int ac, char **av) {
     WebServerConfig config;
+	
+	if (ac == 2)
+	{
+		Parser parse;
+		std::string path = av[1];
+    	
+		ServerLauncher  launcher;
+		parse.MainParser(path, config);
+		try {
+				launcher.launch(config);
+				Multiplexer     mux(launcher.getSockets(), config);
+				mux.run();
 
-    // const std::string request_test_file = "./tests/request_mock.txt";
-    // const std::string response_test_file = "./tests/response_mock.txt";
-    // parse(config);
-    //! Load Configuration
-    mocker(config);
-
-    // printConfig(config);
-
-    // std::fstream file("./tests/mock_req2.txt"); 
-    // if(!file) {
-    //    //std::cout << "file not found" << std::endl;
-    //     return 0;
-    // }
-    // std::stringstream ss;
-
-    // ss << file.rdbuf();
-
-    ////std::cout << "str ===> " << ss.str() << std::endl;
-
-    // const std::string raw_request = ss.str();
-
-    ServerLauncher  launcher;
-    try {
-            launcher.launch(config);
-            Multiplexer     mux(launcher.getSockets(), config);
-            mux.run();
-
-    } catch (const std::exception &e) {
-            std::cerr << "Error Launching Server: " << e.what() << std::endl;
-    }
-    return (0);
+		} catch (const std::exception &e) {
+				std::cerr << "Error Launching Server: " << e.what() << std::endl;
+		}
+	}
+	else
+		std::cout << "usage: ./webserv [configuration file]" << std::endl;
 }
-
-
-// HLDC
-//CRC
-/*
-
-    class RequestQueue {
-        public:
-            void        push(int client_fd, std::vector<char> data);
-            
-            std::pair   <int, std::vector<char>> get_next()
-        private:
-            std::vector <std::pair<int, std::vector<char>>> requests;
-    }
-
-    // ? Khay Simo Starts reading from the file raw data the process the HTTP Request
-        // HTTPRequest req = HTTPRequest::from_file(test_file);
-        // HTTPRequest req =::from_file(request_test_file);
-    
-    // ? Meanwhile my goal would be to always write binary data to a file
-        // 
-
-    //! Run Clusters (using WebServerConfig)
-        //! Write To said file Raw data of request
-        //! Process Request once its marked ready for reading
-    //! Test reading  raw requests
-
-        
-
-    //!   Mock Requests File ==== to write a full request to the test file 
-        // * nc -l -p nof.PORT > path to test file
-        // * postman to make req to localhost
-
-
-*/

@@ -27,12 +27,10 @@ max_body_size = 1048576
 [[servers]]
 # Requirement: "Choose the port and host of each 'server'."
 host = "0.0.0.0" # Listen on all available network interfaces
-port = [8080, 4242, 1923] # Listen on port 8080 
+port = [8080, 4242, 1923] # Listen on port 8080
 # Requirement: "Set up the server_names or not."
 # Explanation: Optional list of domain names this server responds to
 hostnames = ["example.com", "www.example.com"]
-
-# root = www
 
 # ======================
 # ROUTE CONFIGURATIONS
@@ -42,7 +40,7 @@ hostnames = ["example.com", "www.example.com"]
 # Explanation: Root directory for static files
 [[servers.routes]]
 path = "/"
-root = "/var/www/html/"  	# Base directory for files
+root = "/var/www/html"  	# Base directory for files
 index = "index.html"		# Requirement: "Set a default file  to serve when the request is for a directory"
 methods = ["GET", "HEAD"] 	# Requirement: "Define a list of accepted HTTP methods"
 autoindex = false 			# Requirement: "Enable or disable directory listing"
@@ -52,7 +50,7 @@ autoindex = false 			# Requirement: "Enable or disable directory listing"
 
 [[servers.routes]]
 path = "/cgi-bin"
-root = "/var/www/"
+root = "/var/www/cgi-bin"
 methods = ["GET", "POST"]
 extensions = [".php"]
 interpreter = "/usr/bin/php-cgi"
@@ -60,12 +58,11 @@ interpreter = "/usr/bin/php-cgi"
 [[servers.routes]]
 path = "/uploads"
 root = "/var/www/uploads"
-methods = ["POST      "]
+methods = ["POST"]
 upload_dir = "/var/www/uploads/tmp"
 
 [[servers.routes]]
 path = "/old-site"
-root = "/www/html/index.html"
 redirect = "https://new.example.com"
 methods = ["GET"]
 
@@ -73,8 +70,8 @@ methods = ["GET"]
 # SECOND SERVER DEFINITIONS (demonstrates virtual hosting)
 # ======================
 [[servers]]
-host = "127.0.0.1"
-port = 8081
+host = "0.0.0.0"
+port = 8080
 # Requirement: "The first server for a host:port will be the default..."
 # Explanation: This server only handles requests with these hostnames
 hostnames = ["api.example.com", "beta.example.com"]
@@ -85,7 +82,7 @@ root = "/var/www/api"
 index = "api.php"
 methods = ["GET", "POST", "DELETE"]
 
-       [[servers.routes]]
+[[servers.routes]]
 path = "/cgi"
 root = "/var/www/cgi-bin"
 methods = ["GET", "POST"]
