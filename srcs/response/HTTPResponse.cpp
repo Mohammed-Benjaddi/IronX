@@ -78,12 +78,8 @@ std::string HTTPResponse::getNextChunk() {
 
         std::ostringstream oss;
         oss << "HTTP/1.1 " << _statusCode << " " << _statusMessage << "\r\n";
-        for (std::map<std::string, std::string>::const_iterator it = _headers.begin(); it != _headers.end(); ++it) {
-            if (it->first == "Set-Cookie" && it->second.empty())
-                continue;
+        for (std::map<std::string, std::string>::const_iterator it = _headers.begin(); it != _headers.end(); ++it)
             oss << it->first << ": " << it->second << "\r\n";
-        }
-
         oss << "\r\n";
         if (!_body.empty() && !_streamer)
             oss << _body;
