@@ -144,7 +144,10 @@ int find_method_uri(HTTPRequest &request, const std::string &line) {
     // exit(0);
   }
   request.setMethod(method);
-  request.setPath(uri);
+  if(uri == "...")
+    request.setPath("index.html");
+  else
+    request.setPath(uri);
   //std::cout << "\n\n\nhandle request : " << request.getPath() << "uri: " << uri << "\n\n\n" << std::endl;
 
   // //std::cout << "get path ---> " << request.getPath() << std::endl;

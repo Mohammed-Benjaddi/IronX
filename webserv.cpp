@@ -20,7 +20,7 @@ int main(int ac, char **av) {
 		// std::cout << "lllllllll\n";
 		parse.MainParser(path, config);
 		// printConfig(config);
-		// mocker(config);
+		// exit(0);
 		try {
 				launcher.launch(config);
 				Multiplexer     mux(launcher.getSockets(), config);

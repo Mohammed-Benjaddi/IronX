@@ -1,11 +1,11 @@
 #include "HTTPRequest.hpp"
 
 HTTPRequest::HTTPRequest(std::vector<char> &raw_request, WebServerConfig *_config, int _clientId) : IHTTPMessage(), config(_config), clientId(_clientId), cgi(NULL) {
-    //std::cout << "-----------\n";
-    //std::cout << "size: " << raw_request.size() << "\n";
-    //std::cout << "-----------\n";    
+    std::cout << "-----------\n";
+    std::cout << "size: " << raw_request.size() << "\n";
+    std::cout << "-----------\n";    
     if (parse(*this, raw_request) == -1)
-        return;        
+        return;      
     if (checkAllowedMethods(*this) == -1)
         return;
     handleRequest();
@@ -243,12 +243,14 @@ std::string HTTPRequest::getFileExtension()
 int HTTPRequest::setRoutesInfo(std::map<std::string, Route> &routes, Route &route)
 {
     routes = config->getClusters()[clientId].getRoutes();
+    std::cout << "location: " << getLocation() << std::endl;
     std::map<std::string, Route>::const_iterator it_route = routes.find(getLocation());
     if (it_route == routes.end() && getLocation() != "/favicon.ico")
     {
         setStatusCode(404);
         setStatusMessage("Not Found");
         setPath(getErrorPages(getStatusCode()));
+        std::cout << "here" << std::endl;
         return -1;
     }
     else
@@ -266,7 +268,13 @@ void HTTPRequest::handleRequest()
 
     if (setRoutesInfo(routes, route) == -1)
         return;
+
     setFileExtension(getPath());
+
+
+    std::cout << "method: " << getMethod() << std::endl;
+    std::cout << "root: " << getRootDir() << std::endl;
+    std::cout << "path: " << getPath() << std::endl;
     if (getMethod() == "GET")
         handleGet(routes, route);
     else if (getMethod() == "POST")
@@ -299,10 +307,17 @@ void HTTPRequest::executeCGI(Route &route)
 
 void HTTPRequest::handleGet(std::map<std::string, Route> &routes, Route &route)
 {
-    if (isDirectory(getPath(), route.getRootDir()))
+    // exit(99);
+    std::cout << "getPath: " << getPath() << std::endl;
+    if (isDirectory(getPath(), route.getRootDir())) {
+        std::cout << "it is a directory" << std::endl;
         pathIsDirectory(*this, routes, route, getPath());
-    else
+    }
+    else {
+        std::cout << "is a file" << std::endl;
+        // exit(99);
         pathIsFile(*this, routes, route);
+    }
 }
 
 void HTTPRequest::handleDELETE(std::map<std::string, Route> &routes, Route &route)

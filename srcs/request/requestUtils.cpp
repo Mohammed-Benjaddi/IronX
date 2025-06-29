@@ -24,7 +24,7 @@ bool isDirExist(std::string path, std::string rootDir) {
 
 bool isDirectory(const std::string path, std::string rootDir) {
     DIR *dir;
-
+    std::cout << "isDirectory: " << rootDir + "/" + path << std::endl;
     if ((dir = opendir((rootDir + "/" + path).c_str())) != NULL) {
         closedir(dir);
         return true;
@@ -49,7 +49,13 @@ bool isLocationHasCGI(std::string filepath) {
 }
 
 int copyToRoute(HTTPRequest &request, Route &route, std::map<std::string, Route>::const_iterator &it) {
-    route.setRootDir(it->second.getRootDir());
+    // exit(99);
+    char buffer[BUFSIZ];
+    std::string path;
+    if (getcwd(buffer, sizeof(buffer)) != NULL)
+        path = std::string(buffer);
+    std::cout << "path =========> " << it->second.getRootDir() << std::endl;
+    route.setRootDir(path + it->second.getRootDir());
     route.setIndexFiles(it->second.getIndexFiles());
     if (it->second.getAllowedMethods().find(request.getMethod()) == it->second.getAllowedMethods().end()) {
         request.setStatusCode(405);
@@ -62,6 +68,12 @@ int copyToRoute(HTTPRequest &request, Route &route, std::map<std::string, Route>
     route.setRedirect(it->second.getRedirect());
     route.setUploadDir(it->second.getUploadDir());
     route.setCGIConfig(it->second.getCGIConfig());
+
+    std::cout << "-----------------------------------------------------\n";
+    std::cout << route.getRootDir() << std::endl;
+    std::cout << route.isAutoindex() << std::endl;
+    std::cout << route.getRedirect() << std::endl;
+    std::cout << "-----------------------------------------------------\n";
     return 1;
 }
 
@@ -78,6 +90,8 @@ void GETReadFileContent(HTTPRequest &request, std::string path) {
     std::stringstream ss;
     ss << file.rdbuf();
     request.setFileContent(ss.str());
+    // std::cout << "file content: " << request.getFileContent() << std::endl;
+    std::cout << "getPath ===> " << request.getPath() << std::endl;
     file.close();
 } 
 
@@ -105,15 +119,20 @@ void fileHasNoCGI(HTTPRequest &request, Route &route, std::string &file_name) {
         request.setPath(request.getErrorPages(request.getStatusCode()));;
     }
     std::string filePath = (route.getRootDir() + file_name);
-    if (request.getMethod() == "GET")
+    if (request.getMethod() == "GET") {
         GETReadFileContent(request, route.getRootDir() + "/" + request.getPath() + file_name);
+    }
     else if (request.getMethod() == "DELETE")
         deleteRequestedFile(request, "/" + route.getRootDir() + "/" + request.getPath(), file_name);
 }
 
 void directoryHasIndexFiles(HTTPRequest &request, Route &route, std::vector<std::string> index_files) {
     for(size_t i = 0; i < index_files.size(); i++) {
-        std::string path = route.getRootDir() + "/" + request.getPath() + "/" + index_files[i];
+        // std::string path = route.getRootDir() + "/" + request.getPath() + "/" + index_files[i];
+        std::string path = route.getRootDir() + "/" + 
+                    (request.getPath() == "/" ? "" : request.getPath() + "/") + index_files[i];
+
+        std::cout << "search for index file ==> " << path << std::endl;
         if(isFileExist(path.c_str())) {
             if(isLocationHasCGI(path)) {
                 request.executeCGI(route);
@@ -134,23 +153,29 @@ void directoryHasIndexFiles(HTTPRequest &request, Route &route, std::vector<std:
 void pathIsFile(HTTPRequest &request, std::map<std::string, Route> &routes, Route &route) {
     (void) routes;
     std::string filePath = (route.getRootDir() + "/" + request.getPath());
+    std::cout << "filepath: " << route.getRootDir() + "/" + request.getPath() << std::endl;
+
     if (!isFileExist((filePath).c_str())) {
         request.setStatusCode(404);
-
         request.setStatusMessage("Not Found");
         request.setFileContent("");
         // request.setPath(request.getRootDir() + "/errors/404.html");
         request.setPath(request.getErrorPages(request.getStatusCode()));
+        std::cout << "file not found" << std::endl;
         return;
     }
     if(!route.getRedirect().empty()) {
+        std::cout << "file must be redirected to " << route.getRedirect() << std::endl;
         request.RedirectionFound(route);
         return;
     }
-    if (isLocationHasCGI(filePath))
+    if (isLocationHasCGI(filePath)) {
+        std::cout << "file has CGI" << std::endl;
         request.executeCGI(route);
+    }
     else {
         std::string filename = "";
+        std::cout << "file has no CGI" << std::endl;
         fileHasNoCGI(request, route, filename);
     }
 }
@@ -189,11 +214,15 @@ void pathIsDirectory(HTTPRequest &request, std::map<std::string, Route> &routes,
             request.RedirectionFound(route);
             return;
         }
+        std::cout << "index files size: " << index_files.size() << std::endl;
         if (index_files.size() == 0) {
+            std::cout << "directory has no index files" << std::endl;
             directoryHasNoIndexFiles(request, route);
         }
-        else
+        else {
+            std::cout << "directory has index files" << std::endl;
             directoryHasIndexFiles(request, route, index_files);
+        }
         closedir(dir);
     } else {
         request.setStatusCode(404);
