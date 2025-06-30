@@ -53,7 +53,6 @@ private:
     std::map<int, std::string> error_pages;
     CGI *cgi;
 public:
-    HTTPRequest(const std::string &, WebServerConfig *, int );
     HTTPRequest(std::vector<char> &raw_request, WebServerConfig *_config, int _clientId);
     HTTPRequest(const std::string &, WebServerConfig *, int , HTTPResponse *);
     ~HTTPRequest();

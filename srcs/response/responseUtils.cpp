@@ -44,7 +44,7 @@ std::string toString(int value) {
 }
 
 bool    handleCGI(HTTPRequest *req, HTTPResponse *res) {
-    if (req->getCGI()) {
+    if (req->getCGI() != NULL) {
         req->getCGI()->executeCGI();
         if (req->getCGI()) {
             res->setStatus(200, "OK");
@@ -68,7 +68,9 @@ void buildResponse(HTTPRequest* req, HTTPResponse* res) {
     int status = req->getStatusCode();
     int size = getFileSize(req->getPath());
 
-    if (handleCGI(req, res) ) {
+    if (handleCGI(req, res)) {
+        std::cout << "Response: CGI found" << std::endl;
+        exit(99);
         return;
     }
 

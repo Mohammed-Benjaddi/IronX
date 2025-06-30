@@ -37,7 +37,6 @@ bool isLocationHasCGI(std::string filepath) {
     size_t dot_pos = filepath.rfind('.');
     if (dot_pos == std::string::npos)
         return false;
-
     std::string extension = filepath.substr(dot_pos);
     std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
     for (int i = 0; cgi_extensions[i] != NULL; ++i) {
@@ -78,6 +77,8 @@ int copyToRoute(HTTPRequest &request, Route &route, std::map<std::string, Route>
 }
 
 void GETReadFileContent(HTTPRequest &request, std::string path) {
+    std::cout << "trying to open " << path << std::endl;
+    // exit(99);
     std::ifstream file(path.c_str());
     if(!file.is_open()) {
         request.setStatusCode(403);
@@ -120,6 +121,7 @@ void fileHasNoCGI(HTTPRequest &request, Route &route, std::string &file_name) {
     }
     std::string filePath = (route.getRootDir() + file_name);
     if (request.getMethod() == "GET") {
+        std::cout << "READ FILE CONTENT" << std::endl;
         GETReadFileContent(request, route.getRootDir() + "/" + request.getPath() + file_name);
     }
     else if (request.getMethod() == "DELETE")
@@ -129,15 +131,22 @@ void fileHasNoCGI(HTTPRequest &request, Route &route, std::string &file_name) {
 void directoryHasIndexFiles(HTTPRequest &request, Route &route, std::vector<std::string> index_files) {
     for(size_t i = 0; i < index_files.size(); i++) {
         // std::string path = route.getRootDir() + "/" + request.getPath() + "/" + index_files[i];
+        // index_files[i] = index_files[i].substr(1, index_files[i].length() - 1);
+        // std::cout << "removing quotes: " << index_files[i].substr(1, index_files[i].length() - 2) << std::endl;
+        // ! * warning : I should index with index_files[i] after removing double quotes
+        std::string index = index_files[i].substr(1, index_files[i].length() - 2);
         std::string path = route.getRootDir() + "/" + 
-                    (request.getPath() == "/" ? "" : request.getPath() + "/") + index_files[i];
+                    (request.getPath() == "/" ? "" : request.getPath() + "/") + index;
 
+        // path = path.substr(1, path.length() - 1);
+        // std::cout << "removing quotes: " << path.substr(1, path.length() - 1) << std::endl;
         std::cout << "search for index file ==> " << path << std::endl;
         if(isFileExist(path.c_str())) {
             if(isLocationHasCGI(path)) {
                 request.executeCGI(route);
             } else {
-                std::string filename = "/" + index_files[i];
+                std::cout << "file has no CGI" << std::endl;
+                std::string filename = "/" + index;
                 request.setFileExtension(filename);
                 fileHasNoCGI(request, route, filename);
                 return;
@@ -299,7 +308,7 @@ bool isDirectoryEmpty(std::string path) {
 }
 
 void uploadFiles(HTTPRequest &request) {
-    //std::cout << "upload a file" << std::endl;
+    std::cout << "upload a file" << std::endl;
     std::vector<FormFile> files = request.getFormFiles();
     if(files.empty()) {
         //std::cout << "no files found" << std::endl;

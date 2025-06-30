@@ -2,7 +2,7 @@
 
 CGI::CGI(HTTPRequest &_request, Route &_route) : request(_request), route(_route)
 {
-//    //std::cout << "++++++ " << request.getRootDir() + "/" + request.getPath() << std::endl;
+//    //std::c<< "++++++ " << request.getRootDir() + "/" + request.getPath() << std::endl;
     script_path = request.getRootDir() + "/" + request.getPath();
     request_method = request.getMethod();
     query_string = request.getQuery();
@@ -73,6 +73,7 @@ std::vector<std::string> CGI::getInterpreter(const std::string &script_path)
 
 void CGI::executeCGI()
 {
+    std::cout << "execute CGI..." << std::endl;
     int pipe_fd[2];
     int stdin_pipe[2];
 
@@ -144,13 +145,14 @@ void CGI::executeCGI()
         waitpid(pid, &status, 0);
 
         if (WIFEXITED(status) && WEXITSTATUS(status) == 0) {
-           //std::cout << "the script executed successfully" << std::endl;
+           std::cout << "the script executed successfully" << std::endl;
             script_output = output;
+            std::cout << "output: \n" << output << std::endl; 
             request.setStatusCode(200);
             request.setStatusMessage("Ok");
         }
         else {
-           //std::cout << "---------> something went wrong" << std::endl;
+           std::cout << "---------> something went wrong" << std::endl;
            //std::cout << "Exit status: " << WEXITSTATUS(status) << std::endl;
            //std::cout << "Script output: [" << output << "]" << std::endl;
             request.setStatusCode(500);

@@ -4,6 +4,7 @@ HTTPRequest::HTTPRequest(std::vector<char> &raw_request, WebServerConfig *_confi
     std::cout << "-----------\n";
     std::cout << "size: " << raw_request.size() << "\n";
     std::cout << "-----------\n";    
+    cgi = NULL;
     if (parse(*this, raw_request) == -1)
         return;      
     if (checkAllowedMethods(*this) == -1)
@@ -281,6 +282,9 @@ void HTTPRequest::handleRequest()
         handlePOST(routes, route);
     else if (getMethod() == "DELETE")
         handleDELETE(routes, route);
+    else {
+        // ! bad request 400
+    }
 }
 
 void HTTPRequest::executeCGI(Route &route)
@@ -291,10 +295,17 @@ void HTTPRequest::executeCGI(Route &route)
         CGIConfig cgiConfig = route.getCGIConfig();
         std::string path = getPath();
         std::vector<std::string> extensions = cgiConfig.getExtensions();
+
+        // for(size_t i = 0; i < extensions.size(); i++) {
+        //     std::cout << extensions[i] << std::endl;
+        // }
+
         std::string path_ext = path.substr(path.rfind("."));
         std::vector<std::string>::iterator it = std::find(extensions.begin(), extensions.end(), path_ext);
+
         if (it == extensions.end())
         {
+            std::cout << "CGI extension not found: " << path_ext << std::endl;
             setStatusCode(404);
             setStatusMessage("Not Found");
             setPath(getErrorPages(getStatusCode()));
@@ -318,6 +329,7 @@ void HTTPRequest::handleGet(std::map<std::string, Route> &routes, Route &route)
         // exit(99);
         pathIsFile(*this, routes, route);
     }
+    std::cout << "GET end" << std::endl;
 }
 
 void HTTPRequest::handleDELETE(std::map<std::string, Route> &routes, Route &route)

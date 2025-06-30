@@ -10,13 +10,15 @@ max_body_size = 1048576
 
 [[servers]]
 host = "0.0.0.0" # Listen on all available network interfaces
-port = [8080, 4242, 1923] # Listen on port 8080
+port = 8080# Listen on port 8080
 hostnames = ["example.com", "www.example.com"]
 [[servers.routes]]
 path = "/"
 root = "/www/"  	# Base directory for files
 index = "index.html"		# Requirement: "Set a default file  to serve when the request is for a directory"
-methods = ["GET", "HEAD"] 	# Requirement: "Define a list of accepted HTTP methods"
+methods = ["GET", "POST"] 	# Requirement: "Define a list of accepted HTTP methods"
+interpreter = "/usr/bin/env"
+extensions = [".php", ".py"]
 autoindex = false 			# Requirement: "Enable or disable directory listing"
 
 [[servers.routes]]
@@ -34,8 +36,10 @@ methods = ["GET", "POST"]
 [[servers.routes]]
 path = "/new-site"
 root = "/www"
-index = "index.html"
-methods = ["GET", "POST"]
+index = "form.html"
+methods = ["GET", "POST", "DELETE"]
+interpreter = "/usr/bin/env"
+extensions = [".php", ".py"]
 autoindex = true
 # [[servers]]
 # host = "0.0.0.0"
