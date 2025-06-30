@@ -45,7 +45,6 @@ std::string toString(int value) {
 
 bool    handleCGI(HTTPRequest *req, HTTPResponse *res) {
     if (req->getCGI()) {
-        req->getCGI()->executeCGI();
         if (req->getCGI()) {
             res->setStatus(200, "OK");
             res->setHeader("Content-Type", "text/html");
