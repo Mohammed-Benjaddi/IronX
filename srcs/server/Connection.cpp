@@ -111,44 +111,100 @@ void Connection::parseCookie() {
 
 
 
+// void Connection::handleRead() {
+//     char buffer[4096];
+//     ssize_t bytes_read = recv(_fd, buffer, sizeof(buffer), 0);
+
+//     if (bytes_read > 0) {
+//         _readBuffer.insert(_readBuffer.end(), buffer, buffer + bytes_read);
+
+//         if (!_headersParsed) {
+//             const std::string delimiter = "\r\n\r\n";
+//             std::vector<char>::iterator it = std::search(
+//             _readBuffer.begin(),
+//             _readBuffer.end(),
+//             delimiter.begin(),
+//             delimiter.end()
+//         );
+
+//          size_t pos = std::distance(_readBuffer.begin(), it);
+//         _headersPart = std::string(_readBuffer.begin(), _readBuffer.begin() + pos + delimiter.size());
+//         _headersParsed = true;
+
+//         if (_headersPart.find("Cookie:") != std::string::npos) {
+//             _hasCookie = true;
+//             parseCookie();
+//         }
+//         parseContentLength();
+
+//         // If headers are parsed, check for complete body
+//         if (_headersParsed) {
+//             std::cout << "\n\033[1;31m******************************\033[0m\n";            
+//             std::cout << "\033[1;32m== HTTP REQUEST ==\n" << _headersPart << "\033[0m\n";
+//             if ((_expectedBodyLength == 0) || (_readBuffer.size() >= (_headersPart.size() + _expectedBodyLength))) {
+//                 _httpRequest = new HTTPRequest(_readBuffer, _config, _serverClusterId);
+//                 _httpResponse = new HTTPResponse(_httpRequest, _cookieHeader);
+//                 printResponse(_httpResponse, _httpRequest);
+//                 std::cout << "\033[1;31m******************************\033[0m\n\n";
+//                 // exit(0);
+//                 re_armFd();
+//                 //
+//             } else {
+//                 return;
+//             }
+//         }
+//     } else {
+//         _closed = true;
+//         throw Multiplexer::ClientDisconnectedException();
+//     }
+//     re_armFd();
+//     }
+
+// }
+
 void Connection::handleRead() {
     char buffer[4096];
     ssize_t bytes_read = recv(_fd, buffer, sizeof(buffer), 0);
 
     if (bytes_read > 0) {
+        // Append new data to the read buffer
         _readBuffer.insert(_readBuffer.end(), buffer, buffer + bytes_read);
 
+        // If headers haven't been parsed yet, look for the delimiter
         if (!_headersParsed) {
             const std::string delimiter = "\r\n\r\n";
             std::vector<char>::iterator it = std::search(
-            _readBuffer.begin(),
-            _readBuffer.end(),
-            delimiter.begin(),
-            delimiter.end()
-        );
+                _readBuffer.begin(),
+                _readBuffer.end(),
+                delimiter.begin(),
+                delimiter.end()
+            );
 
-         size_t pos = std::distance(_readBuffer.begin(), it);
-        _headersPart = std::string(_readBuffer.begin(), _readBuffer.begin() + pos + delimiter.size());
-        _headersParsed = true;
-
-        if (_headersPart.find("Cookie:") != std::string::npos) {
-            _hasCookie = true;
-            parseCookie();
+            if (_headersPart.find("Cookie:") != std::string::npos) {
+                _hasCookie = true;
+                parseCookie();
+            }
+            
+            if (it != _readBuffer.end()) {
+                size_t pos = std::distance(_readBuffer.begin(), it);
+                _headersPart = std::string(_readBuffer.begin(), _readBuffer.begin() + pos + delimiter.size());
+                _headersParsed = true;
+                parseContentLength();
+            }
         }
-        parseContentLength();
+        
 
         // If headers are parsed, check for complete body
         if (_headersParsed) {
             std::cout << "\n\033[1;31m******************************\033[0m\n";            
             std::cout << "\033[1;32m== HTTP REQUEST ==\n" << _headersPart << "\033[0m\n";
             if ((_expectedBodyLength == 0) || (_readBuffer.size() >= (_headersPart.size() + _expectedBodyLength))) {
+                std::string requestData(_readBuffer.begin(), _readBuffer.end());
                 _httpRequest = new HTTPRequest(_readBuffer, _config, _serverClusterId);
                 _httpResponse = new HTTPResponse(_httpRequest, _cookieHeader);
                 printResponse(_httpResponse, _httpRequest);
                 std::cout << "\033[1;31m******************************\033[0m\n\n";
-                // exit(0);
                 re_armFd();
-                //
             } else {
                 return;
             }
@@ -159,7 +215,7 @@ void Connection::handleRead() {
     }
     re_armFd();
 }
-}
+
 
 void Connection::re_armFd() {
     struct epoll_event ev;

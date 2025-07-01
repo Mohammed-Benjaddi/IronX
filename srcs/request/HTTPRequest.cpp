@@ -1,9 +1,9 @@
 #include "HTTPRequest.hpp"
 
 HTTPRequest::HTTPRequest(std::vector<char> &raw_request, WebServerConfig *_config, int _clientId) : IHTTPMessage(), config(_config), clientId(_clientId), cgi(NULL) {
-    //std::cout << "-----------\n";
-    //std::cout << "size: " << raw_request.size() << "\n";
-    //std::cout << "-----------\n";    
+    // std::cout << "-----------\n";
+    // std::cout << "size: " << raw_request.size() << "\n";
+    // std::cout << "-----------\n";    
     if (parse(*this, raw_request) == -1)
         return;        
     if (checkAllowedMethods(*this) == -1)
@@ -325,6 +325,7 @@ void HTTPRequest::RedirectionFound(Route &route) {
 
 void HTTPRequest::handlePOST(std::map<std::string, Route> &routes, Route &route)
 {
+    // exit(99);
     std::string contentType = getHeader("Content-Type");
     if (isDirExist(getPath(), route.getRootDir())) {
         if (contentType.rfind("application/x-www-form-urlencoded") != std::string::npos) {
