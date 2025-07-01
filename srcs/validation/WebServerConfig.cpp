@@ -21,6 +21,11 @@ const std::string& CGIConfig::getInterpreter() const {
 
 // Route methods
 // setters
+void Cluster::addRoute(const std::string& path, const Route& r) {
+    routes[path] = r; // std::map insertion, C++98 compatible
+}
+
+
 void Route::setRootDir(const std::string& root_dir) {
     this->root_dir = root_dir;
 }
@@ -111,6 +116,10 @@ const std::vector<std::string>& Cluster::getHostnames() const {
 
 const std::map<std::string, Route>& Cluster::getRoutes() const {
     return routes;
+}
+
+std::map<std::string, Route>& Cluster::getRoutes() {
+    return this->routes;
 }
 
 // WebServerConfig methods

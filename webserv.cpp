@@ -3,17 +3,19 @@
 #include "headers/ServerLauncher.hpp"
 #include "headers/Multiplexer.hpp"
 #include "mocker.hpp"
+#include "headers/Parser.hpp"
 
 #include <sstream>
 
-int main() {
-    WebServerConfig config;
+int main(int ac, char **av) {
+    
 
     // const std::string request_test_file = "./tests/request_mock.txt";
     // const std::string response_test_file = "./tests/response_mock.txt";
     // parse(config);
+
     //! Load Configuration
-    mocker(config);
+    // mocker(config);
 
     // printConfig(config);
 
@@ -29,9 +31,21 @@ int main() {
     ////std::cout << "str ===> " << ss.str() << std::endl;
 
     // const std::string raw_request = ss.str();
-
-    ServerLauncher  launcher;
+    if(ac == 2) {
+    WebServerConfig config;        
+    Parser parser;
     try {
+        std::string path(av[1]);
+        parser.MainParser(path ,config);
+    } catch(const std::exception& e) {
+        std::cerr << "===> " << e.what() << '\n';
+        std::cout << "ZEBB2\n";
+
+        return 1;
+    }
+    std::cout << "ZEBB\n";
+    try {
+            ServerLauncher  launcher;
             launcher.launch(config);
             Multiplexer     mux(launcher.getSockets(), config);
             mux.run();
@@ -39,6 +53,7 @@ int main() {
     } catch (const std::exception &e) {
             std::cerr << "Error Launching Server: " << e.what() << std::endl;
     }
+}
     return (0);
 }
 

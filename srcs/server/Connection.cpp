@@ -110,15 +110,75 @@ void Connection::parseCookie() {
 }
 
 
+// void Connection::handleRead() {
+//     char buffer[4096];
+//     ssize_t bytes_read = recv(_fd, buffer, sizeof(buffer), 0);
+
+//     if (bytes_read > 0) {
+//         // Append new data to the read buffer
+//         _readBuffer.insert(_readBuffer.end(), buffer, buffer + bytes_read);
+
+//         // if (!_headersParsed) {
+//             const std::string delimiter = "\r\n\r\n";
+//             std::vector<char>::iterator it = std::search(
+//                 _readBuffer.begin(),
+//                 _readBuffer.end(),
+//                 delimiter.begin(),
+//                 delimiter.end()
+//             );
+
+//             if (_headersPart.find("Content-Length:") != std::string::npos)
+//                 parseContentLength();
+//             if (_headersPart.find("Cookie:") != std::string::npos) {
+//                 _hasCookie = true;
+//                 parseCookie();
+//             }
+//             if (it != _readBuffer.end()) {
+//                 size_t pos = std::distance(_readBuffer.begin(), it);
+//                 _headersPart = std::string(_readBuffer.begin(), _readBuffer.begin() + pos + delimiter.size());
+//                 _headersParsed = true;
+
+//             // } else {
+//             //     return;
+//             // }
+//         }
+        
+//         // If headers are parsed, check for complete body
+//         if (_headersParsed) {
+//             if ( _expectedBodyLength == 0 || (_readBuffer.size() >= (_headersPart.size() + _expectedBodyLength))) {
+//                 std::cout << "\n\033[1;31m******************************\033[0m\n";            
+//                 std::cout << "\033[1;32m== HTTP REQUEST ==\n" << _headersPart << "\033[0m\n";
+//                 // std::string requestData(_readBuffer.begin(), _readBuffer.end());
+//                 _httpRequest = new HTTPRequest(_readBuffer, _config, _serverClusterId);
+//                 _httpResponse = new HTTPResponse(_httpRequest, _cookieHeader);
+//                 printResponse(_httpResponse, _httpRequest);
+//                 std::cout << "\033[1;31m******************************\033[0m\n\n";
+//                 re_armFd();
+//             } else {
+//                 return;
+//             }
+//         }
+//     } else {
+//         _closed = true;
+//         throw Multiplexer::ClientDisconnectedException();
+//     }
+//     re_armFd();
+// }
+
+
+
 void Connection::handleRead() {
-    char buffer[4096];
+    char buffer[4096] = {0};
     ssize_t bytes_read = recv(_fd, buffer, sizeof(buffer), 0);
+
+    std::cout << "Bytes_read:::::::: " << bytes_read << "\n";
 
     if (bytes_read > 0) {
         // Append new data to the read buffer
         _readBuffer.insert(_readBuffer.end(), buffer, buffer + bytes_read);
 
-        if (!_headersParsed) {
+        // If headers haven't been parsed yet, look for the delimiter
+        
             const std::string delimiter = "\r\n\r\n";
             std::vector<char>::iterator it = std::search(
                 _readBuffer.begin(),
@@ -127,24 +187,23 @@ void Connection::handleRead() {
                 delimiter.end()
             );
 
-            if (_headersPart.find("Content-Length:") != std::string::npos)
-                parseContentLength();
-            if (_headersPart.find("Cookie:") != std::string::npos) {
-                _hasCookie = true;
-                parseCookie();
-            }
             if (it != _readBuffer.end()) {
                 size_t pos = std::distance(_readBuffer.begin(), it);
                 _headersPart = std::string(_readBuffer.begin(), _readBuffer.begin() + pos + delimiter.size());
                 _headersParsed = true;
-
-            } else {
-                return;
+                std::cout << "Holala this is the size of buffer1==========>" << _readBuffer.size() << '\n';
+                parseContentLength();
             }
-        }
-        
+            
+            if (_headersPart.find("Cookie:") != std::string::npos) {
+                _hasCookie = true;
+                parseCookie();
+            }
+
         // If headers are parsed, check for complete body
         if (_headersParsed) {
+            std::cout << "expected body length: " << _expectedBodyLength << std::endl;
+            std::cout << "sum: " << _headersPart.size() + _expectedBodyLength << std::endl;
             if ( _expectedBodyLength == 0 || (_readBuffer.size() >= (_headersPart.size() + _expectedBodyLength))) {
                 std::cout << "\n\033[1;31m******************************\033[0m\n";            
                 std::cout << "\033[1;32m== HTTP REQUEST ==\n" << _headersPart << "\033[0m\n";
@@ -158,13 +217,13 @@ void Connection::handleRead() {
                 return;
             }
         }
+
     } else {
         _closed = true;
         throw Multiplexer::ClientDisconnectedException();
     }
     re_armFd();
 }
-
 
 void Connection::re_armFd() {
     struct epoll_event ev;

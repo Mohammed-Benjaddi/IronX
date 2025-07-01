@@ -255,6 +255,7 @@ int HTTPRequest::setRoutesInfo(std::map<std::string, Route> &routes, Route &rout
     std::map<std::string, Route>::const_iterator it_route = routes.find(getLocation());
     if (it_route == routes.end() && getLocation() != "/favicon.ico")
     {
+        // exit(99);
         setStatusCode(404);
         setStatusMessage("Not Found");
         setPath(getErrorPages(getStatusCode()));
@@ -275,7 +276,15 @@ void HTTPRequest::handleRequest()
 
     if (setRoutesInfo(routes, route) == -1)
         return;
+    
     setFileExtension(getPath());
+    
+    std::cout << "method: " << getMethod() << std::endl;
+    std::cout << "path: " << getPath() << std::endl;
+    std::cout << "location: " << getLocation() << std::endl;
+    std::cout << "root dir: " << route.getRootDir() << std::endl;
+    std::cout << "file extension: " << getFileExtension() << std::endl;
+
     if (getMethod() == "GET")
         handleGet(routes, route);
     else if (getMethod() == "POST")
