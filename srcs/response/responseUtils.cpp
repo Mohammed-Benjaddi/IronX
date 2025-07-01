@@ -102,7 +102,7 @@ void buildResponse(HTTPRequest* req, HTTPResponse* res) {
     res->setHeader("Content-Type", connection);
     res->setHeader("Content-Length", toString(size));
     res->setHeader("Connection", "close");
-}
+} 
 
 void printResponse(HTTPResponse* res, HTTPRequest* req) {
     if (!res || !req) {
@@ -139,6 +139,5 @@ std::string getRelativePath(const std::string& path, const std::string& rootPath
 
     relative = relative.substr(0, relative.size() - 11);
 
-    //std::cout << "relative path: " << relative << "\n";
     return relative;
 }

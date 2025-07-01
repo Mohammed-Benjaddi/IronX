@@ -118,7 +118,6 @@ void Connection::handleRead() {
         // Append new data to the read buffer
         _readBuffer.insert(_readBuffer.end(), buffer, buffer + bytes_read);
 
-        // If headers haven't been parsed yet, look for the delimiter
         if (!_headersParsed) {
             const std::string delimiter = "\r\n\r\n";
             std::vector<char>::iterator it = std::search(
@@ -128,16 +127,19 @@ void Connection::handleRead() {
                 delimiter.end()
             );
 
+            if (_headersPart.find("Content-Length:") != std::string::npos)
+                parseContentLength();
+            if (_headersPart.find("Cookie:") != std::string::npos) {
+                _hasCookie = true;
+                parseCookie();
+            }
             if (it != _readBuffer.end()) {
                 size_t pos = std::distance(_readBuffer.begin(), it);
                 _headersPart = std::string(_readBuffer.begin(), _readBuffer.begin() + pos + delimiter.size());
                 _headersParsed = true;
-                parseContentLength();
-            }
-            
-            if (_headersPart.find("Cookie:") != std::string::npos) {
-                _hasCookie = true;
-                parseCookie();
+
+            } else {
+                return;
             }
         }
         

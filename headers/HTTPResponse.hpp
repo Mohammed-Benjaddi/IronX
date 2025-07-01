@@ -39,6 +39,10 @@ public:
 
     bool hasCookie();
 
+    std::string getBody() const {
+        return _body;
+    }
+
 private:
     int                             _statusCode;
     std::string                     _statusMessage;
