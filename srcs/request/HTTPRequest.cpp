@@ -1,11 +1,26 @@
 #include "HTTPRequest.hpp"
 
 HTTPRequest::HTTPRequest(std::vector<char> &raw_request, WebServerConfig *_config, int _clientId) : IHTTPMessage(), config(_config), clientId(_clientId), cgi(NULL) {
-    // std::cout << "-----------\n";
-    // std::cout << "size: " << raw_request.size() << "\n";
-    // std::cout << "-----------\n";    
+    std::cout << "-----------\n";
+    std::cout << "size: " << raw_request.size() << "\n";
+    std::cout << "-----------\n";
     if (parse(*this, raw_request) == -1)
-        return;        
+        return;      
+
+    std::string contentLength = getHeader("Content-Length");
+    std::cout << "content length: " << atoi(contentLength.c_str()) << std::endl;
+    std::cout << "method: " << getMethod() << std::endl;
+    // if(atoi(contentLength.c_str()) == 0)
+    //     exit(99);
+
+    std::map<std::string, std::string> headers = getHeaders();
+    std::map<std::string, std::string>::iterator it = headers.begin();
+
+    while(it != headers.end()) {
+        std::cout << it->first << ": " << it->second << std::endl;
+        it++;
+    }
+ 
     if (checkAllowedMethods(*this) == -1)
         return;
     handleRequest();
