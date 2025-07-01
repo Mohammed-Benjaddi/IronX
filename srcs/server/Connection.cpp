@@ -144,9 +144,10 @@ void Connection::handleRead() {
         // If headers are parsed, check for complete body
         if (_headersParsed) {
             if ( _expectedBodyLength == 0 || (_readBuffer.size() >= (_headersPart.size() + _expectedBodyLength))) {
+                std::cout << "\n\033[1;31m******************************\033[0m\n";            
+                std::cout << "\033[1;32m== HTTP REQUEST ==\n" << _headersPart << "\033[0m\n";
                 // std::string requestData(_readBuffer.begin(), _readBuffer.end());
                 _httpRequest = new HTTPRequest(_readBuffer, _config, _serverClusterId);
-                std::cout << "status code: " << _httpRequest->getStatusCode() << std::endl;
                 _httpResponse = new HTTPResponse(_httpRequest, _cookieHeader);
                 printResponse(_httpResponse, _httpRequest);
                 std::cout << "\033[1;31m******************************\033[0m\n\n";
