@@ -1,8 +1,6 @@
 [  global ]  
 
-
 max_body_size = 1048576
-
 
 [default_error_pages]
 
@@ -12,16 +10,10 @@ max_body_size = 1048576
 500 = "/errors/500.html" # Internal Server Error
 503 = "/errors/503.html" # Service Unavailable
 
-
-
-
 [[servers]]
 host = "0.0.0.0" # Listen on all available network interfaces
-port = [8079, 4142, 1323] # Listen on port 8080
+port = [8080, 4142, 1323] # Listen on port 8080
 hostnames = ["example.com", "www.example.com"  ]
-
-
-
 
 [[servers.routes]]
 path = "/"
@@ -29,8 +21,6 @@ root = "/www"  	# Base directory for files
 index = ["index.html"]		# Requirement: "Set a default file  to serve when the request is for a directory"
 methods = ["GET",  "POST"] 	# Requirement: "Define a list of accepted HTTP methods"
 autoindex = true 			# Requirement: "Enable or disable directory listing"
-
-
 
 [[servers.routes]]
 path = "/cgi-bin"
@@ -44,6 +34,16 @@ path = "/new-site"
 root = "/www"
 methods = ["GET", "POST"]
 index = ["index.html", "form.html"]
+extensions = [".php", ".py"]
+interpreter = "/usr/bin/env"
+
+[[servers.routes]]
+path = "/request"
+root = "/srcs"
+methods = ["GET", "POST"]
+index = ["index.html", "form.html", "HTTPRequest.cpp"]
+extensions = [".php", ".py"]
+interpreter = "/usr/bin/env"
 
 [[servers.routes]]
 path = "/old-site"

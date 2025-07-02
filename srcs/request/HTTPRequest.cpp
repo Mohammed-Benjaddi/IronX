@@ -305,6 +305,7 @@ void HTTPRequest::executeCGI(Route &route)
         std::vector<std::string>::iterator it = std::find(extensions.begin(), extensions.end(), path_ext);
         if (it == extensions.end())
         {
+            exit(99);
             setStatusCode(404);
             setStatusMessage("Not Found");
             setPath(getErrorPages(getStatusCode()));

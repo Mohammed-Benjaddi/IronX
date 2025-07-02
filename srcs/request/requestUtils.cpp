@@ -55,6 +55,7 @@ int copyToRoute(HTTPRequest &request, Route &route, std::map<std::string, Route>
         path = std::string(buffer);
     else
         path = "";
+    std::cout << "path + root: " << path + it->second.getRootDir() << std::endl;
     route.setRootDir(path + it->second.getRootDir());
     route.setIndexFiles(it->second.getIndexFiles());
     if (it->second.getAllowedMethods().find(request.getMethod()) == it->second.getAllowedMethods().end()) {
