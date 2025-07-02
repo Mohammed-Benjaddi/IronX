@@ -17,7 +17,7 @@ hostnames = ["example.com", "www.example.com"  ]
 
 [[servers.routes]]
 path = "/"
-root = "/www"  	# Base directory for files
+root = "/"  	# Base directory for files
 index = ["index.html"]		# Requirement: "Set a default file  to serve when the request is for a directory"
 methods = ["GET",  "POST"] 	# Requirement: "Define a list of accepted HTTP methods"
 autoindex = true 			# Requirement: "Enable or disable directory listing"
@@ -31,7 +31,7 @@ interpreter = "/usr/bin/php-cgi"
 
 [[servers.routes]]
 path = "/new-site"
-root = "/www"
+root = "/tests"
 methods = ["GET", "POST"]
 index = ["index.html", "form.html"]
 extensions = [".php", ".py"]

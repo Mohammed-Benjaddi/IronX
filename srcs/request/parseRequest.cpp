@@ -66,12 +66,8 @@ int parse( HTTPRequest &request, std::vector<char> &req) {
   std::stringstream ss(headers);
   request.setErrorPages(request.getConfig()->getErrorPages());
   char buffer[BUFSIZ];
-  if (getcwd(buffer, sizeof(buffer)) != NULL) {
-    //std::cout << "=====> " << std::string(buffer) << std::endl;
+  if (getcwd(buffer, sizeof(buffer)) != NULL)
     request.setRootDir(std::string(buffer) + "/www");
-  }
-  else
-      request.setRootDir("");
   std::getline(ss, line);
   if (find_method_uri(request, line) == -1)
     return -1;
