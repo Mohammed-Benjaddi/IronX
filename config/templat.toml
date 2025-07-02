@@ -1,7 +1,8 @@
 [  global ]  
 
-max_body_size = 1048576
-
+max_body_size = 300000000
+# 1048772
+# 1048766
 [default_error_pages]
 
 400 = "/errors/400.html" # Bad Request
@@ -31,7 +32,7 @@ interpreter = "/usr/bin/php-cgi"
 
 [[servers.routes]]
 path = "/new-site"
-root = "/tests"
+root = "/"
 methods = ["GET", "POST"]
 index = ["index.html", "form.html"]
 extensions = [".php", ".py"]

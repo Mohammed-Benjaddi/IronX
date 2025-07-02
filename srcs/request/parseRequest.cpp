@@ -76,14 +76,21 @@ int parse( HTTPRequest &request, std::vector<char> &req) {
     request.setHeaders(line);
   }
   
-  std::vector<char>::iterator bodyStart = it + 4; // skip \r\n\r\n
+  std::vector<char>::iterator bodyStart = it + 4;
   if (bodyStart < req.end()) {
     std::vector<char> body(bodyStart, req.end());
     request.setBody(body);
   } else {
-    // Optional: set empty body if nothing present
     std::vector<char> emptyBody;
     request.setBody(emptyBody);
+  }
+
+  std::cout << "body size: " << request.getBody().size() << std::endl;
+  if(request.getBody().size() > request.getConfig()->getMaxBodySize()) {
+    std::cout << "waaa3" << std::endl;
+    request.setStatusCode(413);
+    request.setStatusMessage("Payload Too Large");
+    return -1;
   }
 
   return 1;
@@ -223,7 +230,7 @@ std::vector<FormFile> parseMultipartFormData(const std::vector<char> &body, cons
                 }
             }
         }
-        std::vector<char>::const_iterator contentStart = headerEnd + 4; // skip \r\n\r\n
+        std::vector<char>::const_iterator contentStart = headerEnd + 4;
         std::vector<char>::const_iterator nextBoundary = std::search(contentStart, body.end(), 
                                                                       boundaryMarker.begin(), boundaryMarker.end());
         std::vector<char>::const_iterator contentEnd = nextBoundary;
@@ -231,8 +238,9 @@ std::vector<FormFile> parseMultipartFormData(const std::vector<char> &body, cons
             contentEnd -= 2;
         }
         if (!file.filename.empty()) {
-            file.data.assign(contentStart, contentEnd);
-            files.push_back(file);
+          contentEnd -= (boundary.size() + 3);
+          file.data.assign(contentStart, contentEnd);
+          files.push_back(file);
         }
         pos = nextBoundary;
     }

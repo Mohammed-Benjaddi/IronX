@@ -75,7 +75,6 @@ void CGI::executeCGI()
 {
     int pipe_fd[2];
     int stdin_pipe[2];
-
     if (pipe(pipe_fd) == -1 || pipe(stdin_pipe) == -1)
     {
         request.setStatusCode(500);

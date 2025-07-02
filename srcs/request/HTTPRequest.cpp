@@ -1,26 +1,18 @@
 #include "HTTPRequest.hpp"
 
 HTTPRequest::HTTPRequest(std::vector<char> &raw_request, WebServerConfig *_config, int _clientId) : IHTTPMessage(), config(_config), clientId(_clientId), cgi(NULL) {
-    // std::cout << "-----------\n";
-    // std::cout << "size: " << raw_request.size() << "\n";
-    // std::cout << "-----------\n";
+    cgi = NULL;
     if (parse(*this, raw_request) == -1)
         return;      
-
-    std::map<std::string, std::string> headers = getHeaders();
-    // std::map<std::string, std::string>::iterator it = headers.begin();
-
-    // while(it != headers.end()) {
-    //     std::cout << it->first << ": " << it->second << std::endl;
-    //     it++;
-    // }
- 
     if (checkAllowedMethods(*this) == -1)
         return;
     handleRequest();
 }
 
-HTTPRequest::~HTTPRequest() {}
+HTTPRequest::~HTTPRequest() {
+    if(this->cgi != NULL)
+        delete cgi;
+}
 
 void HTTPRequest::setMethod(const std::string &method) {
     this->method = method;
@@ -291,6 +283,10 @@ void HTTPRequest::handleRequest()
         handlePOST(routes, route);
     else if (getMethod() == "DELETE")
         handleDELETE(routes, route);
+    else {
+        setStatusCode(400);
+        setStatusMessage("Bad Request");
+    }
 }
 
 void HTTPRequest::executeCGI(Route &route)
@@ -305,9 +301,8 @@ void HTTPRequest::executeCGI(Route &route)
         std::vector<std::string>::iterator it = std::find(extensions.begin(), extensions.end(), path_ext);
         if (it == extensions.end())
         {
-            exit(99);
-            setStatusCode(404);
-            setStatusMessage("Not Found");
+            setStatusCode(403);
+            setStatusMessage("Forbidden");
             setPath(getErrorPages(getStatusCode()));
         } else {
             cgi = new CGI(*this, route);

@@ -138,13 +138,14 @@ void directoryHasIndexFiles(HTTPRequest &request, Route &route, std::vector<std:
 
 void pathIsFile(HTTPRequest &request, std::map<std::string, Route> &routes, Route &route) {
     (void) routes;
+
     std::string filePath = (route.getRootDir() + "/" + request.getPath());
     if (!isFileExist((filePath).c_str())) {
         request.setStatusCode(404);
-
         request.setStatusMessage("Not Found");
         request.setFileContent("");
         // request.setPath(request.getRootDir() + "/errors/404.html");
+        std::cout << "error page: " << request.getErrorPages(request.getStatusCode()) << std::endl;
         request.setPath(request.getErrorPages(request.getStatusCode()));
         return;
     }
@@ -277,37 +278,22 @@ bool isDirectoryEmpty(std::string path) {
 }
 
 void uploadFiles(HTTPRequest &request) {
-    //std::cout << "upload a file" << std::endl;
     std::vector<FormFile> files = request.getFormFiles();
-    if(files.empty()) {
-        //std::cout << "no files found" << std::endl;
-    }
-
     char buffer[1024];
     std::string new_path, original_path;
     if (getcwd(buffer, sizeof(buffer)) != NULL) {
         original_path = std::string(buffer);
         new_path = original_path + "/www" + request.getLocation();
     }
-    //std::cout << "new path: " << new_path << std::endl;
-        // path = std::string(buffer) + "/www";
-    // int newDir = chdir((request.getRootDir() + "/" + request.getLocation()).c_str());
     int newDir = chdir(new_path.c_str());
-    if (newDir < 0) {
-        //std::cout << "chdir failed: " << new_path << std::endl;
+    if (newDir < 0)
         return;
+    for(size_t i = 0; i < files.size(); i++) {
+        std::ofstream file(files[i].filename.c_str(), std::ios::binary);
+        file.write(&files[i].data[0], files[i].data.size());
+        file.close();
     }
-    // loop
-    std::ofstream file(files[0].filename.c_str(), std::ios::binary);
-    file.write(&files[0].data[0], files[0].data.size());
-    file.close();
-    //std::cout << "filename: " << files[0].filename << std::endl;
     request.setStatusCode(201);
     request.setStatusMessage("Created");
     chdir(original_path.c_str());
-    //
-    // ! * warning: the loop for debugging, it must be deleted later
-    // while(1) {
-
-    // }
 }
