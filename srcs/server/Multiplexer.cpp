@@ -2,9 +2,9 @@
 
 void	Multiplexer::poll_create() {
     /* Create an epoll instance */
-    epoll_fd = epoll_create1(0);
+    epoll_fd = epoll_create(1);
     if (epoll_fd == -1) {
-        perror("epoll_create failed");
+        std::cerr << "epoll_create failed " <<  std::endl;
         throw std::runtime_error("Failed to create epoll instance");
     }
 }

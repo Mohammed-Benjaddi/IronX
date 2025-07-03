@@ -49,13 +49,14 @@ void	ServerSocket::non_block() {
 	int flags = fcntl(this->_fd, F_GETFL, 0);
 
 	if (flags == -1) {
-		perror("fcntl Failure");
+		std::cerr << "fcntl Failure" << std::endl;
 		close(this->_fd);
 		throw std::runtime_error("Failure (Socket flag Retreival)");
 	};
 
 	if (fcntl(this->_fd, F_SETFL, flags | O_NONBLOCK) == -1) {
-		perror("fcntl(F_SETFL) failed");
+		std::cerr << "fcntl(F_SETFL) failed" << std::endl;
+
         close(this->_fd);
         throw std::runtime_error("Failed to set socket to non-blocking");
 	}
@@ -67,29 +68,44 @@ void	ServerSocket::non_block() {
 	}
 }
 
-//! to be handled ---- failure of one 
-void	ServerSocket::bind_socket() {
-//? 1. Set up address structure
-	struct sockaddr_in addr;
-	memset(&addr, 0 , sizeof(addr));
-	addr.sin_family = AF_INET;
-	//* Converting a string ip to bnf using inet_pton and setting s_addr
+void	*ft_memset(void *b, int c, size_t len)
+{
+	size_t	i;
 
-	if (inet_pton(AF_INET, this->_host.c_str(), &addr.sin_addr) != 1) {
-    	close(this->_fd);
-		throw std::runtime_error("Invalid IP Address - Check Network Config");
+	i = 0;
+	while (i < len)
+	{
+		*(unsigned char *)((unsigned char*)b + i) = (unsigned char)(c);
+		i++;
 	}
-
-	addr.sin_port = htons(this->_port); // port to network byte order
-	//? 2. bind socket
-	////std::cout << "Attempting to bind " << this->_host << ":" << this->_port << std::endl;
-	if (bind(this->_fd, (struct sockaddr*)&addr, sizeof(addr)) == -1) {
-		close(this->getFd());
-		throw std::runtime_error("bind() failed");
-	}
-	////std::cout << "Socket bound to port " << this->_port << std::endl;
+	return (b);
 }
 
+void ServerSocket::bind_socket() {
+	struct addrinfo hints;
+	struct addrinfo* res = NULL;
+
+	ft_memset(&hints, 0, sizeof(hints));
+	hints.ai_family = AF_INET; // Only IPv4 (like inet_pton was doing)
+	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_flags = AI_PASSIVE; // For binding
+
+	std::string port_str = std::to_string(this->_port);
+	int status = getaddrinfo(this->_host.c_str(), port_str.c_str(), &hints, &res);
+
+	if (status != 0 || res == NULL) {
+		close(this->_fd);
+		throw std::runtime_error("getaddrinfo failed: " + std::string(gai_strerror(status)));
+	}
+
+	if (bind(this->_fd, res->ai_addr, res->ai_addrlen) == -1) {
+		freeaddrinfo(res);
+		close(this->_fd);
+		throw std::runtime_error("bind() failed");
+	}
+
+	freeaddrinfo(res);
+}
 void	ServerSocket::init_listen() {
 	const int backlog = 128; //* max num of pending connections (queue for pending connections)
 	//* Serve calls accept() and takes the first waiting connection

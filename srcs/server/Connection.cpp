@@ -236,7 +236,7 @@ void Connection::re_armFd() {
     }
 
     if (epoll_ctl(_epoll_fd, EPOLL_CTL_MOD, _fd, &ev) == -1) {
-        perror("epoll_ctl: re_armFd");
+        std::cerr << "epoll_ctl: re_armFd" << std::endl;
         _closed = true;
     }
 }

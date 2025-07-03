@@ -1,6 +1,6 @@
 [  global ]  
 
-max_body_size = 300000000
+max_body_size = 100000000000000000000
 # 1048772
 # 1048766
 [default_error_pages]
@@ -13,7 +13,7 @@ max_body_size = 300000000
 
 [[servers]]
 host = "0.0.0.0" # Listen on all available network interfaces
-port = [8080, 4142, 1323] # Listen on port 8080
+port = [10093] # Listen on port 8080
 hostnames = ["example.com", "www.example.com"  ]
 
 [[servers.routes]]
