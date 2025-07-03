@@ -4,7 +4,7 @@
 
 # Compiler settings
 CXX      := c++
-CXXFLAGS :=  -Wall -Wextra -Werror 
+CXXFLAGS :=  -Wall -Wextra -Werror -g
 INCLUDES := -Iheaders
 
 # Project name
@@ -18,6 +18,10 @@ RESP_DIR := $(SRC_DIR)/response
 SERV_DIR := $(SRC_DIR)/server
 CGI_DIR := $(SRC_DIR)/CGI
 OBJ_DIR  := obj
+
+IMAGE_NAME := webserv_image
+CONTAINER_NAME := webserv_container
+
 
 # Source files (verify these paths match your actual files)
 MAIN_SRC := webserv.cpp
@@ -36,6 +40,11 @@ SERV_OBJS := $(patsubst $(SERV_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(wildcard $(SERV_DIR)/
 CGI_OBJS := $(patsubst $(CGI_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(wildcard $(CGI_DIR)/*.cpp))
 
 OBJS     := $(MAIN_OBJ) $(VAL_OBJS) $(REQ_OBJS) $(RESP_OBJS) $(SERV_OBJS) $(CGI_OBJS)
+
+
+# make all           # builds the binary locally
+# make docker-build  # builds docker image with binary inside
+# make docker-run    # runs docker container with your server
 
 # Main build rule
 all: $(NAME)
@@ -87,6 +96,13 @@ clean:
 fclean: clean
 	@echo "🗑️ Removing executable..."
 	@rm -f $(NAME)
+
+docker-build:
+	docker build -t $(IMAGE_NAME) .
+
+docker-run:
+	-docker rm -f $(CONTAINER_NAME)
+	docker run --name $(CONTAINER_NAME) -it --network=host  $(IMAGE_NAME) /bin/bash
 
 re: fclean all
 

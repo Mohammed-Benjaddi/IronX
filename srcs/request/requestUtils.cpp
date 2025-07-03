@@ -53,7 +53,7 @@ int copyToRoute(HTTPRequest &request, Route &route, std::map<std::string, Route>
     std::string path;
     if (getcwd(buffer, sizeof(buffer)) != NULL)
         path = std::string(buffer) + "/www";
-    std::cout << "path + root: " << path << " | " + it->second.getRootDir() << std::endl;
+    // std::cout << "path + root: " << path << " | " + it->second.getRootDir() << std::endl;
     route.setRootDir(path + it->second.getRootDir());
     route.setIndexFiles(it->second.getIndexFiles());
     if (it->second.getAllowedMethods().find(request.getMethod()) == it->second.getAllowedMethods().end()) {
@@ -145,7 +145,7 @@ void pathIsFile(HTTPRequest &request, std::map<std::string, Route> &routes, Rout
         request.setStatusMessage("Not Found");
         request.setFileContent("");
         // request.setPath(request.getRootDir() + "/errors/404.html");
-        std::cout << "error page: " << request.getErrorPages(request.getStatusCode()) << std::endl;
+        // std::cout << "error page: " << request.getErrorPages(request.getStatusCode()) << std::endl;
         request.setPath(request.getErrorPages(request.getStatusCode()));
         return;
     }
@@ -189,7 +189,7 @@ void DELETEDirectory(HTTPRequest &request, std::map<std::string, Route> &routes,
 void pathIsDirectory(HTTPRequest &request, std::map<std::string, Route> &routes, Route &route, const std::string &_path) {
     (void) routes;
     DIR *dir;
-    std::cout << "---> " << (route.getRootDir() + "/" + (_path == "/" ? "" : _path)) << std::endl;
+    // std::cout << "---> " << (route.getRootDir() + "/" + (_path == "/" ? "" : _path)) << std::endl;
     // exit(99);
     if((dir = opendir((route.getRootDir() + "/" + (_path == "/" ? "" : _path)).c_str())) != NULL) {
         const std::vector<std::string> index_files = route.getIndexFiles();

@@ -85,12 +85,25 @@ void    Multiplexer::make_fd_non_blocking(int fd) {
     }
 }
 
-void    Multiplexer::add_fd_to_epoll(int fd, uint32_t events) {
+// void    Multiplexer::add_fd_to_epoll(int fd, uint32_t events) {
+//     struct epoll_event ev;
+//     ev.events = events;
+//     ev.data.fd = fd;
+//     if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, fd, &ev) == -1) {
+//         std::cerr << "epoll_ctl client_fd" << std::endl;
+//         close(fd);
+//         throw std::runtime_error("Failed to add client fd to epoll (Action; Closed Client Fd)");
+//     }
+// }
+
+void Multiplexer::add_fd_to_epoll(int fd, uint32_t events) {
     struct epoll_event ev;
     ev.events = events;
     ev.data.fd = fd;
+
     if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, fd, &ev) == -1) {
-        std::cerr << "epoll_ctl client_fd" << std::endl;
+        std::cerr << "epoll_ctl failed: " << strerror(errno) << std::endl;
+        std::cerr << "epoll_fd: " << epoll_fd << ", fd: " << fd << ", events: " << events << std::endl;
         close(fd);
         throw std::runtime_error("Failed to add client fd to epoll (Action; Closed Client Fd)");
     }

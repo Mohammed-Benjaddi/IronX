@@ -271,11 +271,11 @@ void HTTPRequest::handleRequest()
     
     setFileExtension(getPath());
     
-    std::cout << "method: " << getMethod() << std::endl;
-    std::cout << "path: " << getPath() << std::endl;
-    std::cout << "location: " << getLocation() << std::endl;
-    std::cout << "root dir: " << route.getRootDir() << std::endl;
-    std::cout << "file extension: " << getFileExtension() << std::endl;
+    // std::cout << "method: " << getMethod() << std::endl;
+    // std::cout << "path: " << getPath() << std::endl;
+    // std::cout << "location: " << getLocation() << std::endl;
+    // std::cout << "root dir: " << route.getRootDir() << std::endl;
+    // std::cout << "file extension: " << getFileExtension() << std::endl;
 
     if (getMethod() == "GET")
         handleGet(routes, route);

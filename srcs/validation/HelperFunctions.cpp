@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HelperFunctions.cpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ael-maaz <ael-maaz@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nhayoun <nhayoun@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 17:32:43 by ael-maaz          #+#    #+#             */
-/*   Updated: 2025/06/12 20:34:10 by ael-maaz         ###   ########.fr       */
+/*   Updated: 2025/07/03 17:17:43 by nhayoun          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ std::string checkBracketLabel(std::string label)
 std::string removeSpaces(const std::string& s)
 {
 	size_t start = s.find_first_not_of(" ",1);
-	std::cout <<start << std::endl;
+	// std::cout <<start << std::endl;
     if (start == std::string::npos)
         return "";
     // size_t end = s.find_last_not_of(" \t\r\n");

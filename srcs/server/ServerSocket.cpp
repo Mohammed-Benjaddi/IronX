@@ -19,8 +19,8 @@ ServerSocket::ServerSocket(const std::string& ip, uint16_t port, int clusterId) 
 
 ServerSocket::~ServerSocket() {
 	// if (this->_fd != -1) {
-	// 	// //std::cout << "Server Socket Destroyed due to failure of one!" << std::endl;
-	// 	close(_fd);
+	// 	close(this->_fd);
+	// 	this->_fd = -1;
 	// }
 };
 

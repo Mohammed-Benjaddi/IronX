@@ -6,7 +6,7 @@
 /*   By: nhayoun <nhayoun@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 17:38:54 by ael-maaz          #+#    #+#             */
-/*   Updated: 2025/07/01 20:32:54 by nhayoun          ###   ########.fr       */
+/*   Updated: 2025/07/03 17:18:00 by nhayoun          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -624,7 +624,7 @@ int Parser::MainParser(std::string path, WebServerConfig& conf)
 		OpenTomlFile(path);
 		parseTOML(path, conf);
 		validateAndFixConfig(conf);
-		printConfigs(conf);
+		// printConfigs(conf);
 		
 
 		// this->lines = ReadLines();

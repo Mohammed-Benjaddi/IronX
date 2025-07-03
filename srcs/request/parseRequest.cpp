@@ -85,9 +85,9 @@ int parse( HTTPRequest &request, std::vector<char> &req) {
     request.setBody(emptyBody);
   }
 
-  std::cout << "body size: " << request.getBody().size() << std::endl;
+  // std::cout << "body size: " << request.getBody().size() << std::endl;
   if(request.getBody().size() > request.getConfig()->getMaxBodySize()) {
-    std::cout << "waaa3" << std::endl;
+    // std::cout << "waaa3" << std::endl;
     request.setStatusCode(413);
     request.setStatusMessage("Payload Too Large");
     return -1;
