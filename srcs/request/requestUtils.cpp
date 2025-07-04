@@ -241,7 +241,7 @@ std::vector<std::string> getDirectoryListing(const std::string& path, bool show_
                 filename += "/";
             }
             entries.push_back(filename);
-            std::cout << "filename: " << filename << std::endl;
+            // std::cout << "filename: " << filename << std::endl;
         }
         closedir(dir);
         std::sort(entries.begin(), entries.end());

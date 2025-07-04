@@ -124,6 +124,14 @@ std::string HTTPResponse::getNextChunk() {
     return "";
 }
 
+std::string normalizePath(const std::string& base, const std::string& entry) {
+    std::string result = base;
+    if (!result.empty() && result.back() != '/')
+        result += "/";
+    result += entry;
+    return result;
+}
+
 void HTTPResponse::buildAutoIndexResponse(HTTPRequest *request) {
 
     std::string location = request->getLocation();
@@ -131,6 +139,9 @@ void HTTPResponse::buildAutoIndexResponse(HTTPRequest *request) {
     std:: string rootPath = request->getRootDir();
 
     std::string relative = getRelativePath(curPath, rootPath);
+
+
+    // exit(0);
 
     std::string directoryPath = curPath.substr(0, curPath.find_last_of("/\\"));
     std::vector<std::string> entries = getDirectoryListing(directoryPath, false);
@@ -147,10 +158,16 @@ void HTTPResponse::buildAutoIndexResponse(HTTPRequest *request) {
 
     for (std::vector<std::string>::const_iterator it = entries.begin(); it != entries.end(); ++it) {
         const std::string& entry = *it;
-        const std::string entryPathToRoute = relative + "/" + entry;
+        const std::string entryPathToRoute = relative.substr(1) +  + "/" + entry;
         const std::string absolutePath = rootPath + relative + "/" + entry;
 
         size_t size = getFileSize(absolutePath);
+        std::cout << "location: " << location << std::endl;
+        std::cout << "curPath: " << curPath << std::endl;
+        std::cout << "rootPath: " << rootPath << std::endl;
+        std::cout << "relative: " << relative << std::endl;
+        std::cout << "entry: " << entry << std::endl;
+        std::cout << "absolutePath: " << absolutePath << std::endl;
         html << "<tr><td><a class=\"td a\" href=\"" << entryPathToRoute << "\">📂 " << entry << "</a></td>";
         html << "<td class=\"td\">" << size << " B</td></tr>\n";
     }

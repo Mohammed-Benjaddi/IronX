@@ -63,52 +63,68 @@ bool    handleCGI(HTTPRequest *req, HTTPResponse *res) {
     return false;
 }
 
-void buildResponse(HTTPRequest* req, HTTPResponse* res) {
-    int status = req->getStatusCode();
-    int size = getFileSize(req->getPath());
+bool    fileExists(std::string fullPath) {
+    std::ifstream file(fullPath.c_str());
 
-    if (handleCGI(req, res) ) {
+    return file.good();
+}
+
+void buildResponse(HTTPRequest* req, HTTPResponse* res) {
+
+    const std::string connection = "keep-alive";
+    const std::string contentType = "text/html";
+
+    int status = req->getStatusCode();
+    std::string path = req->getPath();
+
+    bool hasFile = fileExists(path);
+    int fileSize = hasFile ? getFileSize(path) : 0;
+
+    if (handleCGI(req, res)) {
         return;
     }
 
-    std::string connection = "keep-alive";
-    std::string contentType = "text/html";
-
     if (status == 9999) {
-        res->setStatus(200, "OK");
+        req->setStatusCode(200);
         res->setHeader("Content-Type", contentType);
-        res->setHeader("Content-Length", toString(size));
         res->setHeader("Connection", connection);
         res->buildAutoIndexResponse(req);
-        res->setStreamer(new FileStreamer(req->getPath(), connection));
+        if (hasFile)
+            res->setStreamer(new FileStreamer(path, connection));
         return;
     }
 
     switch (status) {
+        case 200:
+        case 301:
+        case 403:
+        case 404:
+        case 405:
         case 508:
             res->setStatus(status, req->getStatusMessage());
             res->setHeader("Content-Type", contentType);
-            res->setHeader("Content-Length", toString(size));
             res->setHeader("Connection", connection);
-            break;
-        case 404:
-        case 403:
-        case 405:
-        case 301:
-        case 200:
-            res->setStatus(status, req->getStatusMessage());
-            res->setHeader("Content-Type", contentType);
-            res->setHeader("Content-Length", toString(size));
-            res->setHeader("Connection", connection);
-            res->setStreamer(new FileStreamer(req->getPath(), connection));
+            if (hasFile) {
+                res->setHeader("Content-Length", toString(fileSize));
+                res->setStreamer(new FileStreamer(path, connection));
+            } else {
+                std::string html = "<html><body><h1>" + toString(status) + " " + req->getStatusMessage() + "</h1></body></html>";
+                res->setBody(html);
+                res->setHeader("Content-Length", toString(html.size()));
+            }
             return;
+
+        default:
+            break;
     }
 
+    std::string errBody = "<html><body><h1>500 Internal Server Error</h1></body></html>";
     res->setStatus(500, "Internal Server Error");
-    res->setHeader("Content-Type", connection);
-    res->setHeader("Content-Length", toString(size));
+    res->setHeader("Content-Type", contentType);
+    res->setHeader("Content-Length", toString(errBody.size()));
     res->setHeader("Connection", "close");
-} 
+    res->setBody(errBody);
+}
 
 void printResponse(HTTPResponse* res, HTTPRequest* req) {
     if (!res || !req) {
