@@ -41,14 +41,14 @@ void ServerLauncher::launch(const WebServerConfig &config) {
     }
 
     // Append the collected host entries to the known_hosts file
-    std::ofstream knownHostsFile("/etc/hosts", std::ios::app);
-    if (!knownHostsFile.is_open()) {
-        std::cerr << "Failed to open known_hosts file for appending.\n";
-        return;
-    }
+    // std::ofstream knownHostsFile("/etc/hosts", std::ios::app);
+    // if (!knownHostsFile.is_open()) {
+    //     std::cerr << "Failed to open known_hosts file for appending.\n";
+    //     return;
+    // }
 
-    knownHostsFile << hostsStream.str();
-    knownHostsFile.close();
+    // knownHostsFile << hostsStream.str();
+    // knownHostsFile.close();
 }
 
 const	std::vector<ServerSocket>&	ServerLauncher::getSockets() {

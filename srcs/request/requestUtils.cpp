@@ -55,7 +55,7 @@ int copyToRoute(HTTPRequest &request, Route &route, std::map<std::string, Route>
         path = std::string(buffer) + "/www";
     // std::cout << "path + root: " << path << " | " + it->second.getRootDir() << std::endl;
     route.setRootDir(path + it->second.getRootDir());
-    route.setIndexFiles(it->second.getIndexFiles());
+    route.setIndexFiles(it->second.getIndexFiles());    
     if (it->second.getAllowedMethods().find(request.getMethod()) == it->second.getAllowedMethods().end()) {
         request.setStatusCode(405);
         request.setStatusMessage("Method Not Allowed");
@@ -164,7 +164,7 @@ void pathIsFile(HTTPRequest &request, std::map<std::string, Route> &routes, Rout
 void DELETEDirectory(HTTPRequest &request, std::map<std::string, Route> &routes, Route &route, const std::string &_path) {
     DIR *dir;
     (void) routes;
-   
+
     std::string location = "/" + route.getRootDir() + "/" + _path;
     if ((dir = opendir(location.c_str())) == NULL) {
         request.setStatusCode(403);
@@ -241,6 +241,7 @@ std::vector<std::string> getDirectoryListing(const std::string& path, bool show_
                 filename += "/";
             }
             entries.push_back(filename);
+            std::cout << "filename: " << filename << std::endl;
         }
         closedir(dir);
         std::sort(entries.begin(), entries.end());

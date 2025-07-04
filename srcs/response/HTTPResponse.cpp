@@ -151,7 +151,6 @@ void HTTPResponse::buildAutoIndexResponse(HTTPRequest *request) {
         const std::string absolutePath = rootPath + relative + "/" + entry;
 
         size_t size = getFileSize(absolutePath);
-
         html << "<tr><td><a class=\"td a\" href=\"" << entryPathToRoute << "\">📂 " << entry << "</a></td>";
         html << "<td class=\"td\">" << size << " B</td></tr>\n";
     }

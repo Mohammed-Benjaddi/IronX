@@ -73,6 +73,11 @@ void HTTPRequest::setLocation(const std::string &location)
     this->location = extractDirectory(location);
 }
 
+void HTTPRequest::setRedirectedFrom(const std::string &location)
+{
+    this->redirected_from = location;
+}
+
 void HTTPRequest::setFormFile(std::vector<FormFile> &formFiles)
 {
     this->formFiles = formFiles;
@@ -135,6 +140,11 @@ std::vector<char> HTTPRequest::getBody() const
 std::string HTTPRequest::getLocation() const
 {
     return location;
+}
+
+std::string HTTPRequest::getRedirectedFrom() const
+{
+    return redirected_from;
 }
 
 std::map<std::string, std::string> HTTPRequest::getHeaders() const
@@ -330,7 +340,14 @@ void HTTPRequest::handleDELETE(std::map<std::string, Route> &routes, Route &rout
 void HTTPRequest::RedirectionFound(Route &route) {
     std::string a = getPath(), b = getLocation();
     setPath(route.getRedirect());
+    if(getRedirectedFrom() == getPath()) {
+        setStatusCode(508);
+        setStatusMessage("Loop Detected");
+        return;
+    }
+    setRedirectedFrom(getLocation());
     setLocation(getPath());
+
     setStatusCode(301);
     setStatusMessage("Moved Permanently");
     setMethod("GET");

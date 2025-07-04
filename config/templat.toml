@@ -33,10 +33,12 @@ interpreter = "/usr/bin/php-cgi"
 [[servers.routes]]
 path = "/new-site"
 root = "/"
-methods = ["GET", "POST"]
-index = ["index.html", "form.html"]
+methods = ["GET", "GET"]
+# index = ["file.html", "form.html"]
+# redirect = "/old-site"
 extensions = [".php", ".py"]
 interpreter = "/usr/bin/env"
+autoindex = true
 
 [[servers.routes]]
 path = "/request"
@@ -48,24 +50,27 @@ interpreter = "/usr/bin/env"
 
 [[servers.routes]]
 path = "/old-site"
-redirect = "https://new.example.com"
-methods = ["GET"]
+root = "/"
+# redirect = "/"
+methods = ["POST"]
+index = ["index.html", "form.html"]
+# methods = ["GET"]
 
-[[     servers]]
-host = "0.0.0.0"
-port = 8081
+# [[     servers]]
+# host = "0.0.0.0"
+# port = 8081
 
-hostnames = ["api.example.com", "beta.example.com"]
+# hostnames = ["api.example.com", "beta.example.com"]
 
-[[         servers.routes    ]]
-path = "/"
-root = "/var/www/api"
-index = ["api.php"]
-methods = ["GET", "POST", "DELETE"]
+# [[         servers.routes    ]]
+# path = "/"
+# root = "/var/www/api"
+# index = ["api.php"]
+# methods = ["GET", "POST", "DELETE"]
 
-[[servers.routes]]
-path = "/cgi"
-root = "/var/www/cgi-bin"
-methods = ["GET", "POST"]
-extensions = [".php", ".py"]
-interpreter = "/usr/bin/php-cgi"
+# [[servers.routes]]
+# path = "/cgi"
+# root = "/var/www/cgi-bin"
+# methods = ["GET", "POST"]
+# extensions = [".php", ".py"]
+# interpreter = "/usr/bin/php-cgi"
