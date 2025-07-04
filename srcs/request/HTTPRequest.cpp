@@ -1,7 +1,6 @@
 #include "HTTPRequest.hpp"
 
 HTTPRequest::HTTPRequest(std::vector<char> &raw_request, WebServerConfig *_config, int _clientId) : IHTTPMessage(), config(_config), clientId(_clientId), cgi(NULL) {
-    cgi = NULL;
     if (parse(*this, raw_request) == -1)
         return;      
     if (checkAllowedMethods(*this) == -1)
@@ -10,7 +9,7 @@ HTTPRequest::HTTPRequest(std::vector<char> &raw_request, WebServerConfig *_confi
 }
 
 HTTPRequest::~HTTPRequest() {
-    if(this->cgi != NULL)
+    if (this->cgi != NULL)
         delete cgi;
 }
 

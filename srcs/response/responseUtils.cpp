@@ -72,13 +72,17 @@ bool    fileExists(std::string fullPath) {
 void buildResponse(HTTPRequest* req, HTTPResponse* res) {
 
     const std::string connection = "keep-alive";
+
     const std::string contentType = "text/html";
+
 
     int status = req->getStatusCode();
     std::string path = req->getPath();
 
     bool hasFile = fileExists(path);
     int fileSize = hasFile ? getFileSize(path) : 0;
+
+    std::cout << "CGI:" << ((req->getCGI()) ? "Yes\n" : "NO\n");
 
     if (handleCGI(req, res)) {
         return;
@@ -117,7 +121,6 @@ void buildResponse(HTTPRequest* req, HTTPResponse* res) {
         default:
             break;
     }
-
     std::string errBody = "<html><body><h1>500 Internal Server Error</h1></body></html>";
     res->setStatus(500, "Internal Server Error");
     res->setHeader("Content-Type", contentType);

@@ -33,7 +33,7 @@ interpreter = "/usr/bin/php-cgi"
 [[servers.routes]]
 path = "/new-site"
 root = "/"
-methods = ["GET", "GET"]
+methods = ["GET", "POST"]
 # index = ["file.html", "form.html"]
 # redirect = "/old-site"
 extensions = [".php", ".py"]

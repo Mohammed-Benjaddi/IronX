@@ -3,7 +3,7 @@ import signal
 import time
 import os
 
-BINARY = "./webserv"  # Change this to your executable if needed
+BINARY = "./webserv config/templat.toml"  # Change this to your executable if needed
 
 def build():
     print("\033[94m[BUILDING...]\033[0m")
@@ -16,6 +16,9 @@ def build():
     return True
 
 def run():
+    if not os.path.exists(BINARY):
+        print(f"\033[91m[BINARY NOT FOUND: {BINARY}]\033[0m")
+        return None
     print("\033[92m[RUNNING... Ctrl+C to restart]\033[0m")
     return subprocess.Popen(BINARY)
 
@@ -26,6 +29,9 @@ def main():
             continue
 
         proc = run()
+        if proc is None:
+            time.sleep(1)
+            continue
 
         try:
             proc.wait()
