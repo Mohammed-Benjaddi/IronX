@@ -85,6 +85,12 @@ void buildResponse(HTTPRequest* req, HTTPResponse* res) {
     }
 
     switch (status) {
+        case 508:
+            res->setStatus(status, req->getStatusMessage());
+            res->setHeader("Content-Type", contentType);
+            res->setHeader("Content-Length", toString(size));
+            res->setHeader("Connection", connection);
+            break;
         case 404:
         case 403:
         case 405:
