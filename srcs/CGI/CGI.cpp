@@ -144,6 +144,8 @@ void CGI::executeCGI()
 
         if (WIFEXITED(status) && WEXITSTATUS(status) == 0) {
            //std::cout << "the script executed successfully" << std::endl;
+
+           // * 
             script_output = output;
             request.setStatusCode(200);
             request.setStatusMessage("Ok");

@@ -20,7 +20,7 @@ hostnames = ["example.com", "www.example.com"  ]
 path = "/"
 root = "/"  	# Base directory for files
 index = ["index.html"]		# Requirement: "Set a default file  to serve when the request is for a directory"
-methods = ["GET",  "POST"] 	# Requirement: "Define a list of accepted HTTP methods"
+methods = ["GET"] 	# Requirement: "Define a list of accepted HTTP methods"
 autoindex = true 			# Requirement: "Enable or disable directory listing"
 
 [[servers.routes]]

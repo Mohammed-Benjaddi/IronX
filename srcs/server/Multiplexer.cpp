@@ -142,7 +142,6 @@ void Multiplexer::handle_client_event(int fd, uint32_t event) {
             conn.handleWrite();
 
 	} catch (const std::exception &e) {
-        // std::cerr << "Client with fd " << fd << " had a critical event: " << e.what() << std::endl;
         Multiplexer::close_connection(fd);
 	}
 }

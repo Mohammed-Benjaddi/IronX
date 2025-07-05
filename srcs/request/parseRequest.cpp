@@ -41,12 +41,12 @@ int checkAllowedMethods(HTTPRequest &request) {
 // }
 
 bool URIHasUnallowedChar(std::string uri) {
-  const std::string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_-~/?#[]@!$$('*+,'=%.&";
+  const std::string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_-~/?#[]@!$$()'*+,'=%.&";
   const std::vector<char> allowedChars(chars.begin(), chars.end());
   
   for(size_t i = 0; i < uri.size(); i++) {
     if(std::find(allowedChars.begin(), allowedChars.end(), uri[i]) == allowedChars.end()) {
-       //std::cout << "unallowed char ---> " << uri[i] << std::endl;
+       std::cout << "unallowed char ---> " << uri[i] << std::endl;
         return true;
     }
   }
@@ -102,6 +102,7 @@ bool checkRequestURI(HTTPRequest &request, std::string uri) {
       request.setStatusCode(400);
       request.setStatusMessage("Bad request");
       request.setPath(request.getErrorPages(400));
+      exit(99);
       return false;
   }
   // 414 Request-URI Too Long

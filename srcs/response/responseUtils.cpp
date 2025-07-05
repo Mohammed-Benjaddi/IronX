@@ -82,8 +82,6 @@ void buildResponse(HTTPRequest* req, HTTPResponse* res) {
     bool hasFile = fileExists(path);
     int fileSize = hasFile ? getFileSize(path) : 0;
 
-    std::cout << "CGI:" << ((req->getCGI()) ? "Yes\n" : "NO\n");
-
     if (handleCGI(req, res)) {
         return;
     }
@@ -105,6 +103,7 @@ void buildResponse(HTTPRequest* req, HTTPResponse* res) {
         case 404:
         case 405:
         case 508:
+        case 400:
             res->setStatus(status, req->getStatusMessage());
             res->setHeader("Content-Type", contentType);
             res->setHeader("Connection", connection);
