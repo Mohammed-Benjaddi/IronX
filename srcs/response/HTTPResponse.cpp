@@ -1,5 +1,5 @@
 #include "../../headers/HTTPResponse.hpp"
-#include "../../headers/requestUtils.hpp"
+
 
 std::map<std::string, std::string> HTTPResponse::_mimeTypes = initMimeTypes();
 
@@ -163,31 +163,24 @@ void HTTPResponse::buildAutoIndexResponse(HTTPRequest *request) {
         const std::string entryPathToRoute = relative.substr(1) +  + "/" + entry;
         const std::string absolutePath = rootPath + relative + "/" + entry;
 
-        std::cout << "Absolute Path: " << absolutePath << std::endl;
-        std::cout << "Entry Path to Route: " << entryPathToRoute << std::endl;
-        std::cout << "Entry: " << entry << std::endl;
-        std::cout << "Base Path: " << basePath << std::endl;
-
         size_t size = getFileSize(absolutePath);
-        html << "<tr><td><a class=\"td a\" href=\"" << entryPathToRoute << "\">📂 " << entry << "</a></td>";
+        bool isFile = isFileExist(absolutePath.c_str());
+        html << "<tr><td><a class=\"td a\" href=\"" << entryPathToRoute << "\">📂 " << (isFile ? entry : entryPathToRoute) << "</a></td>";
         html << "<td class=\"td\">" << size << " B</td></tr>\n";
     }
-    
 
     // exit(0);
+
     html << "</tbody></table>\n<a class=\"gta-btn\" href=\"/\">⬅ Back to home</a>\n</div>\n</body>\n</html>\n";
 
-    std::string outputPath = directoryPath + "/index.html";
-    
-    if (isFileExist(outputPath.c_str())) {
-        std::ofstream outputFile(outputPath.c_str());
-        outputFile << html.str();
-        outputFile.close();
-        _streamer = new FileStreamer(outputPath, _connectionType);
-        setStandardHeaders(this, "text/html", _streamer->getFileSize(), "keep-alive", 200, "OK");
-        _tempFilePath = outputPath;
-    }
+    std::string outputPath = request->getPath();
+    std::ofstream outputFile(outputPath.c_str());
 
+    outputFile << html.str();
+    outputFile.close();
+    _streamer = new FileStreamer(outputPath, _connectionType);
+    setStandardHeaders(this, "text/html", _streamer->getFileSize(), "keep-alive", 200, "OK");
+    _tempFilePath = outputPath;
 }
 
 // Used for setting Connection: header

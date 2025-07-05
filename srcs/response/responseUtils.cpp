@@ -105,7 +105,7 @@ void buildResponse(HTTPRequest* req, HTTPResponse* res) {
         return;
     }
 
-    if (status == 9999) {
+    if (status == 9999 && !fileExists(req->getPath())) {
         req->setStatusCode(200);
         res->setHeader("Content-Type", contentType);
         res->setHeader("Connection", connection);
