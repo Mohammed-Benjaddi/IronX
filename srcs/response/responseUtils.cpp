@@ -44,14 +44,23 @@ std::string toString(int value) {
 }
 
 bool    handleCGI(HTTPRequest *req, HTTPResponse *res) {
-    if (req->getCGI()) {
+    std::cout << "------------------- START --------------------" << std::endl;
+    if (req->getCGI() != NULL) {
         if (req->getCGI()) {
             res->setStatus(200, "OK");
             res->setHeader("Content-Type", "text/html");
             res->setHeader("Content-Length", toString(req->getCGI()->getScriptOutput().size()));
             res->setHeader("Connection", "close");
             res->setBody(req->getCGI()->getScriptOutput());
+            // ! tomorrow start with this
+            if(req->getCGI() != NULL) {
+                std::cout << "CGI != NULL:  2" << std::endl;
+                // req->deleteCGI();
+            }
+            std::cout << "------------------ END ---------------------" << std::endl;
+            // exit(99);
         } else {
+            std::cout << "ELSE: no CGI found" << std::endl;
             res->setStatus(500, "Internal Server Error");
             res->setHeader("Content-Type", "text/html");
             res->setHeader("Content-Length", "97");
@@ -68,6 +77,8 @@ void buildResponse(HTTPRequest* req, HTTPResponse* res) {
     int size = getFileSize(req->getPath());
 
     if (handleCGI(req, res) ) {
+        if(req->getCGI() != NULL)
+        req->deleteCGI();
         return;
     }
 

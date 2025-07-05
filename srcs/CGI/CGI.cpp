@@ -2,7 +2,6 @@
 
 CGI::CGI(HTTPRequest &_request, Route &_route) : request(_request), route(_route)
 {
-//    //std::cout << "++++++ " << request.getRootDir() + "/" + request.getPath() << std::endl;
     script_path = request.getRootDir() + "/" + request.getPath();
     request_method = request.getMethod();
     query_string = request.getQuery();
@@ -10,11 +9,11 @@ CGI::CGI(HTTPRequest &_request, Route &_route) : request(_request), route(_route
     request_body = "body must be here";
     script_output = "";
     setupEnvironment();
-//    //std::cout << "query ---> " << query_string << std::endl;
 }
 
-void CGI::setupEnvironment()
-{
+CGI::~CGI() {}
+
+void CGI::setupEnvironment() {
     env_vars["REQUEST_METHOD"] = request_method;
     env_vars["QUERY_STRING"] = query_string;
     env_vars["CONTENT_LENGTH"] = intToString(request_body.length());
@@ -107,7 +106,7 @@ void CGI::executeCGI()
         close(pipe_fd[1]);
         dup2(stdin_pipe[0], 0);
         close(stdin_pipe[0]);
-        char **env_array = createEnvArray();
+        this->env_array = createEnvArray();
         std::vector<std::string> interpreter = getInterpreter(script_path);
         char *args[4];
         args[0] = const_cast<char *>(interpreter[0].c_str());

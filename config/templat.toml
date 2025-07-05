@@ -1,11 +1,11 @@
 [  global ]  
 
-max_body_size = 100000000000000000000
+max_body_size = 1000000000000
 # 1048772
 # 1048766
 [default_error_pages]
 
-400 = "/errors/400.html" # Bad Request
+# 400 = "/errors/400.html" # Bad Request
 403 = "/errors/403.html" # Forbidden
 404 = "/errors/404.html" # Not Found
 500 = "/errors/500.html" # Internal Server Error
@@ -13,7 +13,7 @@ max_body_size = 100000000000000000000
 
 [[servers]]
 host = "0.0.0.0" # Listen on all available network interfaces
-port = [10093] # Listen on port 8080
+port = [8080] # Listen on port 8080
 hostnames = ["example.com", "www.example.com"  ]
 
 [[servers.routes]]
@@ -33,9 +33,8 @@ interpreter = "/usr/bin/php-cgi"
 [[servers.routes]]
 path = "/new-site"
 root = "/"
-methods = ["GET", "GET"]
-# index = ["file.html", "form.html"]
-# redirect = "/old-site"
+methods = ["GET", "POST"]
+index = ["file.html"]
 extensions = [".php", ".py"]
 interpreter = "/usr/bin/env"
 autoindex = true

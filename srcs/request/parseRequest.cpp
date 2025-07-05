@@ -41,7 +41,7 @@ int checkAllowedMethods(HTTPRequest &request) {
 // }
 
 bool URIHasUnallowedChar(std::string uri) {
-  const std::string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_-~/?#[]@!$$('*+,'=%.&";
+  const std::string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_-~/?#[]@!$('*+,'=%.&";
   const std::vector<char> allowedChars(chars.begin(), chars.end());
   
   for(size_t i = 0; i < uri.size(); i++) {
@@ -90,6 +90,7 @@ int parse( HTTPRequest &request, std::vector<char> &req) {
     // std::cout << "waaa3" << std::endl;
     request.setStatusCode(413);
     request.setStatusMessage("Payload Too Large");
+    request.setPath(request.getErrorPages(request.getStatusCode()));
     return -1;
   }
 

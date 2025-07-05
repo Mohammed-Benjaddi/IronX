@@ -10,8 +10,10 @@ HTTPRequest::HTTPRequest(std::vector<char> &raw_request, WebServerConfig *_confi
 }
 
 HTTPRequest::~HTTPRequest() {
-    if(this->cgi != NULL)
-        delete cgi;
+    // if(this->cgi != NULL) {
+    //     delete cgi;
+    //     cgi = NULL;
+    // }
 }
 
 void HTTPRequest::setMethod(const std::string &method) {
@@ -187,6 +189,12 @@ void HTTPRequest::setRootDir(std::string rootDir)
     this->rootDir = rootDir;
 }
 
+void HTTPRequest::deleteCGI() {
+    delete cgi;
+    cgi = NULL;
+    std::cout << "CGI freed successfully" << std::endl;
+}
+
 
 // ? "----WebKitFormBoundary9cvF8eER4QLomYfB"
 std::string HTTPRequest::getBoundary() const {
@@ -296,6 +304,7 @@ void HTTPRequest::handleRequest()
     else {
         setStatusCode(400);
         setStatusMessage("Bad Request");
+        setPath(getErrorPages(getStatusCode()));;
     }
 }
 
@@ -343,6 +352,7 @@ void HTTPRequest::RedirectionFound(Route &route) {
     if(getRedirectedFrom() == getPath()) {
         setStatusCode(508);
         setStatusMessage("Loop Detected");
+        setPath(getErrorPages(getStatusCode()));
         return;
     }
     setRedirectedFrom(getLocation());
@@ -380,4 +390,11 @@ void HTTPRequest::handlePOST(std::map<std::string, Route> &routes, Route &route)
     }
 }
 
-CGI* HTTPRequest::getCGI() const { return cgi; }
+CGI* HTTPRequest::getCGI() const {
+    if(this->cgi != NULL) {
+        std::cout << "cgi is allocated" << std::endl;
+        return cgi; 
+    }
+    std::cout << "cgi is null" << std::endl;\
+    return NULL;
+}

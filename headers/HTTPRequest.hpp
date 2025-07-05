@@ -103,6 +103,8 @@ public:
     std::string getFileExtension();
     // bool isCGI() const;
 
+    void deleteCGI();
+
     virtual std::vector<uint8_t> to_bytes() const;
 
     int setRoutesInfo(std::map<std::string, Route> &routes, Route &route);

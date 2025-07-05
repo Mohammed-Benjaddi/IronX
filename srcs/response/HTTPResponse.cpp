@@ -20,6 +20,8 @@ HTTPResponse::HTTPResponse(HTTPRequest* request, std::string cookies)
         setStandardHeaders(this, "text/plain", 0, "close", request->getStatusCode(), request->getStatusMessage());
     } else
         buildResponse(request, this);
+
+    // delete request;
 }
 
 bool HTTPResponse::hasCookie() {

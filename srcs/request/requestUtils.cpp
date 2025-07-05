@@ -100,6 +100,7 @@ void deleteRequestedFile(HTTPRequest &request, std::string path, std::string fil
     if (!result) {
         request.setStatusCode(204);
         request.setStatusMessage("No Content");
+        request.setPath(request.getErrorPages(request.getStatusCode()));
     }
 }
 
@@ -181,6 +182,7 @@ void DELETEDirectory(HTTPRequest &request, std::map<std::string, Route> &routes,
             remove((location).c_str());
             request.setStatusCode(204);
             request.setStatusMessage("No Content");
+            request.setPath(request.getErrorPages(request.getStatusCode()));
             return ;
         }
     }
@@ -296,5 +298,6 @@ void uploadFiles(HTTPRequest &request) {
     }
     request.setStatusCode(201);
     request.setStatusMessage("Created");
+    request.setPath(request.getErrorPages(request.getStatusCode()));
     chdir(original_path.c_str());
 }
