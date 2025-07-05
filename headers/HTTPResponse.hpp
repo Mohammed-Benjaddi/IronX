@@ -35,11 +35,13 @@ public:
     std::string getStatusMessage() const;
     void buildAutoIndexResponse(HTTPRequest*);
 
-    bool hasCookie() const { return _hasCookie; }
-
-    
-
     static std::string getMimeType(const std::string& path);
+
+    bool hasCookie();
+
+    std::string getBody() const {
+        return _body;
+    }
 
 private:
     int                             _statusCode;
@@ -60,5 +62,7 @@ private:
     bool                            _hasCookie;
 
     static std::map<std::string, std::string> _mimeTypes;
+
+    bool hasCookie() const { return _hasCookie; }
 };
 

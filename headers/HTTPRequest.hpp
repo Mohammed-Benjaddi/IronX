@@ -52,7 +52,9 @@ private:
     std::string location;
     std::map<int, std::string> error_pages;
     CGI *cgi;
+    std::string redirected_from;
 public:
+    // HTTPRequest(const std::string &, WebServerConfig *, int );
     HTTPRequest(std::vector<char> &raw_request, WebServerConfig *_config, int _clientId);
     HTTPRequest(const std::string &, WebServerConfig *, int , HTTPResponse *);
     ~HTTPRequest();
@@ -74,7 +76,9 @@ public:
     void setFileExtension(const std::string& path);
 
     void setLocation(const std::string& location);
+    void setRedirectedFrom(const std::string& location);
     void setErrorPages(const std::map<int, std::string>& error_pages);
+    
     // void setIsCGI(bool isCGI);
     // Getters
     CGI* getCGI() const;
@@ -91,6 +95,7 @@ public:
     int getClientId() const;
     std::string getRootDir() const;
     std::string getLocation() const;
+    std::string getRedirectedFrom() const;
     std::string getErrorPages(int code) const;
     std::string getBoundary() const;
     bool isBodyFound() const;

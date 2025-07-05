@@ -41,12 +41,12 @@ int checkAllowedMethods(HTTPRequest &request) {
 // }
 
 bool URIHasUnallowedChar(std::string uri) {
-  const std::string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_-~/?#[]@!$$('*+,'=%.&";
+  const std::string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_-~/?#[]@!$$()'*+,'=%.&";
   const std::vector<char> allowedChars(chars.begin(), chars.end());
   
   for(size_t i = 0; i < uri.size(); i++) {
     if(std::find(allowedChars.begin(), allowedChars.end(), uri[i]) == allowedChars.end()) {
-       //std::cout << "unallowed char ---> " << uri[i] << std::endl;
+       std::cout << "unallowed char ---> " << uri[i] << std::endl;
         return true;
     }
   }
@@ -66,12 +66,8 @@ int parse( HTTPRequest &request, std::vector<char> &req) {
   std::stringstream ss(headers);
   request.setErrorPages(request.getConfig()->getErrorPages());
   char buffer[BUFSIZ];
-  if (getcwd(buffer, sizeof(buffer)) != NULL) {
-    //std::cout << "=====> " << std::string(buffer) << std::endl;
+  if (getcwd(buffer, sizeof(buffer)) != NULL)
     request.setRootDir(std::string(buffer) + "/www");
-  }
-  else
-      request.setRootDir("");
   std::getline(ss, line);
   if (find_method_uri(request, line) == -1)
     return -1;
@@ -80,14 +76,21 @@ int parse( HTTPRequest &request, std::vector<char> &req) {
     request.setHeaders(line);
   }
   
-  std::vector<char>::iterator bodyStart = it + 4; // skip \r\n\r\n
+  std::vector<char>::iterator bodyStart = it + 4;
   if (bodyStart < req.end()) {
     std::vector<char> body(bodyStart, req.end());
     request.setBody(body);
   } else {
-    // Optional: set empty body if nothing present
     std::vector<char> emptyBody;
     request.setBody(emptyBody);
+  }
+
+  // std::cout << "body size: " << request.getBody().size() << std::endl;
+  if(request.getBody().size() > request.getConfig()->getMaxBodySize()) {
+    // std::cout << "waaa3" << std::endl;
+    request.setStatusCode(413);
+    request.setStatusMessage("Payload Too Large");
+    return -1;
   }
 
   return 1;
@@ -99,6 +102,7 @@ bool checkRequestURI(HTTPRequest &request, std::string uri) {
       request.setStatusCode(400);
       request.setStatusMessage("Bad request");
       request.setPath(request.getErrorPages(400));
+      exit(99);
       return false;
   }
   // 414 Request-URI Too Long
@@ -230,7 +234,7 @@ std::vector<FormFile> parseMultipartFormData(const std::vector<char> &body, cons
                 }
             }
         }
-        std::vector<char>::const_iterator contentStart = headerEnd + 4; // skip \r\n\r\n
+        std::vector<char>::const_iterator contentStart = headerEnd + 4;
         std::vector<char>::const_iterator nextBoundary = std::search(contentStart, body.end(), 
                                                                       boundaryMarker.begin(), boundaryMarker.end());
         std::vector<char>::const_iterator contentEnd = nextBoundary;
@@ -238,8 +242,9 @@ std::vector<FormFile> parseMultipartFormData(const std::vector<char> &body, cons
             contentEnd -= 2;
         }
         if (!file.filename.empty()) {
-            file.data.assign(contentStart, contentEnd);
-            files.push_back(file);
+          contentEnd -= (boundary.size() + 3);
+          file.data.assign(contentStart, contentEnd);
+          files.push_back(file);
         }
         pos = nextBoundary;
     }

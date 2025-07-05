@@ -1,10 +1,9 @@
 #include "HTTPRequest.hpp"
 
 HTTPRequest::HTTPRequest(std::vector<char> &raw_request, WebServerConfig *_config, int _clientId) : IHTTPMessage(), config(_config), clientId(_clientId), cgi(NULL) {
-    std::cout << "-----------\n";
-    std::cout << "size: " << raw_request.size() << "\n";
-    std::cout << "-----------\n";    
-    cgi = NULL;
+    //std::cout << "-----------\n";
+    //std::cout << "size: " << raw_request.size() << "\n";
+    //std::cout << "-----------\n";    
     if (parse(*this, raw_request) == -1)
         return;      
     if (checkAllowedMethods(*this) == -1)
@@ -12,7 +11,10 @@ HTTPRequest::HTTPRequest(std::vector<char> &raw_request, WebServerConfig *_confi
     handleRequest();
 }
 
-HTTPRequest::~HTTPRequest() {}
+HTTPRequest::~HTTPRequest() {
+    if (this->cgi != NULL)
+        delete cgi;
+}
 
 void HTTPRequest::setMethod(const std::string &method) {
     this->method = method;
@@ -71,6 +73,11 @@ void HTTPRequest::setBodyFound(bool b)
 void HTTPRequest::setLocation(const std::string &location)
 {
     this->location = extractDirectory(location);
+}
+
+void HTTPRequest::setRedirectedFrom(const std::string &location)
+{
+    this->redirected_from = location;
 }
 
 void HTTPRequest::setFormFile(std::vector<FormFile> &formFiles)
@@ -135,6 +142,11 @@ std::vector<char> HTTPRequest::getBody() const
 std::string HTTPRequest::getLocation() const
 {
     return location;
+}
+
+std::string HTTPRequest::getRedirectedFrom() const
+{
+    return redirected_from;
 }
 
 std::map<std::string, std::string> HTTPRequest::getHeaders() const
@@ -248,6 +260,7 @@ int HTTPRequest::setRoutesInfo(std::map<std::string, Route> &routes, Route &rout
     std::map<std::string, Route>::const_iterator it_route = routes.find(getLocation());
     if (it_route == routes.end() && getLocation() != "/favicon.ico")
     {
+        // exit(99);
         setStatusCode(404);
         setStatusMessage("Not Found");
         setPath(getErrorPages(getStatusCode()));
@@ -269,22 +282,13 @@ void HTTPRequest::handleRequest()
 
     if (setRoutesInfo(routes, route) == -1)
         return;
-
     setFileExtension(getPath());
-
-
-    std::cout << "method: " << getMethod() << std::endl;
-    std::cout << "root: " << getRootDir() << std::endl;
-    std::cout << "path: " << getPath() << std::endl;
     if (getMethod() == "GET")
         handleGet(routes, route);
     else if (getMethod() == "POST")
         handlePOST(routes, route);
     else if (getMethod() == "DELETE")
         handleDELETE(routes, route);
-    else {
-        // ! bad request 400
-    }
 }
 
 void HTTPRequest::executeCGI(Route &route)
@@ -305,7 +309,6 @@ void HTTPRequest::executeCGI(Route &route)
 
         if (it == extensions.end())
         {
-            std::cout << "CGI extension not found: " << path_ext << std::endl;
             setStatusCode(404);
             setStatusMessage("Not Found");
             setPath(getErrorPages(getStatusCode()));
@@ -343,7 +346,14 @@ void HTTPRequest::handleDELETE(std::map<std::string, Route> &routes, Route &rout
 void HTTPRequest::RedirectionFound(Route &route) {
     std::string a = getPath(), b = getLocation();
     setPath(route.getRedirect());
+    if(getRedirectedFrom() == getPath()) {
+        setStatusCode(508);
+        setStatusMessage("Loop Detected");
+        return;
+    }
+    setRedirectedFrom(getLocation());
     setLocation(getPath());
+
     setStatusCode(301);
     setStatusMessage("Moved Permanently");
     setMethod("GET");
@@ -352,6 +362,7 @@ void HTTPRequest::RedirectionFound(Route &route) {
 
 void HTTPRequest::handlePOST(std::map<std::string, Route> &routes, Route &route)
 {
+    // exit(99);
     std::string contentType = getHeader("Content-Type");
     if (isDirExist(getPath(), route.getRootDir())) {
         if (contentType.rfind("application/x-www-form-urlencoded") != std::string::npos) {

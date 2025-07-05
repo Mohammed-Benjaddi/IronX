@@ -48,6 +48,7 @@ bool isLocationHasCGI(std::string filepath) {
 }
 
 int copyToRoute(HTTPRequest &request, Route &route, std::map<std::string, Route>::const_iterator &it) {
+<<<<<<< HEAD
     // exit(99);
     char buffer[BUFSIZ];
     std::string path;
@@ -56,6 +57,15 @@ int copyToRoute(HTTPRequest &request, Route &route, std::map<std::string, Route>
     std::cout << "path =========> " << it->second.getRootDir() << std::endl;
     route.setRootDir(path + it->second.getRootDir());
     route.setIndexFiles(it->second.getIndexFiles());
+=======
+    char buffer[BUFSIZ];
+    std::string path;
+    if (getcwd(buffer, sizeof(buffer)) != NULL)
+        path = std::string(buffer) + "/www";
+    // std::cout << "path + root: " << path << " | " + it->second.getRootDir() << std::endl;
+    route.setRootDir(path + it->second.getRootDir());
+    route.setIndexFiles(it->second.getIndexFiles());    
+>>>>>>> test
     if (it->second.getAllowedMethods().find(request.getMethod()) == it->second.getAllowedMethods().end()) {
         request.setStatusCode(405);
         request.setStatusMessage("Method Not Allowed");
@@ -161,6 +171,7 @@ void directoryHasIndexFiles(HTTPRequest &request, Route &route, std::vector<std:
 
 void pathIsFile(HTTPRequest &request, std::map<std::string, Route> &routes, Route &route) {
     (void) routes;
+
     std::string filePath = (route.getRootDir() + "/" + request.getPath());
     std::cout << "filepath: " << route.getRootDir() + "/" + request.getPath() << std::endl;
 
@@ -169,6 +180,7 @@ void pathIsFile(HTTPRequest &request, std::map<std::string, Route> &routes, Rout
         request.setStatusMessage("Not Found");
         request.setFileContent("");
         // request.setPath(request.getRootDir() + "/errors/404.html");
+        // std::cout << "error page: " << request.getErrorPages(request.getStatusCode()) << std::endl;
         request.setPath(request.getErrorPages(request.getStatusCode()));
         std::cout << "file not found" << std::endl;
         return;
@@ -192,7 +204,7 @@ void pathIsFile(HTTPRequest &request, std::map<std::string, Route> &routes, Rout
 void DELETEDirectory(HTTPRequest &request, std::map<std::string, Route> &routes, Route &route, const std::string &_path) {
     DIR *dir;
     (void) routes;
-   
+
     std::string location = "/" + route.getRootDir() + "/" + _path;
     if ((dir = opendir(location.c_str())) == NULL) {
         request.setStatusCode(403);
@@ -217,6 +229,8 @@ void DELETEDirectory(HTTPRequest &request, std::map<std::string, Route> &routes,
 void pathIsDirectory(HTTPRequest &request, std::map<std::string, Route> &routes, Route &route, const std::string &_path) {
     (void) routes;
     DIR *dir;
+    // std::cout << "---> " << (route.getRootDir() + "/" + (_path == "/" ? "" : _path)) << std::endl;
+    // exit(99);
     if((dir = opendir((route.getRootDir() + "/" + (_path == "/" ? "" : _path)).c_str())) != NULL) {
         const std::vector<std::string> index_files = route.getIndexFiles();
         if(!route.getRedirect().empty()) {
@@ -271,6 +285,7 @@ std::vector<std::string> getDirectoryListing(const std::string& path, bool show_
                 filename += "/";
             }
             entries.push_back(filename);
+            // std::cout << "filename: " << filename << std::endl;
         }
         closedir(dir);
         std::sort(entries.begin(), entries.end());
@@ -308,37 +323,26 @@ bool isDirectoryEmpty(std::string path) {
 }
 
 void uploadFiles(HTTPRequest &request) {
+<<<<<<< HEAD
     std::cout << "upload a file" << std::endl;
+=======
+>>>>>>> test
     std::vector<FormFile> files = request.getFormFiles();
-    if(files.empty()) {
-        //std::cout << "no files found" << std::endl;
-    }
-
     char buffer[1024];
     std::string new_path, original_path;
     if (getcwd(buffer, sizeof(buffer)) != NULL) {
         original_path = std::string(buffer);
         new_path = original_path + "/www" + request.getLocation();
     }
-    //std::cout << "new path: " << new_path << std::endl;
-        // path = std::string(buffer) + "/www";
-    // int newDir = chdir((request.getRootDir() + "/" + request.getLocation()).c_str());
     int newDir = chdir(new_path.c_str());
-    if (newDir < 0) {
-        //std::cout << "chdir failed: " << new_path << std::endl;
+    if (newDir < 0)
         return;
+    for(size_t i = 0; i < files.size(); i++) {
+        std::ofstream file(files[i].filename.c_str(), std::ios::binary);
+        file.write(&files[i].data[0], files[i].data.size());
+        file.close();
     }
-    // loop
-    std::ofstream file(files[0].filename.c_str(), std::ios::binary);
-    file.write(&files[0].data[0], files[0].data.size());
-    file.close();
-    //std::cout << "filename: " << files[0].filename << std::endl;
     request.setStatusCode(201);
     request.setStatusMessage("Created");
     chdir(original_path.c_str());
-    //
-    // ! * warning: the loop for debugging, it must be deleted later
-    // while(1) {
-
-    // }
 }

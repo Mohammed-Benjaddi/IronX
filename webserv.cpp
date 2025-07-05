@@ -3,32 +3,31 @@
 #include "headers/ServerLauncher.hpp"
 #include "headers/Multiplexer.hpp"
 #include "mocker.hpp"
-#include "./headers/Parser.hpp"
+#include "headers/Parser.hpp"
+
+#include <sstream>
 
 int main(int ac, char **av) {
-    WebServerConfig config;
-	
-	// (void)ac;
-	// (void)av;
+    if (ac == 2) {
+        WebServerConfig config;        
+        Parser parser;
+        try {
+            std::string path(av[1]);
+            parser.MainParser(path ,config);
+        } catch(const std::exception& e) {
+            std::cerr << "===> " << e.what() << '\n';
+            return 1;
+        }
 
-	if (ac == 2)
-	{
-		Parser parse;
-		std::string path = av[1];
-    	
-		ServerLauncher  launcher;
-		// std::cout << "lllllllll\n";
-		parse.MainParser(path, config);
-		// printConfig(config);
-		// exit(0);
-		try {
-				launcher.launch(config);
-				Multiplexer     mux(launcher.getSockets(), config);
-				mux.run();
-		} catch (const std::exception &e) {
-				std::cerr << "Error Launching Server: " << e.what() << std::endl;
-		}
-	}
-	// else
-	// 	std::cout << "usage: ./webserv [configuration file]" << std::endl;
+        try {
+                ServerLauncher  launcher;
+                launcher.launch(config);
+                Multiplexer     mux(launcher.getSockets(), config);
+                mux.run();
+
+        } catch (const std::exception &e) {
+                std::cerr << "Error Launching Server: " << e.what() << std::endl;
+        }
+    }
+    return (0);
 }

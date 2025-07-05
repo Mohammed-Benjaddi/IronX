@@ -6,12 +6,21 @@
 /*   By: nhayoun <nhayoun@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 17:38:54 by ael-maaz          #+#    #+#             */
+<<<<<<< HEAD
 /*   Updated: 2025/06/29 15:40:59 by nhayoun          ###   ########.fr       */
+=======
+/*   Updated: 2025/07/03 17:18:00 by nhayoun          ###   ########.fr       */
+>>>>>>> test
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../headers/Parser.hpp"
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> test
 Parser::Parser()
 {
 	return ;
@@ -25,12 +34,22 @@ Parser::~Parser()
 
 int Parser::OpenTomlFile(std::string& path)
 {
+<<<<<<< HEAD
 	if(checkExtension(path) == 1)
 		throw std::runtime_error("bad extension");
 	std::string fullpath = "./config/" + path;
 	this->infile.open(fullpath.c_str());
 	path = fullpath;
 	if (!this->infile.is_open())
+=======
+	if (checkExtension(path) == 1)
+		throw std::runtime_error("bad extension");
+	std::string fullpath(path);
+    this->infile.open(fullpath.c_str());
+	// this->infile.open(fullpath);
+	path = fullpath;
+	if(!this->infile.is_open())
+>>>>>>> test
 	{
 		std::cerr << "Couldnt open config file, Please make sure the config file is present in config folder and read permission is set\n"; 
 		throw std::runtime_error("lol");
@@ -45,7 +64,11 @@ std::vector<std::string> Parser::ReadLines()
 	while(std::getline(this->infile,line))
 	{
 		if(line[0] != '#' && line.length() != 0)
+<<<<<<< HEAD
 			lines.push_back(trim(line));
+=======
+			lines.push_back(_trim(line));
+>>>>>>> test
 	}
 	for(size_t i = 0; i < lines.size();i++)
 	{
@@ -62,7 +85,11 @@ bool isWhitespace(char c) {
 	return c == ' ' || c == '\t' || c == '\n' || c == '\r';
 }
 
+<<<<<<< HEAD
 std::string trim(const std::string& str) {
+=======
+std::string _trim(const std::string& str) {
+>>>>>>> test
 	size_t start = 0;
 	while (start < str.length() && isWhitespace(str[start])) ++start;
 	size_t end = str.length();
@@ -224,7 +251,11 @@ void commitRoute(Cluster* c, const std::string& path, const Route& r)
     if (path.empty())
         throw std::runtime_error("Route defined outside of [[servers]] block");
 
+<<<<<<< HEAD
     c->getRoutes()[path] = r;  // or c->addRoute(path, r);
+=======
+    c->addRoute(path, r);
+>>>>>>> test
 }
 
 
@@ -254,13 +285,21 @@ void parseTOML(const std::string& filepath, WebServerConfig& config)
     //------------------------------------------------------------------
     while (std::getline(file, line))
     {
+<<<<<<< HEAD
         line = trim(line);
+=======
+        line = _trim(line);
+>>>>>>> test
         if (line.empty() || line[0] == '#')
             continue;
 		size_t pos  = line.find("#");
 		if(pos != std::string::npos)
 			line.erase(pos);
+<<<<<<< HEAD
 		line = trim(line);
+=======
+		line = _trim(line);
+>>>>>>> test
 		if (line.empty())               // everything before # was whitespace
 			continue;
         // --------- SECTION HEADERS ----------------------------------
@@ -275,8 +314,13 @@ void parseTOML(const std::string& filepath, WebServerConfig& config)
 				if (line.find("]]", 2) != line.size() - 2)
 					throw std::runtime_error("Unexpected characters after closing ]] in: " + line);
 			} else {
+<<<<<<< HEAD
 				if (line.size() < 3 || line[line.size() - 1] != ']')
 					throw std::runtime_error("Malformed section header: " + line);
+=======
+				if (line.size() < 3 || line.back() != ']')
+					throw std::runtime_error("Malformed section header: back" + line);
+>>>>>>> test
 				if (line.find(']', 1) != line.size() - 1)
 					throw std::runtime_error("Unexpected characters after closing ] in: " + line);
 				if (line.find('[', 1) != std::string::npos)
@@ -323,7 +367,11 @@ void parseTOML(const std::string& filepath, WebServerConfig& config)
                     commitRoute(currentCluster, currentRoutePath, currentRoute);
                 inRoute = false;
 
+<<<<<<< HEAD
                 currentSection = trim(line.substr(1, line.size()-2)); // strip [ ]
+=======
+                currentSection = _trim(line.substr(1, line.size()-2)); // strip [ ]
+>>>>>>> test
 				if (currentSection == "global") {
 					if (seenGlobalBlock)
 						throw std::runtime_error("Duplicate [global] block");
@@ -347,8 +395,13 @@ void parseTOML(const std::string& filepath, WebServerConfig& config)
         if (eq == std::string::npos) 
 			throw std::runtime_error("Invalid line" + line);            // malformed / skip
 
+<<<<<<< HEAD
         std::string key = trim(line.substr(0, eq));
         std::string val = trim(line.substr(eq + 1));
+=======
+        std::string key = _trim(line.substr(0, eq));
+        std::string val = _trim(line.substr(eq + 1));
+>>>>>>> test
 
         //------------------------------------------------------------------
         // 1) GLOBAL / DEFAULT_ERROR_PAGES
@@ -366,7 +419,11 @@ void parseTOML(const std::string& filepath, WebServerConfig& config)
             int code = atoi(key.c_str());
             if (val.empty()) {
         		throw std::runtime_error("Empty string not permitted");
+<<<<<<< HEAD
 			}
+=======
+            }
+>>>>>>> test
 
 			if (val[0] != '"' || val[val.size() - 1] != '"')
 				throw std::runtime_error("Error page value must be enclosed in double quotes");
@@ -434,8 +491,13 @@ void parseTOML(const std::string& filepath, WebServerConfig& config)
             else if (key == "root")
                 currentRoute.setRootDir(val);
             else if (key == "index") {
+<<<<<<< HEAD
                 std::vector<std::string> tmp(1, val);
                 currentRoute.setIndexFiles(tmp);
+=======
+                std::vector<std::string> v = parseStringList(val);
+                currentRoute.setIndexFiles(v);
+>>>>>>> test
             }
             else if (key == "methods") {
                 std::vector<std::string> v = parseStringList(val);
@@ -553,18 +615,96 @@ void printConfigs(const WebServerConfig& conf)
 
 
 
+<<<<<<< HEAD
 
 int Parser::MainParser(std::string path, WebServerConfig &conf)
+=======
+bool isValidIPv4(const std::string& ip)
+{
+    std::istringstream iss(ip);
+    std::string token;
+    int parts = 0;
+
+    while (std::getline(iss, token, '.'))
+    {
+        if (++parts > 4)
+            return false;
+        if (token.empty() || token.length() > 3)
+            return false;
+        for (size_t i = 0; i < token.length(); ++i)
+            if (!isdigit(token[i]))
+                return false;
+        int num = std::atoi(token.c_str());
+        if (num < 0 || num > 255)
+            return false;
+        if (token[0] == '0' && token.length() > 1)
+            return false; // leading zero
+    }
+    return parts == 4;
+}
+
+
+void validateAndFixConfig(WebServerConfig& config)
+{
+    std::vector<Cluster> validClusters;
+    std::set<std::string> seenHosts;
+
+    const std::vector<Cluster>& originalClusters = config.getClusters();
+
+    for (size_t i = 0; i < originalClusters.size(); ++i)
+    {
+        const Cluster& cluster = originalClusters[i];
+        const std::string& host = cluster.getHost();
+
+        // Test 1: Is the host a valid IPv4 address?
+        if (!isValidIPv4(host))
+        {
+            std::cerr << "Invalid IP address in server #" << i << ": " << host << std::endl;
+            continue; // skip this cluster
+        }
+
+        // Test 2: Check for duplicate host
+        if (seenHosts.find(host) != seenHosts.end())
+        {
+            std::cerr << "Duplicate host detected: " << host << " — skipping server #" << i << std::endl;
+            continue; // skip duplicate
+        }
+
+        seenHosts.insert(host);
+        validClusters.push_back(cluster);
+    }
+
+    // Replace clusters with the validated ones
+    config.setClusters(validClusters);
+}
+
+
+
+int Parser::MainParser(std::string path, WebServerConfig& conf)
+>>>>>>> test
 {
 	try
 	{
 		OpenTomlFile(path);
 		parseTOML(path, conf);
+<<<<<<< HEAD
 		// printConfigs(conf);
 	}
 	catch(std::exception& e)
 	{
 		std::cout << e.what() << std::endl;
+=======
+		validateAndFixConfig(conf);
+		// printConfigs(conf);
+		
+
+		// this->lines = ReadLines();
+		// parseLines(conf);
+	}
+	catch(std::exception& e)
+	{
+        throw std::runtime_error(e.what());
+>>>>>>> test
 	}
 	return 0;
 }

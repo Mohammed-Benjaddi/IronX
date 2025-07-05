@@ -9,6 +9,7 @@
 #include <iostream> //* cerr cout
 #include <sstream> //* sstream
 #include <stdio.h>
+#include <netdb.h>
 
 typedef unsigned char uint8_t; 
 

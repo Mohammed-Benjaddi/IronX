@@ -76,7 +76,6 @@ void CGI::executeCGI()
     std::cout << "execute CGI..." << std::endl;
     int pipe_fd[2];
     int stdin_pipe[2];
-
     if (pipe(pipe_fd) == -1 || pipe(stdin_pipe) == -1)
     {
         request.setStatusCode(500);
@@ -145,7 +144,9 @@ void CGI::executeCGI()
         waitpid(pid, &status, 0);
 
         if (WIFEXITED(status) && WEXITSTATUS(status) == 0) {
-           std::cout << "the script executed successfully" << std::endl;
+           //std::cout << "the script executed successfully" << std::endl;
+
+           // * 
             script_output = output;
             std::cout << "output: \n" << output << std::endl; 
             request.setStatusCode(200);

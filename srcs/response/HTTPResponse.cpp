@@ -12,14 +12,19 @@ HTTPResponse::HTTPResponse(HTTPRequest* request, std::string cookies)
         request->setStatusMessage("OK");
     }
 
-    if (!cookies.empty())
+    if (!cookies.empty()) {
+        _hasCookie = true;
         setHeader("Set-Cookie", cookies);
+    }
     if (request->getMethod() == "DELETE" || (request->getMethod() == "POST" && !request->getCGI())){
         setStandardHeaders(this, "text/plain", 0, "close", request->getStatusCode(), request->getStatusMessage());
     } else
         buildResponse(request, this);
 }
 
+bool HTTPResponse::hasCookie() {
+    return _hasCookie;
+}
 
 HTTPResponse::~HTTPResponse() {
     delete _streamer;
@@ -119,6 +124,14 @@ std::string HTTPResponse::getNextChunk() {
     return "";
 }
 
+std::string normalizePath(const std::string& base, const std::string& entry) {
+    std::string result = base;
+    if (!result.empty() && result.back() != '/')
+        result += "/";
+    result += entry;
+    return result;
+}
+
 void HTTPResponse::buildAutoIndexResponse(HTTPRequest *request) {
 
     std::string location = request->getLocation();
@@ -126,6 +139,9 @@ void HTTPResponse::buildAutoIndexResponse(HTTPRequest *request) {
     std:: string rootPath = request->getRootDir();
 
     std::string relative = getRelativePath(curPath, rootPath);
+
+
+    // exit(0);
 
     std::string directoryPath = curPath.substr(0, curPath.find_last_of("/\\"));
     std::vector<std::string> entries = getDirectoryListing(directoryPath, false);
@@ -142,11 +158,10 @@ void HTTPResponse::buildAutoIndexResponse(HTTPRequest *request) {
 
     for (std::vector<std::string>::const_iterator it = entries.begin(); it != entries.end(); ++it) {
         const std::string& entry = *it;
-        const std::string entryPathToRoute = relative + "/" + entry;
+        const std::string entryPathToRoute = relative.substr(1) +  + "/" + entry;
         const std::string absolutePath = rootPath + relative + "/" + entry;
 
         size_t size = getFileSize(absolutePath);
-
         html << "<tr><td><a class=\"td a\" href=\"" << entryPathToRoute << "\">📂 " << entry << "</a></td>";
         html << "<td class=\"td\">" << size << " B</td></tr>\n";
     }

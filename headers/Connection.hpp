@@ -24,6 +24,14 @@ class Connection {
     public:
         Connection();
         Connection(int, int, WebServerConfig*, int serverClusterId);
+        // ~Connection() {
+        //     if (_streamer)
+        //         delete _streamer;
+        //     if (_httpResponse)
+        //         delete _httpResponse;
+        //     if (_httpRequest)
+        //         delete _httpRequest;
+        // }
         // std::string&    getReadBuffer();
         std::string&        getWriteBuffer();
         std::vector<char>&  getReadBuffer();
