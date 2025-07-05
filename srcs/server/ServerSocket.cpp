@@ -90,7 +90,10 @@ void ServerSocket::bind_socket() {
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_flags = AI_PASSIVE; // For binding
 
-	std::string port_str = std::to_string(this->_port);
+	std::stringstream ss;
+	ss << this->_port;
+	std::string port_str = ss.str();
+
 	int status = getaddrinfo(this->_host.c_str(), port_str.c_str(), &hints, &res);
 
 	if (status != 0 || res == NULL) {
@@ -106,6 +109,7 @@ void ServerSocket::bind_socket() {
 
 	freeaddrinfo(res);
 }
+
 void	ServerSocket::init_listen() {
 	const int backlog = 128; //* max num of pending connections (queue for pending connections)
 	//* Serve calls accept() and takes the first waiting connection

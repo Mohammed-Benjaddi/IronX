@@ -4,7 +4,7 @@
 
 # Compiler settings
 CXX      := c++
-CXXFLAGS :=  -Wall -Wextra -Werror -g
+CXXFLAGS :=  -Wall -Wextra -Werror -g -std=c++98
 INCLUDES := -Iheaders
 
 # Project name

@@ -128,7 +128,7 @@ std::string HTTPResponse::getNextChunk() {
 
 std::string normalizePath(const std::string& base, const std::string& entry) {
     std::string result = base;
-    if (!result.empty() && result.back() != '/')
+    if (!result.empty() && result[result.size() - 1] != '/')
         result += "/";
     result += entry;
     return result;

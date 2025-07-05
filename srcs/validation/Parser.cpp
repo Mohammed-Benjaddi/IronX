@@ -278,7 +278,7 @@ void parseTOML(const std::string& filepath, WebServerConfig& config)
 				if (line.find("]]", 2) != line.size() - 2)
 					throw std::runtime_error("Unexpected characters after closing ]] in: " + line);
 			} else {
-				if (line.size() < 3 || line.back() != ']')
+				if (line.size() < 3 || line[line.size() - 1] != ']')
 					throw std::runtime_error("Malformed section header: back" + line);
 				if (line.find(']', 1) != line.size() - 1)
 					throw std::runtime_error("Unexpected characters after closing ] in: " + line);
