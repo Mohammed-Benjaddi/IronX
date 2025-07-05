@@ -34,6 +34,9 @@ Connection::Connection(int fd, int epoll_fd, WebServerConfig* config, int server
 //     return this->_readBuffer;
 // }
 
+// ! leaks
+Connection::~Connection () {}
+
 std::string& Connection::getWriteBuffer() {
     return this->_writeBuffer;
 }
@@ -109,8 +112,6 @@ void Connection::parseCookie() {
     }
 }
 
-
-
 void Connection::handleRead() {
     char buffer[4096] = {0};
     ssize_t bytes_read = recv(_fd, buffer, sizeof(buffer), 0);
@@ -151,7 +152,9 @@ void Connection::handleRead() {
                 std::cout << "\n\033[1;31m******************************\033[0m\n";            
                 std::cout << "\033[1;32m== HTTP REQUEST ==\n" << _headersPart << "\033[0m\n";
                 // std::string requestData(_readBuffer.begin(), _readBuffer.end());
+                // HTTPRequest req = HTTPRequest(_readBuffer, _config, _serverClusterId);
                 _httpRequest = new HTTPRequest(_readBuffer, _config, _serverClusterId);
+
                 _httpResponse = new HTTPResponse(_httpRequest, _cookieHeader);
                 printResponse(_httpResponse, _httpRequest);
                 std::cout << "\033[1;31m******************************\033[0m\n\n";
@@ -180,15 +183,14 @@ void Connection::re_armFd() {
 
     if (epoll_ctl(_epoll_fd, EPOLL_CTL_MOD, _fd, &ev) == -1) {
         std::cerr << "epoll_ctl: re_armFd" << std::endl;
+        // delete _httpRequest;
         _closed = true;
     }
 }
 
 void Connection::handleWrite() {
     if (_httpResponse && _httpResponse->isComplete() && _writeBuffer.empty()) {
-        std::string connType = _httpResponse->getConnectionHeader();
-        delete _httpResponse;
-        _httpResponse = NULL;     
+        std::string connType = _httpResponse->getConnectionHeader(); 
 		reset();
         re_armFd();
         return ;
@@ -215,13 +217,26 @@ void Connection::handleWrite() {
         re_armFd();
 }
 
+
+// ! leaks
 void	Connection::reset() {
+
+    std::cout << "location: " << _httpRequest->getLocation() << std::endl;
+
 	_writeBuffer.clear();
 	_readBuffer.clear();
-	delete _httpResponse;
-	_httpResponse = NULL;
-	delete _streamer;
-	_streamer = NULL;
+    if (_streamer) {
+        delete _streamer;
+        _streamer = NULL;
+    }
+    if (_httpResponse) {
+        delete _httpResponse;
+        _httpResponse = NULL;
+    }
+    if (_httpRequest != NULL) {
+        delete _httpRequest;
+        _httpRequest = NULL;
+    }
 }
 
 bool	Connection::isClosed()	const {

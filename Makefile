@@ -104,6 +104,10 @@ docker-run:
 	-docker rm -f $(CONTAINER_NAME)
 	docker run --name $(CONTAINER_NAME) -it --network=host  $(IMAGE_NAME) /bin/bash
 
+docker-run:
+	-docker rm -f $(CONTAINER_NAME)
+	docker run --name $(CONTAINER_NAME) -it --network=host  $(IMAGE_NAME) /bin/bash
+
 re: fclean all
 
 .PHONY: all clean fclean re

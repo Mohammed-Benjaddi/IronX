@@ -10,8 +10,10 @@ HTTPRequest::HTTPRequest(std::vector<char> &raw_request, WebServerConfig *_confi
 }
 
 HTTPRequest::~HTTPRequest() {
-    if(this->cgi != NULL)
-        delete cgi;
+    // if(this->cgi != NULL) {
+    //     delete cgi;
+    //     cgi = NULL;
+    // }
 }
 
 void HTTPRequest::setMethod(const std::string &method) {
@@ -71,6 +73,11 @@ void HTTPRequest::setBodyFound(bool b)
 void HTTPRequest::setLocation(const std::string &location)
 {
     this->location = extractDirectory(location);
+}
+
+void HTTPRequest::setRedirectedFrom(const std::string &location)
+{
+    this->redirected_from = location;
 }
 
 void HTTPRequest::setFormFile(std::vector<FormFile> &formFiles)
@@ -137,6 +144,11 @@ std::string HTTPRequest::getLocation() const
     return location;
 }
 
+std::string HTTPRequest::getRedirectedFrom() const
+{
+    return redirected_from;
+}
+
 std::map<std::string, std::string> HTTPRequest::getHeaders() const
 {
     return headers;
@@ -175,6 +187,12 @@ std::string HTTPRequest::getRootDir() const
 void HTTPRequest::setRootDir(std::string rootDir)
 {
     this->rootDir = rootDir;
+}
+
+void HTTPRequest::deleteCGI() {
+    delete cgi;
+    cgi = NULL;
+    std::cout << "CGI freed successfully" << std::endl;
 }
 
 
@@ -286,6 +304,7 @@ void HTTPRequest::handleRequest()
     else {
         setStatusCode(400);
         setStatusMessage("Bad Request");
+        setPath(getErrorPages(getStatusCode()));;
     }
 }
 
@@ -330,7 +349,15 @@ void HTTPRequest::handleDELETE(std::map<std::string, Route> &routes, Route &rout
 void HTTPRequest::RedirectionFound(Route &route) {
     std::string a = getPath(), b = getLocation();
     setPath(route.getRedirect());
+    if(getRedirectedFrom() == getPath()) {
+        setStatusCode(508);
+        setStatusMessage("Loop Detected");
+        setPath(getErrorPages(getStatusCode()));
+        return;
+    }
+    setRedirectedFrom(getLocation());
     setLocation(getPath());
+
     setStatusCode(301);
     setStatusMessage("Moved Permanently");
     setMethod("GET");
@@ -363,4 +390,11 @@ void HTTPRequest::handlePOST(std::map<std::string, Route> &routes, Route &route)
     }
 }
 
-CGI* HTTPRequest::getCGI() const { return cgi; }
+CGI* HTTPRequest::getCGI() const {
+    if(this->cgi != NULL) {
+        std::cout << "cgi is allocated" << std::endl;
+        return cgi; 
+    }
+    std::cout << "cgi is null" << std::endl;\
+    return NULL;
+}

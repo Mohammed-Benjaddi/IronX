@@ -135,12 +135,14 @@ void Multiplexer::handle_client_event(int fd, uint32_t event) {
 
         Connection &conn = activeConnections.at(fd);
 
-        if (event & EPOLLIN)
+        if (event & EPOLLIN) {
             conn.handleRead();
+        }
         
-        if (event & EPOLLOUT)
+        if (event & EPOLLOUT) {
             conn.handleWrite();
 
+        }
 	} catch (const std::exception &e) {
         Multiplexer::close_connection(fd);
 	}

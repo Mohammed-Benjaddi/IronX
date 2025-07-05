@@ -25,10 +25,12 @@ class CGI {
     std::string extension;
     std::string script_output;
     std::map<std::string, std::string> env_vars;
+    char **env_array;
     HTTPRequest &request;
     Route &route;
     public:
     CGI(HTTPRequest &request, Route &route);
+    ~CGI();
     void setupEnvironment();
     std::string intToString(int num);
     char** createEnvArray();
