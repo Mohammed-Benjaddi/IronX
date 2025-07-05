@@ -16,12 +16,9 @@ HTTPResponse::HTTPResponse(HTTPRequest* request, std::string cookies)
         _hasCookie = true;
         setHeader("Set-Cookie", cookies);
     }
-    // if (request->getMethod() == "DELETE" || (request->getMethod() == "POST" && !request->getCGI())){
-    //     setStandardHeaders(this, "text/plain", 0, "close", request->getStatusCode(), request->getStatusMessage());
-    // } else
+    
     buildResponse(request, this);
 
-    // delete request;
 }
 
 bool HTTPResponse::hasCookie() {

@@ -116,14 +116,11 @@ void Connection::handleRead() {
     char buffer[4096] = {0};
     ssize_t bytes_read = recv(_fd, buffer, sizeof(buffer), 0);
 
-    // std::cout << "Bytes_read:::::::: " << bytes_read << "\n";
-
     if (bytes_read > 0) {
         // Append new data to the read buffer
         _readBuffer.insert(_readBuffer.end(), buffer, buffer + bytes_read);
 
         // If headers haven't been parsed yet, look for the delimiter
-        
             const std::string delimiter = "\r\n\r\n";
             std::vector<char>::iterator it = std::search(
                 _readBuffer.begin(),
@@ -136,7 +133,6 @@ void Connection::handleRead() {
                 size_t pos = std::distance(_readBuffer.begin(), it);
                 _headersPart = std::string(_readBuffer.begin(), _readBuffer.begin() + pos + delimiter.size());
                 _headersParsed = true;
-                // std::cout << "Holala this is the size of buffer1==========>" << _readBuffer.size() << '\n';
                 parseContentLength();
             }
             
@@ -146,15 +142,10 @@ void Connection::handleRead() {
             }
         // If headers are parsed, check for complete body
         if (_headersParsed) {
-            // std::cout << "expected body length: " << _expectedBodyLength << std::endl;
-            // std::cout << "sum: " << _headersPart.size() + _expectedBodyLength << std::endl;
             if ( _expectedBodyLength == 0 || (_readBuffer.size() >= (_headersPart.size() + _expectedBodyLength))) {
                 std::cout << "\n\033[1;31m******************************\033[0m\n";            
                 std::cout << "\033[1;32m== HTTP REQUEST ==\n" << _headersPart << "\033[0m\n";
-                // std::string requestData(_readBuffer.begin(), _readBuffer.end());
-                // HTTPRequest req = HTTPRequest(_readBuffer, _config, _serverClusterId);
                 _httpRequest = new HTTPRequest(_readBuffer, _config, _serverClusterId);
-
                 _httpResponse = new HTTPResponse(_httpRequest, _cookieHeader);
                 printResponse(_httpResponse, _httpRequest);
                 std::cout << "\033[1;31m******************************\033[0m\n\n";
