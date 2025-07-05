@@ -54,12 +54,10 @@ bool    handleCGI(HTTPRequest *req, HTTPResponse *res) {
             res->setHeader("Connection", "close");
             res->setBody(req->getCGI()->getScriptOutput());
             // ! tomorrow start with this
-            if(req->getCGI() != NULL) {
+            if (req->getCGI() != NULL) {
                 std::cout << "CGI != NULL:  2" << std::endl;
-                // req->deleteCGI();
             }
             std::cout << "------------------ END ---------------------" << std::endl;
-            // exit(99);
         } else {
             std::cout << "ELSE: no CGI found" << std::endl;
             res->setStatus(500, "Internal Server Error");
@@ -111,7 +109,7 @@ void buildResponse(HTTPRequest* req, HTTPResponse* res) {
         res->setHeader("Connection", connection);
         if (!fileExists(req->getPath()))
             res->buildAutoIndexResponse(req);
-        if (hasFile)
+        else
             res->setStreamer(new FileStreamer(path, connection));
         return;
     }
