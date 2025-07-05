@@ -1,5 +1,5 @@
 #include "../../headers/HTTPResponse.hpp"
-
+#include "../../headers/requestUtils.hpp"
 
 std::map<std::string, std::string> HTTPResponse::_mimeTypes = initMimeTypes();
 
@@ -178,13 +178,16 @@ void HTTPResponse::buildAutoIndexResponse(HTTPRequest *request) {
     html << "</tbody></table>\n<a class=\"gta-btn\" href=\"/\">⬅ Back to home</a>\n</div>\n</body>\n</html>\n";
 
     std::string outputPath = directoryPath + "/index.html";
-    std::ofstream outputFile(outputPath.c_str());
+    
+    if (isFileExist(outputPath.c_str())) {
+        std::ofstream outputFile(outputPath.c_str());
+        outputFile << html.str();
+        outputFile.close();
+        _streamer = new FileStreamer(outputPath, _connectionType);
+        setStandardHeaders(this, "text/html", _streamer->getFileSize(), "keep-alive", 200, "OK");
+        _tempFilePath = outputPath;
+    }
 
-    outputFile << html.str();
-    outputFile.close();
-    _streamer = new FileStreamer(outputPath, _connectionType);
-    setStandardHeaders(this, "text/html", _streamer->getFileSize(), "keep-alive", 200, "OK");
-    _tempFilePath = outputPath;
 }
 
 // Used for setting Connection: header

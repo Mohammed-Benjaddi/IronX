@@ -251,14 +251,14 @@ std::vector<std::string> getDirectoryListing(const std::string& path, bool show_
 }
 
 void autoIndexOfDirectory(Route &route, HTTPRequest &request) {
-    std::string indexes[2] = {"index.html", "index.htm"};
+    // std::string indexes[2] = {"index.html", "index.htm"};
     std::string path = route.getRootDir() + "/" + request.getPath() + "/";
-    for(size_t i = 0; i < 2; i++) {
-        if(isFileExist((path + indexes[i]).c_str())) {
-            request.setPath(path + indexes[i]);
-            return;
-        }
-    }
+    // for(size_t i = 0; i < 2; i++) {
+    //     if(isFileExist((path + indexes[i]).c_str())) {
+    //         request.setPath(path + indexes[i]);
+    //         return;
+    //     }
+    // }
     std::vector<std::string> entries = getDirectoryListing(path, false);
     request.setPath(path + "index.html");
     request.setStatusCode(9999);
