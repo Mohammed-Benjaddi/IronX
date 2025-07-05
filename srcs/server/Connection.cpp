@@ -124,11 +124,7 @@ void Connection::handleRead() {
         // If headers haven't been parsed yet, look for the delimiter
         
             const std::string delimiter = "\r\n\r\n";
-<<<<<<< HEAD
-                std::vector<char>::iterator it = std::search(
-=======
             std::vector<char>::iterator it = std::search(
->>>>>>> test
                 _readBuffer.begin(),
                 _readBuffer.end(),
                 delimiter.begin(),

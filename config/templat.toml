@@ -20,7 +20,7 @@ hostnames = ["example.com", "www.example.com"  ]
 path = "/"
 root = "/"  	# Base directory for files
 index = ["index.html"]		# Requirement: "Set a default file  to serve when the request is for a directory"
-methods = ["GET"] 	# Requirement: "Define a list of accepted HTTP methods"
+methods = ["GET",  "POST"] 	# Requirement: "Define a list of accepted HTTP methods"
 autoindex = true 			# Requirement: "Enable or disable directory listing"
 
 [[servers.routes]]
@@ -34,8 +34,7 @@ interpreter = "/usr/bin/php-cgi"
 path = "/new-site"
 root = "/"
 methods = ["GET", "POST"]
-# index = ["file.html", "form.html"]
-# redirect = "/old-site"
+# index = ["index.html", "form.html"]
 extensions = [".php", ".py"]
 interpreter = "/usr/bin/env"
 autoindex = true
@@ -50,27 +49,24 @@ interpreter = "/usr/bin/env"
 
 [[servers.routes]]
 path = "/old-site"
-root = "/"
-# redirect = "/"
-methods = ["POST"]
-index = ["index.html", "form.html"]
-# methods = ["GET"]
+redirect = "https://new.example.com"
+methods = ["GET"]
 
-# [[     servers]]
-# host = "0.0.0.0"
-# port = 8081
+[[     servers]]
+host = "0.0.0.0"
+port = 8081
 
-# hostnames = ["api.example.com", "beta.example.com"]
+hostnames = ["api.example.com", "beta.example.com"]
 
-# [[         servers.routes    ]]
-# path = "/"
-# root = "/var/www/api"
-# index = ["api.php"]
-# methods = ["GET", "POST", "DELETE"]
+[[         servers.routes    ]]
+path = "/"
+root = "/var/www/api"
+index = ["api.php"]
+methods = ["GET", "POST", "DELETE"]
 
-# [[servers.routes]]
-# path = "/cgi"
-# root = "/var/www/cgi-bin"
-# methods = ["GET", "POST"]
-# extensions = [".php", ".py"]
-# interpreter = "/usr/bin/php-cgi"
+[[servers.routes]]
+path = "/cgi"
+root = "/var/www/cgi-bin"
+methods = ["GET", "POST"]
+extensions = [".php", ".py"]
+interpreter = "/usr/bin/php-cgi"

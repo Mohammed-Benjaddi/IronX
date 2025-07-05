@@ -14,11 +14,10 @@ int main(int ac, char **av) {
         try {
             std::string path(av[1]);
             parser.MainParser(path ,config);
-        } catch(const std::exception& e) {
-            std::cerr << "===> " << e.what() << '\n';
+        } catch (const std::exception& e) {
+            std::cerr << "Error parsing configuration file: " << e.what() << std::endl;
             return 1;
         }
-
         try {
                 ServerLauncher  launcher;
                 launcher.launch(config);
@@ -28,6 +27,10 @@ int main(int ac, char **av) {
         } catch (const std::exception &e) {
                 std::cerr << "Error Launching Server: " << e.what() << std::endl;
         }
+    } else {
+        std::cerr << "Usage: " << av[0] << " <config_file_path>" << std::endl;
+        std::cerr << "Example: " << av[0] << " config/templat.toml" << std::endl;
+        return 1;
     }
     return (0);
 }

@@ -41,12 +41,12 @@ int checkAllowedMethods(HTTPRequest &request) {
 // }
 
 bool URIHasUnallowedChar(std::string uri) {
-  const std::string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_-~/?#[]@!$$()'*+,'=%.&";
+  const std::string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_-~/?#[]@!$$('*+,'=%.&";
   const std::vector<char> allowedChars(chars.begin(), chars.end());
   
   for(size_t i = 0; i < uri.size(); i++) {
     if(std::find(allowedChars.begin(), allowedChars.end(), uri[i]) == allowedChars.end()) {
-       std::cout << "unallowed char ---> " << uri[i] << std::endl;
+       //std::cout << "unallowed char ---> " << uri[i] << std::endl;
         return true;
     }
   }
@@ -102,7 +102,6 @@ bool checkRequestURI(HTTPRequest &request, std::string uri) {
       request.setStatusCode(400);
       request.setStatusMessage("Bad request");
       request.setPath(request.getErrorPages(400));
-      exit(99);
       return false;
   }
   // 414 Request-URI Too Long
@@ -148,10 +147,7 @@ int find_method_uri(HTTPRequest &request, const std::string &line) {
     // exit(0);
   }
   request.setMethod(method);
-  if(uri == "...")
-    request.setPath("index.html");
-  else
-    request.setPath(uri);
+  request.setPath(uri);
   //std::cout << "\n\n\nhandle request : " << request.getPath() << "uri: " << uri << "\n\n\n" << std::endl;
 
   // //std::cout << "get path ---> " << request.getPath() << std::endl;
@@ -173,17 +169,17 @@ std::vector<char> trim_crlf(const std::string &str) {
     return vec;
 }
 
-// std::string trim(const std::string& str) {
-//     std::string::size_type start = 0;
-//     while (start < str.size() && std::isspace(static_cast<unsigned char>(str[start]))) {
-//       ++start;
-//     }
-//     std::string::size_type end = str.size();
-//     while (end > start && std::isspace(static_cast<unsigned char>(str[end - 1]))) {
-//         --end;
-//     }
-//     return str.substr(start, end - start);
-// }
+std::string trim(const std::string& str) {
+    std::string::size_type start = 0;
+    while (start < str.size() && std::isspace(static_cast<unsigned char>(str[start]))) {
+      ++start;
+    }
+    std::string::size_type end = str.size();
+    while (end > start && std::isspace(static_cast<unsigned char>(str[end - 1]))) {
+        --end;
+    }
+    return str.substr(start, end - start);
+}
 
 std::vector<FormFile> parseMultipartFormData(const std::vector<char> &body, const std::string &boundary) {
     //std::cout << "boundary: " << boundary << std::endl;
