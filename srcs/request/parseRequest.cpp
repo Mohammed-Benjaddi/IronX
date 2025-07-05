@@ -8,12 +8,12 @@ int checkAllowedMethods(HTTPRequest &request) {
   if(route_it != routes.end()) {
     const std::set<std::string> &allowedMethod  = route_it->second.getAllowedMethods();
 
-    std::set<std::string>::iterator it = allowedMethod.begin();
+    // std::set<std::string>::iterator it = allowedMethod.begin();
 
-    while(it != allowedMethod.end()) {
-     //std::cout << "===> " << *it->begin() << std::endl;
-      it++;
-    }
+    // while(it != allowedMethod.end()) {
+    //    std::cout << "===> " << *it->begin() << std::endl;
+    //   it++;
+    // }
 
     if(allowedMethod.find(request.getMethod()) == allowedMethod.end()) {
         request.setStatusCode(405);
@@ -21,13 +21,24 @@ int checkAllowedMethods(HTTPRequest &request) {
         request.setPath(request.getErrorPages(request.getStatusCode()));;
         return -1;
     }
-  } else {
-    ////std::cout << "+++ location not found" << std::endl;
-    // request.setStatusCode(404);
-    // request.setStatusMessage("Not Found");
-    // request.setPath(request.getRootDir() + "/errors/404.html");
-    // return -1;
   }
+
+  std::cout << "not valid uri ---> " << request.getPath() << std::endl;
+
+  size_t start_pos = 0;
+  std::string path = request.getPath();
+  while(1)
+  {
+    start_pos = path.find("%20", start_pos);
+    if(start_pos == std::string::npos)
+      break;
+    path.erase(start_pos, 3);
+    path.insert(start_pos, " ");
+    start_pos += 1;
+  }
+
+  std::cout << "valid uri ---> " << path << std::endl;
+  request.setPath(path);
 
   return 1;
 }
