@@ -25,18 +25,18 @@ body {
   z-index: 1;
   text-align: center;
   max-width: 800px;
-  margin: 10rem auto;
-  padding: 2rem;
+  margin: 20rem auto;
+  /* padding: 2rem; */
 }
 
 h1 {
-  font-family: 'Pricedown Bl', sans-serif;
-  font-size: 6rem;
-  color: #ff4c4c;
+  font-size: 3rem !important;
+  color: #fff;
   text-align: center;
   text-shadow: 3px 3px 0 #000, 6px 6px 0 #000;
   margin-bottom: 2rem;
   animation: flicker 2.5s infinite;
+  font-family: 'Pricedown Bl', sans-serif;
 }
 
 p {
