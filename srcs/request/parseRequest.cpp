@@ -41,7 +41,7 @@ int checkAllowedMethods(HTTPRequest &request) {
 // }
 
 bool URIHasUnallowedChar(std::string uri) {
-  const std::string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_-~/?#[]@!$('*+,'=%.&";
+  const std::string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_-~/?#[]@!$()'*+,'=%.&";
   const std::vector<char> allowedChars(chars.begin(), chars.end());
   
   for(size_t i = 0; i < uri.size(); i++) {
