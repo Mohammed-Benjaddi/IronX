@@ -20,7 +20,7 @@ hostnames = ["example.com", "www.example.com"  ]
 path = "/"
 root = "/"  	# Base directory for files
 index = ["index.html"]		# Requirement: "Set a default file  to serve when the request is for a directory"
-methods = ["GET",  "POST"] 	# Requirement: "Define a list of accepted HTTP methods"
+methods = ["GET"] 	# Requirement: "Define a list of accepted HTTP methods"
 autoindex = true 			# Requirement: "Enable or disable directory listing"
 
 [[servers.routes]]
@@ -33,7 +33,7 @@ interpreter = "/usr/bin/php-cgi"
 [[servers.routes]]
 path = "/new-site"
 root = "/"
-methods = ["GET", "POST"]
+methods = ["GET", "POST", "DELETE"]
 # index = ["file.html"]
 extensions = [".php", ".py"]
 interpreter = "/usr/bin/env"
@@ -49,7 +49,7 @@ interpreter = "/usr/bin/env"
 
 [[servers.routes]]
 path = "/old-site"
-redirect = "https://new.example.com"
+redirect = "/new-site"
 methods = ["GET"]
 
 [[     servers]]

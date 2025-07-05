@@ -105,11 +105,12 @@ void buildResponse(HTTPRequest* req, HTTPResponse* res) {
         return;
     }
 
-    if (status == 9999 && !fileExists(req->getPath())) {
+    if (status == 9999) {
         req->setStatusCode(200);
         res->setHeader("Content-Type", contentType);
         res->setHeader("Connection", connection);
-        res->buildAutoIndexResponse(req);
+        if (!fileExists(req->getPath()))
+            res->buildAutoIndexResponse(req);
         if (hasFile)
             res->setStreamer(new FileStreamer(path, connection));
         return;
@@ -122,6 +123,8 @@ void buildResponse(HTTPRequest* req, HTTPResponse* res) {
         case 405:
         case 508:
         case 400:
+        case 204:
+        case 201:
             res->setStatus(status, req->getStatusMessage());
             res->setHeader("Content-Type", contentType);
             res->setHeader("Connection", connection);
