@@ -10,7 +10,7 @@ max_body_size = 1048576
 
 [[servers]]
 host = "0.0.0.0" # Listen on all available network interfaces
-port = 8080# Listen on port 8080
+port = [8080, 8081, 8082]# Listen on port 8080
 hostnames = ["example.com", "www.example.com"]
 [[servers.routes]]
 path = "/"
@@ -41,20 +41,21 @@ methods = ["GET", "POST", "DELETE"]
 interpreter = "/usr/bin/env"
 extensions = [".php", ".py"]
 autoindex = true
-# [[servers]]
-# host = "0.0.0.0"
-# port = 8080
-# hostnames = ["api.example.com", "beta.example.com"]
 
-# [[servers.routes]]
-# path = "/"
-# root = "/var/www/api"
-# index = "api.php"
-# methods = ["GET", "POST", "DELETE"]
+[[servers]]
+host = "127.0.0.1"
+port = [9090, 9091]
+hostnames = ["api.example.com", "beta.example.com"]
 
-# [[servers.routes]]
-# path = "/cgi"
-# root = "/var/www/cgi-bin"
-# methods = ["GET", "POST"]
-# extensions = [".php", ".py"]
-# interpreter = "/usr/bin/php-cgi"
+[[servers.routes]]
+path = "/"
+root = "/var/www/api"
+index = "api.php"
+methods = ["GET", "POST", "DELETE"]
+
+[[servers.routes]]
+path = "/cgi"
+root = "/var/www/cgi-bin"
+methods = ["GET", "POST"]
+extensions = [".php", ".py"]
+interpreter = "/usr/bin/php-cgi"

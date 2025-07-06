@@ -1,0 +1,5 @@
+0.0.0.0 example.com
+0.0.0.0 www.example.com
+0.0.0.0 nabil.com
+127.0.0.1 api.example.com
+127.0.0.1 beta.example.com

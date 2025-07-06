@@ -158,7 +158,6 @@ void Connection::handleRead() {
                 return;
             }
         }
-
     } else {
         _closed = true;
         throw Multiplexer::ClientDisconnectedException();

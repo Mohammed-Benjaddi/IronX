@@ -13,8 +13,8 @@ max_body_size = 1000000000000
 
 [[servers]]
 host = "0.0.0.0" # Listen on all available network interfaces
-port = [8080] # Listen on port 8080
-hostnames = ["example.com", "www.example.com"  ]
+port = [8080, 8081, 8082] # Listen on port 8080
+hostnames = ["example.com", "www.example.com", "nabil.com"  ]
 
 [[servers.routes]]
 path = "/"
@@ -53,8 +53,8 @@ redirect = "/new-site"
 methods = ["GET"]
 
 [[     servers]]
-host = "0.0.0.0"
-port = 8081
+host = "127.0.0.1"
+port = [8090, 8091, 8092]
 
 hostnames = ["api.example.com", "beta.example.com"]
 
