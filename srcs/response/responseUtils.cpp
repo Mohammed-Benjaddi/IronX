@@ -45,27 +45,18 @@ std::string toString(int value) {
 }
 
 bool    handleCGI(HTTPRequest *req, HTTPResponse *res) {
-    std::cout << "------------------- START --------------------" << std::endl;
-    if (req->getCGI() != NULL) {
-        if (req->getCGI()) {
-            res->setStatus(200, "OK");
+    if (req->getCGI()) {
+            res->setStatus(req->getStatusCode(), req->getStatusMessage());
             res->setHeader("Content-Type", "text/html");
             res->setHeader("Content-Length", toString(req->getCGI()->getScriptOutput().size()));
             res->setHeader("Connection", "close");
-            res->setBody(req->getCGI()->getScriptOutput());
-            // ! tomorrow start with this
-            if (req->getCGI() != NULL) {
-                std::cout << "CGI != NULL:  2" << std::endl;
-            }
-            std::cout << "------------------ END ---------------------" << std::endl;
-        } else {
-            std::cout << "ELSE: no CGI found" << std::endl;
-            res->setStatus(500, "Internal Server Error");
-            res->setHeader("Content-Type", "text/html");
-            res->setHeader("Content-Length", "97");
-            res->setHeader("Connection", "close");
-            res->setBody("<html><body><h1>500 Internal Server Error</h1><p>CGI script failed to execute.</p></body></html>");
-        }
+            std::string body("");
+            if (req->getStatusCode() == 200)
+                body.append("<html><body><h1>200 OK </h1><p>CGI Script Executed Succesefully.</p></body></html>");
+            else
+                body.append("<html><body><h1>500 Internal Server Error</h1><p>CGI script failed to execute.</p></body></html>");
+            body.append(req->getCGI()->getScriptOutput());
+            res->setBody(body);
         return true;
     }
     return false;
@@ -83,12 +74,12 @@ void buildResponse(HTTPRequest* req, HTTPResponse* res) {
 
     const std::string contentType = "text/html";
 
-    std::cout << "Path: " << req->getPath() << std::endl;
-    std::cout << "Method: " << req->getMethod() << std::endl;
-    std::cout << "Status Code: " << req->getStatusCode() << std::endl;
-    std::cout << "Status Message: " << req->getStatusMessage() << std::endl;
-    std::cout << "Connection: " << connection << std::endl;
-    std::cout << "Content-Type: " << contentType << std::endl;
+    // std::cout << "Path: " << req->getPath() << std::endl;
+    // std::cout << "Method: " << req->getMethod() << std::endl;
+    // std::cout << "Status Code: " << req->getStatusCode() << std::endl;
+    // std::cout << "Status Message: " << req->getStatusMessage() << std::endl;
+    // std::cout << "Connection: " << connection << std::endl;
+    // std::cout << "Content-Type: " << contentType << std::endl;
 
     int status = req->getStatusCode();
     std::string path = req->getPath();

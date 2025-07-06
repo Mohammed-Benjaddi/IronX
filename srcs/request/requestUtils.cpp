@@ -95,8 +95,8 @@ void deleteRequestedFile(HTTPRequest &request, std::string path, std::string fil
         request.setPath(request.getErrorPages(request.getStatusCode()));
         return;
     }
-
     int result = remove((path).c_str());
+    // exit(0);
     if (!result) {
         request.setStatusCode(204);
         request.setStatusMessage("No Content");

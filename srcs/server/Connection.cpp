@@ -129,6 +129,8 @@ void Connection::handleRead() {
                 delimiter.end()
             );
 
+            // std::string reqRaw = std::string(_readBuffer.begin(), _readBuffer.end());
+
             if (it != _readBuffer.end()) {
                 size_t pos = std::distance(_readBuffer.begin(), it);
                 _headersPart = std::string(_readBuffer.begin(), _readBuffer.begin() + pos + delimiter.size());
@@ -143,6 +145,8 @@ void Connection::handleRead() {
         // If headers are parsed, check for complete body
         if (_headersParsed) {
             if ( _expectedBodyLength == 0 || (_readBuffer.size() >= (_headersPart.size() + _expectedBodyLength))) {
+                // std::cout << reqRaw << std::endl;
+                // exit(0);
                 std::cout << "\n\033[1;31m******************************\033[0m\n";            
                 std::cout << "\033[1;32m== HTTP REQUEST ==\n" << _headersPart << "\033[0m\n";
                 _httpRequest = new HTTPRequest(_readBuffer, _config, _serverClusterId);

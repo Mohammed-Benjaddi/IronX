@@ -153,13 +153,13 @@ void CGI::executeCGI()
             request.setStatusMessage("Ok");
         }
         else {
-           std::cout << "---------> something went wrong" << std::endl;
-           //std::cout << "Exit status: " << WEXITSTATUS(status) << std::endl;
-           //std::cout << "Script output: [" << output << "]" << std::endl;
+        //    std::cout << "---------> something went wrong" << std::endl;
+           std::cout << "Exit status: " << WEXITSTATUS(status) << std::endl;
+           std::cout << "Script output: [" << output << "]" << std::endl;
             request.setStatusCode(500);
             request.setStatusMessage("Internal Server");
             request.setPath(request.getErrorPages(request.getStatusCode()));
-           //std::cout << "* CGI: script execution failed" << std::endl;
+           std::cout << "* CGI: script execution failed" << std::endl;
         }
     }
 }

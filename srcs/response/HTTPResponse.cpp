@@ -120,7 +120,9 @@ std::string HTTPResponse::getNextChunk() {
     }
 
     _complete = true;
+
     return "";
+
 }
 
 std::string normalizePath(const std::string& base, const std::string& entry) {
