@@ -73,7 +73,6 @@ std::vector<std::string> CGI::getInterpreter(const std::string &script_path)
 
 void CGI::executeCGI()
 {
-    std::cout << "execute CGI..." << std::endl;
     int pipe_fd[2];
     int stdin_pipe[2];
     if (pipe(pipe_fd) == -1 || pipe(stdin_pipe) == -1)
@@ -81,10 +80,7 @@ void CGI::executeCGI()
         request.setStatusCode(500);
         request.setStatusMessage("Internal Server");
         request.setPath(request.getErrorPages(request.getStatusCode()));
-        //std::cout << "* CGI: creation failed" << std::endl;
     }
-
-    //std::cout << "script_path ----> " << script_path << std::endl;
 
     pid_t pid = fork();
 
@@ -153,13 +149,9 @@ void CGI::executeCGI()
             request.setStatusMessage("Ok");
         }
         else {
-        //    std::cout << "---------> something went wrong" << std::endl;
-           std::cout << "Exit status: " << WEXITSTATUS(status) << std::endl;
-           std::cout << "Script output: [" << output << "]" << std::endl;
             request.setStatusCode(500);
             request.setStatusMessage("Internal Server");
             request.setPath(request.getErrorPages(request.getStatusCode()));
-           std::cout << "* CGI: script execution failed" << std::endl;
         }
     }
 }

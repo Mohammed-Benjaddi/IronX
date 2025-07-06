@@ -14,7 +14,7 @@ max_body_size = 1000000000000
 [[servers]]
 host = "0.0.0.0" # Listen on all available network interfaces
 port = [8080, 8081, 8082] # Listen on port 8080
-hostnames = ["example.com", "www.example.com", "nabil.com"  ]
+hostnames = ["example.com", "www.example.com", "nabil.com"]
 
 [[servers.routes]]
 path = "/"

@@ -41,7 +41,7 @@ void    Multiplexer::dispatch_event(const struct epoll_event &event) {
     } else {
         handle_client_event(fd, event_flags);
         // exit(0);
-       std::cout << "Client event on fd: " << fd << std::endl;
+    //    std::cout << "Client event on fd: " << fd << std::endl;
     }
 }
 
