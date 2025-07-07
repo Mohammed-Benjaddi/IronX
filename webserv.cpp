@@ -2,7 +2,6 @@
 #include "headers/HTTPRequest.hpp"
 #include "headers/ServerLauncher.hpp"
 #include "headers/Multiplexer.hpp"
-#include "mocker.hpp"
 #include "headers/Parser.hpp"
 
 #include <sstream>

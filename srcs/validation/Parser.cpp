@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Parser.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nhayoun <nhayoun@student.1337.ma>          +#+  +:+       +#+        */
+/*   By: ael-maaz <ael-maaz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 17:38:54 by ael-maaz          #+#    #+#             */
-/*   Updated: 2025/07/05 14:54:40 by nhayoun          ###   ########.fr       */
+/*   Updated: 2025/07/06 22:33:19 by ael-maaz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -223,9 +223,9 @@ std::vector<uint16_t> parseIntList(const std::string& value) {
 void commitRoute(Cluster* c, const std::string& path, const Route& r)
 {
     if (!c)
-        throw std::runtime_error("Route block is missing a \"path\" key");
-    if (path.empty())
         throw std::runtime_error("Route defined outside of [[servers]] block");
+    if (path.empty())
+        throw std::runtime_error("Invalid/Missing Path");
 
     c->addRoute(path, r);
 }
@@ -243,13 +243,14 @@ void parseTOML(const std::string& filepath, WebServerConfig& config)
     Route      currentRoute;             // the route we are filling
     std::string currentRoutePath;        // its eventual key in the map
     bool        inRoute = false;         // true when inside [[servers.routes]]
+	bool hasPathKey = false;
 
     // data that will be moved into WebServerConfig at the end
     std::vector<Cluster>        clusters;
     std::map<int, std::string>  errorPages;
     size_t                      maxBodySize = 1048576; // default 1 MB
 
-
+	// hasPathKey = true;
 	bool seenGlobalBlock = false;              // NEW
 	bool seenDefaultErrorPagesBlock = false;
     //---------------------------------- --------------------------------
@@ -286,16 +287,25 @@ void parseTOML(const std::string& filepath, WebServerConfig& config)
 					throw std::runtime_error("Unexpected '[' inside single‑bracket section: " + line);
     		}
 			
-            if (line.compare(0,2,"[[") == 0 &&
-                line.find("servers.routes") != std::string::npos)
+            if (line.compare(0,2,"[[") == 0 && line.find("servers.routes") != std::string::npos)
             {
                 // commit the previous route (if we were already in one)
-                if (inRoute)
-                    commitRoute(currentCluster, currentRoutePath, currentRoute);
+				if (!currentCluster)
+        			throw std::runtime_error("Route block declared outside of [[servers]] block");
+                // if (inRoute)
+                //     commitRoute(currentCluster, currentRoutePath, currentRoute);
+				if (inRoute) {
+					if (!hasPathKey)
+						throw std::runtime_error("Missing required `path` key in [[servers.routes]] block");
+					if (currentRoutePath.empty())
+						throw std::runtime_error("Empty `path` value in [[servers.routes]] block");
 
+					commitRoute(currentCluster, currentRoutePath, currentRoute);
+    			}
                 // start a fresh route
                 currentRoute       = Route();
                 currentRoutePath.clear();
+				hasPathKey         = false; 
                 inRoute            = true;
                 currentSection.clear();      // keys now belong to the route
                 continue;
@@ -365,8 +375,18 @@ void parseTOML(const std::string& filepath, WebServerConfig& config)
         }
         else if (currentSection == "default_error_pages")
         {
-
+			bool isAllDigits = true;
+			for (std::string::const_iterator it = key.begin(); it != key.end(); ++it) {
+				if (!isdigit(static_cast<unsigned char>(*it))) {
+					isAllDigits = false;
+					break;
+				}
+			}
+			if (!isAllDigits)
+				throw std::runtime_error("Invalid error code in [default_error_pages]: " + key);
             int code = atoi(key.c_str());
+			 if (code < 100 || code > 599)
+        		throw std::runtime_error("Invalid HTTP status code: " + key);
             if (val.empty()) {
         		throw std::runtime_error("Empty string not permitted");
             }
@@ -410,6 +430,8 @@ void parseTOML(const std::string& filepath, WebServerConfig& config)
                 currentCluster->setPorts(parseIntList(val));
             else if (key == "hostnames")
                 currentCluster->setHostnames(parseStringList(val));
+			else
+				throw std::runtime_error("Invalid key for [[servers]] block");
         }
         //------------------------------------------------------------------
         // 3) ROUTE‑LEVEL keys
@@ -433,7 +455,10 @@ void parseTOML(const std::string& filepath, WebServerConfig& config)
 				val = val.substr(1, val.size() - 2);
 			}
             if      (key == "path")
+			{
                 currentRoutePath = val;
+				hasPathKey         = true; 
+			}
             else if (key == "root")
                 currentRoute.setRootDir(val);
             else if (key == "index") {
@@ -460,14 +485,21 @@ void parseTOML(const std::string& filepath, WebServerConfig& config)
                 cgi.setInterpreter(val);
                 currentRoute.setCGIConfig(cgi);
             }
+			else
+				throw std::runtime_error("Invalid key for [[server.routes]] block");	
         }
     }
 
     //------------------------------------------------------------------
     // commit the last open route / cluster after EOF
     //------------------------------------------------------------------
-    if (inRoute)
-        commitRoute(currentCluster, currentRoutePath, currentRoute);
+    if (inRoute) {
+		if (!hasPathKey)
+			throw std::runtime_error("Missing required `path` key in final [[servers.routes]] block");
+		if (currentRoutePath.empty())
+			throw std::runtime_error("Empty `path` value in final [[servers.routes]] block");
+		commitRoute(currentCluster, currentRoutePath, currentRoute);
+	}
 
     // move data into WebServerConfig
     config.setMaxBodySize(maxBodySize);

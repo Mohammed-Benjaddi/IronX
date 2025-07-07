@@ -25,18 +25,18 @@ void	ServerLauncher::launch(const WebServerConfig &config) {
 	std::vector<ServerSocket> sockets;
 	//? For each Cluster
 
-	std::ofstream conf("/etc/hosts", std::ios::out | std::ios::trunc);
-    if (!conf) {
-        std::cerr << "Erreur : impossible d'ouvrir le fichier\n";
-        return;
-    }
+	// std::ofstream conf("/etc/hosts", std::ios::out | std::ios::trunc);
+    // if (!conf) {
+    //     std::cerr << "Erreur : impossible d'ouvrir le fichier\n";
+    //     return;
+    // }
 
-	conf << "127.0.0.1 localhost\n";
+	// conf << "127.0.0.1 localhost\n";
 
 	for (size_t i = 0; i < clusters.size(); i++) {
 		std::vector<std::string> hostnames = clusters.at(i).getHostnames();
 
-		buildHostnames(hostnames, clusters.at(i).getHost(), conf);
+		// buildHostnames(hostnames, clusters.at(i).getHost(), conf);
 		
 		const Cluster& cluster = clusters.at(i);
 		
