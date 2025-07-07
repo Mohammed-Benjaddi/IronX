@@ -73,13 +73,6 @@ int parse( HTTPRequest &request, std::vector<char> &req) {
     request.setBody(emptyBody);
   }
 
-  if(request.getBody().size() > request.getConfig()->getMaxBodySize()) {
-    request.setStatusCode(413);
-    request.setStatusMessage("Payload Too Large");
-    request.setPath(request.getErrorPages(request.getStatusCode()));
-    return -1;
-  }
-
   return 1;
 }
 

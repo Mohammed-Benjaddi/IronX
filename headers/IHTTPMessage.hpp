@@ -18,8 +18,6 @@ protected:
 public:
     virtual ~IHTTPMessage() {}
 
-    // Serialize to raw bytes
-    virtual std::vector<uint8_t> to_bytes() const = 0;
 
     void setStatusMessage(const std::string& message);
     void setStatusCode(int code);

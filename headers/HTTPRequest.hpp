@@ -56,7 +56,7 @@ private:
 public:
     // HTTPRequest(const std::string &, WebServerConfig *, int );
     HTTPRequest(std::vector<char> &raw_request, WebServerConfig *_config, int _clientId);
-    HTTPRequest(const std::string &, WebServerConfig *, int , HTTPResponse *);
+    HTTPRequest();
     ~HTTPRequest();
 
     // Setters
@@ -101,17 +101,11 @@ public:
     bool isBodyFound() const;
     std::vector<FormFile> &getFormFiles();
     std::string getFileExtension();
-    // bool isCGI() const;
 
     void deleteCGI();
-
-    virtual std::vector<uint8_t> to_bytes() const;
-
     int setRoutesInfo(std::map<std::string, Route> &routes, Route &route);
-
     void RedirectionFound(Route &route);
-
-
+  
     void handleRequest();
     void handleGet(std::map<std::string, Route> &routes, Route &route);
     void handlePOST(std::map<std::string, Route> &routes, Route &route);

@@ -9,12 +9,13 @@ HTTPRequest::HTTPRequest(std::vector<char> &raw_request, WebServerConfig *_confi
     handleRequest();
 }
 
-HTTPRequest::~HTTPRequest() {
-    // if(this->cgi != NULL) {
-    //     delete cgi;
-    //     cgi = NULL;
-    // }
+HTTPRequest::HTTPRequest() {
+    setStatusCode(413);
+    setStatusMessage("Payload Too Large");
+    setPath(getErrorPages(getStatusCode()));
 }
+
+HTTPRequest::~HTTPRequest() {}
 
 void HTTPRequest::setMethod(const std::string &method) {
     this->method = method;
@@ -231,11 +232,6 @@ std::string HTTPRequest::getErrorPages(int code) const
 
 // Methods
 
-std::vector<uint8_t> HTTPRequest::to_bytes() const
-{
-    std::vector<uint8_t> bytes;
-    return bytes;
-}
 
 void HTTPRequest::setFileExtension(const std::string &path)
 {
