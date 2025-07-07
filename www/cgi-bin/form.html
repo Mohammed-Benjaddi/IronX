@@ -69,7 +69,7 @@
         <h2>Contact Information</h2>
         
         <!-- GET Method Form -->
-        <form action="/new-site/script.py" method="GET">
+        <form action="/cgi-bin/script.py" method="GET">
             <div class="form-group">
                 <label for="firstName">First Name <span class="required">*</span></label>
                 <input type="text" id="firstName" name="firstName" required>
@@ -85,13 +85,13 @@
                 <input type="email" id="email" name="email" required>
             </div>
             
-            <button type="submit" class="submit-btn">Submit (GET)</button>
+            <button type="submit" class="submit-btn">Submit python (GET)</button>
         </form>
         
         <hr style="margin: 30px 0; border: 1px solid #eee;">
         
         <!-- POST Method Form -->
-        <form action="/new-site/script.py" method="POST">
+        <form action="/cgi-bin/script.py" method="POST">
             <div class="form-group">
                 <label for="firstName2">First Name <span class="required">*</span></label>
                 <input type="text" id="firstName2" name="firstName" required>
@@ -107,7 +107,45 @@
                 <input type="email" id="email2" name="email" required>
             </div>
             
-            <button type="submit" class="submit-btn">Submit (POST)</button>
+            <button type="submit" class="submit-btn">Submit python (POST)</button>
+        </form>
+
+        <form action="/cgi-bin/php_script.php" method="GET">
+            <div class="form-group">
+                <label for="firstName2">First Name <span class="required">*</span></label>
+                <input type="text" id="firstName2" name="firstName" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="lastName2">Last Name <span class="required">*</span></label>
+                <input type="text" id="lastName2" name="lastName" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="email2">Email Address <span class="required">*</span></label>
+                <input type="email" id="email2" name="email" required>
+            </div>
+            
+            <button type="submit" class="submit-btn">Submit php (GET)</button>
+        </form>
+
+        <form action="/cgi-bin/php_script.php" method="POST">
+            <div class="form-group">
+                <label for="firstName2">First Name <span class="required">*</span></label>
+                <input type="text" id="firstName2" name="firstName" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="lastName2">Last Name <span class="required">*</span></label>
+                <input type="text" id="lastName2" name="lastName" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="email2">Email Address <span class="required">*</span></label>
+                <input type="email" id="email2" name="email" required>
+            </div>
+            
+            <button type="submit" class="submit-btn">Submit php (POST)</button>
         </form>
     </div>
 </body>

@@ -1,61 +1,68 @@
-[global]
-max_body_size = 1048576
+[  global ]  
+
+max_body_size = 1000000000000
 
 [default_error_pages]
-400 = "/errors/400.html" # Bad Request
-403 = "/errors/403.html" # Forbidden
-404 = "/errors/404.html" # Not Found
-500 = "/errors/500.html" # Internal Server Error
-503 = "/errors/503.html" # Service Unavailable
+400 = "/errors/400.html"
+403 = "/errors/403.html"
+404 = "/errors/404.html"
+500 = "/errors/500.html"
+503 = "/errors/503.html"
 
 [[servers]]
-host = "0.0.0.0" # Listen on all available network interfaces
-port = [8080, 8081, 8082]# Listen on port 8080
-hostnames = ["example.com", "www.example.com"]
+host = "0.0.0.0"
+port = [8080, 8081, 8082]
+hostnames = ["example.com", "www.example.com", "nabil.com"]
+
 [[servers.routes]]
 path = "/"
-root = "/www/"  	# Base directory for files
-index = "index.html"		# Requirement: "Set a default file  to serve when the request is for a directory"
-methods = ["GET", "POST"] 	# Requirement: "Define a list of accepted HTTP methods"
-interpreter = "/usr/bin/env"
-extensions = [".php", ".py"]
-autoindex = false 			# Requirement: "Enable or disable directory listing"
+root = "/"  
+index = ["index.html"]	
+methods = ["GET", "POST", "DELETE"] 
+autoindex = true
 
 [[servers.routes]]
 path = "/cgi-bin"
-root = "/var/www/cgi-bin"
-methods = ["GET", "POST"]
-extensions = [".php"]
-interpreter = "/usr/bin/php-cgi"
-
-[[servers.routes]]
-path = "/new1"
-root = "/www/new-site"
-methods = ["GET", "POST"]
+root = "/"
+index = ["form.html"]
+methods = ["GET", "POST", "DELETE"]
+extensions = [".py"]
+interpreter = "/usr/bin/env"
+autoindex = true
 
 [[servers.routes]]
 path = "/new-site"
-root = "/www"
-index = "form.html"
-methods = ["GET", "POST", "DELETE"]
-interpreter = "/usr/bin/env"
+root = "/"
+methods = ["POST", "DELETE"]
 extensions = [".php", ".py"]
+interpreter = "/usr/bin/env"
 autoindex = true
+
+[[servers.routes]]
+path = "/not-found"
+root = "/"
+methods = ["GET", "POST", "DELETE"]
+autoindex = false
+
+[[servers.routes]]
+path = "/old-site"
+redirect = "/"
+methods = ["GET", "POST", "DELETE"]
 
 [[servers]]
 host = "127.0.0.1"
-port = [9090, 9091]
+port = [8090, 8091, 8092]
+
 hostnames = ["api.example.com", "beta.example.com"]
 
 [[servers.routes]]
 path = "/"
-root = "/var/www/api"
-index = "api.php"
+root = "/somewhere"
+index = ["index.html"]
 methods = ["GET", "POST", "DELETE"]
 
 [[servers.routes]]
-path = "/cgi"
-root = "/var/www/cgi-bin"
+path = "/upload"
+root = "/"
 methods = ["GET", "POST"]
-extensions = [".php", ".py"]
-interpreter = "/usr/bin/php-cgi"
+autoindex = true

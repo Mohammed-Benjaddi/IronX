@@ -6,28 +6,51 @@ import cgi
 print("Content-Type: text/html")
 print()  # End of headers
 
-print("<html>")
-print("<head><title>CGI Test</title></head>")
-print("<body>")
-print("<h1>Hello from Python CGI!</h1>")
+# Read the form data
+form = cgi.FieldStorage()
 
-# Show some environment variables
-print("<h2>Environment</h2>")
-print("<pre>")
-for key in sorted(os.environ.keys()):
-    print(f"{key} = {os.environ[key]}")
-print("</pre>")
+# Extract form fields (returns None if field doesn't exist)
+first_name = form.getfirst("firstName", "")
+last_name = form.getfirst("lastName", "")
+email = form.getfirst("email", "")
+method = os.environ.get("REQUEST_METHOD", "UNKNOWN")
 
-# Handle GET query string
-query = os.environ.get("QUERY_STRING", "")
-print(f"<p><strong>Query string:</strong> {query}</p>")
-
-# Handle POST data
-if os.environ.get("REQUEST_METHOD", "") == "POST":
-    form = cgi.FieldStorage()
-    print("<h2>POST Data</h2>")
-    for key in form.keys():
-        print(f"<p>{key} = {form.getvalue(key)}</p>")
-
-print("</body>")
-print("</html>")
+# HTML Response
+print(f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Form Result</title>
+    <style>
+        body {{
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background: #f9f9f9;
+        }}
+        .result {{
+            padding: 20px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }}
+        h2 {{
+            color: #333;
+        }}
+        .field {{
+            margin-bottom: 10px;
+        }}
+        .field span {{
+            font-weight: bold;
+        }}
+    </style>
+</head>
+<body>
+    <div class="result">
+        <h2>Form Submitted via {method}</h2>
+        <div class="field"><span>First Name:</span> {first_name}</div>
+        <div class="field"><span>Last Name:</span> {last_name}</div>
+        <div class="field"><span>Email:</span> {email}</div>
+    </div>
+</body>
+</html>
+""")

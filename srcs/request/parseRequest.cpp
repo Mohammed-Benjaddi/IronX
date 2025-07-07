@@ -3,18 +3,9 @@
 
 int checkAllowedMethods(HTTPRequest &request) {
   const std::map<std::string, Route>& routes = request.getConfig()->getClusters()[request.getClientId()].getRoutes();
-  ////std::cout << "req ---> " << request.getRootDir() + request.getPath() << std::endl;
   std::map<std::string, Route>::const_iterator route_it = routes.find(request.getPath());
   if(route_it != routes.end()) {
     const std::set<std::string> &allowedMethod  = route_it->second.getAllowedMethods();
-
-    // std::set<std::string>::iterator it = allowedMethod.begin();
-
-    // while(it != allowedMethod.end()) {
-    //    std::cout << "===> " << *it->begin() << std::endl;
-    //   it++;
-    // }
-
     if(allowedMethod.find(request.getMethod()) == allowedMethod.end()) {
         request.setStatusCode(405);
         request.setStatusMessage("Method Not Allowed");
@@ -22,9 +13,6 @@ int checkAllowedMethods(HTTPRequest &request) {
         return -1;
     }
   }
-
-  std::cout << "not valid uri ---> " << request.getPath() << std::endl;
-
   size_t start_pos = 0;
   std::string path = request.getPath();
   while(1)
@@ -36,20 +24,10 @@ int checkAllowedMethods(HTTPRequest &request) {
     path.insert(start_pos, " ");
     start_pos += 1;
   }
-
-  std::cout << "valid uri ---> " << path << std::endl;
   request.setPath(path);
 
   return 1;
 }
-
-// std::string findHeader(HTTPRequest &request, std::string key) {
-//   std::map<std::string, std::string> headers = request.getHeaders();
-//   std::map<std::string, std::string>::const_iterator it = headers.find(key);
-//   if (it != headers.end())
-//     return it ->second;
-//   return "";
-// }
 
 bool URIHasUnallowedChar(std::string uri) {
   const std::string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_-~/?#[]@!$()'*+,'=%.&";
@@ -57,7 +35,6 @@ bool URIHasUnallowedChar(std::string uri) {
   
   for(size_t i = 0; i < uri.size(); i++) {
     if(std::find(allowedChars.begin(), allowedChars.end(), uri[i]) == allowedChars.end()) {
-       //std::cout << "unallowed char ---> " << uri[i] << std::endl;
         return true;
     }
   }
@@ -96,9 +73,7 @@ int parse( HTTPRequest &request, std::vector<char> &req) {
     request.setBody(emptyBody);
   }
 
-  // std::cout << "body size: " << request.getBody().size() << std::endl;
   if(request.getBody().size() > request.getConfig()->getMaxBodySize()) {
-    // std::cout << "waaa3" << std::endl;
     request.setStatusCode(413);
     request.setStatusMessage("Payload Too Large");
     request.setPath(request.getErrorPages(request.getStatusCode()));
@@ -120,7 +95,6 @@ bool checkRequestURI(HTTPRequest &request, std::string uri) {
   if(uri.length() > 2048) {
       request.setStatusCode(414);
       request.setStatusMessage("Request-URI Too Long");
-      // request.setPath(request.getRootDir() + "/errors/414.html");
       request.setPath(request.getErrorPages(request.getStatusCode()));;
       return false;
   }
@@ -129,12 +103,9 @@ bool checkRequestURI(HTTPRequest &request, std::string uri) {
 
 int find_method_uri(HTTPRequest &request, const std::string &line) {
   std::stringstream sstream(line);
-  //std::cout << "line ===> " << line << std::endl;
-  // exit(99);
   std::string method, uri, httpVersion;
   sstream >> method >> uri >> httpVersion;
   if(!checkRequestURI(request, uri)) {
-    //std::cout << "URI is not correct" << std::endl;
     return -1;
   }
   request.setLocation(uri);
@@ -146,24 +117,15 @@ int find_method_uri(HTTPRequest &request, const std::string &line) {
   }
   if(uri[uri.length() - 1] == '/' && uri.size() == 1) {
     uri = uri.substr(0, uri.length() - 1);
-    ////std::cout << "new path ==> " << (uri.empty() ? "only slash" : uri) << std::endl;
-    ////std::cout << "|" << uri << "|" << std::endl;
     uri = "/";
   } else {
     size_t size = uri.size() - 1;
     if (uri[size] == '/')
       size--;
-      // ! -------------------------- !/ Exception thrown ?
     uri = uri.substr(1, size);
-    ////std::cout << "uri +++ " << uri << std::endl;
-    // exit(0);
   }
   request.setMethod(method);
   request.setPath(uri);
-  //std::cout << "\n\n\nhandle request : " << request.getPath() << "uri: " << uri << "\n\n\n" << std::endl;
-
-  // //std::cout << "get path ---> " << request.getPath() << std::endl;
-  // exit(99);
   request.setHTTPVersion(httpVersion);
   return 1;
 }
@@ -177,7 +139,6 @@ std::vector<char> trim_crlf(const std::string &str) {
     for(size_t i = 0; i < end; i++) {
       vec.push_back(str[i]);
     }
-    // return str.substr(0, end);
     return vec;
 }
 
@@ -194,7 +155,6 @@ std::string trim(const std::string& str) {
 }
 
 std::vector<FormFile> parseMultipartFormData(const std::vector<char> &body, const std::string &boundary) {
-    //std::cout << "boundary: " << boundary << std::endl;
     std::vector<FormFile> files;
     std::string boundaryMarker = "--" + boundary;
     std::string endMarker = boundaryMarker + "--";
@@ -273,7 +233,6 @@ std::string extractDirectory(const std::string& location)
         return "/";
     if (lastSlash == firstSlash && dot == std::string::npos)
         return location;
-    // if (dot != std::string::npos && lastSlash != firstSlash) {
     if (lastSlash != firstSlash) {
         size_t secondSlash = location.find('/', firstSlash + 1);
         if (secondSlash != std::string::npos)
@@ -286,6 +245,5 @@ std::string extractDirectory(const std::string& location)
         }
         return extractDirectory(trimmed);
     }
-   //std::cout << "-------------> here" << std::endl;
     return location.substr(0, lastSlash);
 }

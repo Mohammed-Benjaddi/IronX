@@ -192,11 +192,9 @@ void HTTPRequest::setRootDir(std::string rootDir)
 void HTTPRequest::deleteCGI() {
     delete cgi;
     cgi = NULL;
-    std::cout << "CGI freed successfully" << std::endl;
 }
 
 
-// ? "----WebKitFormBoundary9cvF8eER4QLomYfB"
 std::string HTTPRequest::getBoundary() const {
     const std::string& content_type = getHeader("Content-Type");
     std::string key = "boundary=";
@@ -286,15 +284,7 @@ void HTTPRequest::handleRequest()
 
     if (setRoutesInfo(routes, route) == -1)
         return;
-    
     setFileExtension(getPath());
-    
-    // std::cout << "method: " << getMethod() << std::endl;
-    // std::cout << "path: " << getPath() << std::endl;
-    // std::cout << "location: " << getLocation() << std::endl;
-    // std::cout << "root dir: " << route.getRootDir() << std::endl;
-    // std::cout << "file extension: " << getFileExtension() << std::endl;
-
     if (getMethod() == "GET")
         handleGet(routes, route);
     else if (getMethod() == "POST")
@@ -375,13 +365,10 @@ void HTTPRequest::handlePOST(std::map<std::string, Route> &routes, Route &route)
             setPath(getErrorPages(getStatusCode()));
             return;
         }
-        // if(getBody().empty())
-        //     exit(0);
         std::vector<FormFile> formFiles = parseMultipartFormData(getBody(), getBoundary());
         setFormFile(formFiles);
 
         if (getFormFiles().empty()) {
-           //std::cout << "no form files" << std::endl;
            return;
         }
         uploadFiles(*this);
@@ -391,10 +378,7 @@ void HTTPRequest::handlePOST(std::map<std::string, Route> &routes, Route &route)
 }
 
 CGI* HTTPRequest::getCGI() const {
-    if(this->cgi != NULL) {
-        std::cout << "cgi is allocated" << std::endl;
+    if(this->cgi != NULL)
         return cgi; 
-    }
-    std::cout << "cgi is null" << std::endl;\
     return NULL;
 }

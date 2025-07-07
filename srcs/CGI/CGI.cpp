@@ -2,12 +2,14 @@
 
 CGI::CGI(HTTPRequest &_request, Route &_route) : request(_request), route(_route)
 {
-//    //std::c<< "++++++ " << request.getRootDir() + "/" + request.getPath() << std::endl;
     script_path = request.getRootDir() + "/" + request.getPath();
     request_method = request.getMethod();
     query_string = request.getQuery();
     extension = script_path.substr(script_path.rfind("."));
-    request_body = "body must be here";
+    std::vector<char> ss = _request.getBody();
+    for(size_t i = 0; i < ss.size(); i++) {
+        request_body.push_back(ss[i]);
+    }
     script_output = "";
     setupEnvironment();
 }
@@ -58,11 +60,8 @@ std::vector<std::string> CGI::getInterpreter(const std::string &script_path)
 {
     std::vector<std::string> interpreters;
     CGIConfig config = route.getCGIConfig();
-    // std::vector<std::string> extensions = config.getExtensions();
-    // std::vector<std::string>::iterator it = std::find(extensions.begin(), extensions.end(), extension);
     std::string interpreter = config.getInterpreter();
     interpreters.push_back(interpreter);
-    // interpreters.push_back("/usr/bin/env");
     if (script_path.find(".py") != std::string::npos)
         interpreters.push_back("python3");
     else if (script_path.find(".php") != std::string::npos)
@@ -93,7 +92,6 @@ void CGI::executeCGI()
         request.setStatusCode(500);
         request.setStatusMessage("Internal Server");
         request.setPath(request.getErrorPages(request.getStatusCode()));
-        //std::cout << "* CGI: Fork() failed" << std::endl;
     }
 
     if (pid == 0)
@@ -112,8 +110,6 @@ void CGI::executeCGI()
         args[2] = const_cast<char *>(interpreter[2].c_str());
         args[3] = NULL;
         execve(interpreter[0].c_str(), args, env_array);
-        std::cerr << "CGI execution failed" << std::endl;
-        // exit(1);
     }
     else
     {
@@ -140,11 +136,7 @@ void CGI::executeCGI()
         waitpid(pid, &status, 0);
 
         if (WIFEXITED(status) && WEXITSTATUS(status) == 0) {
-           //std::cout << "the script executed successfully" << std::endl;
-
-           // * 
             script_output = output;
-            std::cout << "output: \n" << output << std::endl; 
             request.setStatusCode(200);
             request.setStatusMessage("Ok");
         }
