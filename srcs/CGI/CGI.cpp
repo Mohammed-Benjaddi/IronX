@@ -2,7 +2,7 @@
 
 CGI::CGI(HTTPRequest &_request, Route &_route) : request(_request), route(_route)
 {
-    script_path = request.getRootDir() + "/" + request.getPath();
+    script_path = route.getRootDir() + "/" + request.getPath();
     request_method = request.getMethod();
     query_string = request.getQuery();
     extension = script_path.substr(script_path.rfind("."));
@@ -110,9 +110,14 @@ void CGI::executeCGI()
         args[2] = const_cast<char *>(interpreter[2].c_str());
         args[3] = NULL;
         execve(interpreter[0].c_str(), args, env_array);
+        std::cerr << "CGI execution failed" << std::endl;
+        exit(1);
     }
     else
     {
+        std::cout << "script_path: " << script_path << std::endl;
+        std::cout << "request_body: " << request_body << std::endl;
+        std::cout << "request_method: " << request_method << std::endl;
         close(pipe_fd[1]);
         close(stdin_pipe[0]);
 

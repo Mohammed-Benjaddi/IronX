@@ -263,7 +263,6 @@ int HTTPRequest::setRoutesInfo(std::map<std::string, Route> &routes, Route &rout
     std::map<std::string, Route>::const_iterator it_route = routes.find(getLocation());
     if (it_route == routes.end() && getLocation() != "/favicon.ico")
     {
-        // exit(99);
         setStatusCode(404);
         setStatusMessage("Not Found");
         setPath(getErrorPages(getStatusCode()));
@@ -356,7 +355,6 @@ void HTTPRequest::RedirectionFound(Route &route) {
 
 void HTTPRequest::handlePOST(std::map<std::string, Route> &routes, Route &route)
 {
-    // exit(99);
     std::string contentType = getHeader("Content-Type");
     if (isDirExist(getPath(), route.getRootDir())) {
         if (contentType.rfind("application/x-www-form-urlencoded") != std::string::npos) {

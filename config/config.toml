@@ -23,7 +23,7 @@ autoindex = true
 
 [[servers.routes]]
 path = "/cgi-bin"
-root = "/"
+root = "/new-site"
 index = ["form.html"]
 methods = ["GET", "POST", "DELETE"]
 extensions = [".py"]
