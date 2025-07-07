@@ -33,7 +33,7 @@ autoindex = true
 [[servers.routes]]
 path = "/new-site"
 root = "/"
-methods = ["POST", "DELETE"]
+methods = ["GET", "POST", "DELETE"]
 extensions = [".php", ".py"]
 interpreter = "/usr/bin/env"
 autoindex = true
@@ -51,7 +51,7 @@ methods = ["GET", "POST", "DELETE"]
 
 [[servers]]
 host = "127.0.0.1"
-port = [8090, 8091, 8092]
+# port = [8090, 8091, 8092]
 
 hostnames = ["api.example.com", "beta.example.com"]
 

@@ -118,6 +118,8 @@ void fileHasNoCGI(HTTPRequest &request, Route &route, std::string &file_name) {
 void directoryHasIndexFiles(HTTPRequest &request, Route &route, std::vector<std::string> index_files) {
     for(size_t i = 0; i < index_files.size(); i++) {
         std::string path = route.getRootDir() + "/" + request.getPath() + "/" + index_files[i];
+        if(index_files[i].empty())
+            continue;
         if(isFileExist(path.c_str())) {
             if(isLocationHasCGI(path)) {
                 request.executeCGI(route);
