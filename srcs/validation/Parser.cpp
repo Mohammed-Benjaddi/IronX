@@ -383,7 +383,18 @@ void parseTOML(const std::string& filepath, WebServerConfig& config)
         if      (currentSection == "global")
         {
             if (key == "max_body_size")
+			{
+				bool isAllDigits = true;
+				for (std::string::const_iterator it = val.begin(); it != val.end(); ++it) {
+					if (!isdigit(static_cast<unsigned char>(*it))) {
+						isAllDigits = false;
+						break;
+					}
+				}
+				if (!isAllDigits)
+					throw std::runtime_error("Invalid value for max_body_size: " + val);
                 maxBodySize = static_cast<size_t>(strtoul(val.c_str(), 0, 10));
+			}
 			else
 				throw std::runtime_error("Invalid Var for global label");
         }
