@@ -1,6 +1,6 @@
 [  global ]  
 
-max_body_size = 1000000000000
+max_body_size = 1
 
 [default_error_pages]
 400 = "/errors/400.html"
@@ -25,7 +25,7 @@ autoindex = true
 path = "/cgi-bin"
 root = "/new-site"
 index = ["form.html"]
-methods = ["GET", "POST", "DELETE"]
+methods = ["GET", "DELETE"]
 extensions = [".py"]
 interpreter = "/usr/bin/env"
 autoindex = true
