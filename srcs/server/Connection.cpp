@@ -114,7 +114,10 @@ void Connection::parseCookie() {
 
 void Connection::handleRead() {
     char buffer[4096] = {0};
-    ssize_t bytes_read = recv(_fd, buffer, sizeof(buffer), 0);
+
+    ssize_t bytes_read;
+
+    bytes_read = recv(_fd, buffer, sizeof(buffer), 0);
 
     if (bytes_read > 0) {
         // Append new data to the read buffer
@@ -137,6 +140,7 @@ void Connection::handleRead() {
                 _headersParsed = true;
                 parseContentLength();
             }
+
             
             if (_headersPart.find("Cookie:") != std::string::npos) {
                 _hasCookie = true;
@@ -144,9 +148,28 @@ void Connection::handleRead() {
             }
         // If headers are parsed, check for complete body
         if (_headersParsed) {
+
+            if (_expectedBodyLength > _config->getMaxBodySize()) {
+                std::cerr << "[+] Payload Too Large detected\n";
+    
+                _httpRequest = new HTTPRequest(); // builds a 413 response
+                _httpResponse = new HTTPResponse(_httpRequest, _cookieHeader);
+
+                _closed = true; // close after writing 413
+                _writeBuffer = _httpResponse->getNextChunk();
+
+                // Force switch to write-only mode
+                struct epoll_event ev;
+                ev.data.fd = _fd;
+                ev.events = EPOLLOUT | EPOLLRDHUP;
+                if (epoll_ctl(_epoll_fd, EPOLL_CTL_MOD, _fd, &ev) == -1) {
+                    std::cerr << "epoll_ctl: switch to EPOLLOUT (Payload Too Large)\n";
+                    _closed = true;
+                }
+                return;
+            }
+
             if ( _expectedBodyLength == 0 || (_readBuffer.size() >= (_headersPart.size() + _expectedBodyLength))) {
-                // std::cout << reqRaw << std::endl;
-                // exit(0);
                 std::cout << "\n\033[1;31m******************************\033[0m\n";            
                 std::cout << "\033[1;32m== HTTP REQUEST ==\n" << _headersPart << "\033[0m\n";
                 _httpRequest = new HTTPRequest(_readBuffer, _config, _serverClusterId);
@@ -169,7 +192,9 @@ void Connection::re_armFd() {
     struct epoll_event ev;
     ev.data.fd = _fd;
 
-    if (!_writeBuffer.empty() || (_httpResponse && !_httpResponse->isComplete())) {
+    if (_closed) {
+        ev.events = EPOLLHUP | EPOLLRDHUP;
+    } else if (!_writeBuffer.empty() || (_httpResponse && !_httpResponse->isComplete())) {
         ev.events = EPOLLOUT | EPOLLRDHUP;
     } else {
         ev.events = EPOLLIN | EPOLLRDHUP;
@@ -177,17 +202,19 @@ void Connection::re_armFd() {
 
     if (epoll_ctl(_epoll_fd, EPOLL_CTL_MOD, _fd, &ev) == -1) {
         std::cerr << "epoll_ctl: re_armFd" << std::endl;
-        // delete _httpRequest;
         _closed = true;
     }
 }
 
 void Connection::handleWrite() {
     if (_httpResponse && _httpResponse->isComplete() && _writeBuffer.empty()) {
-        std::string connType = _httpResponse->getConnectionHeader(); 
-		reset();
+        if (_closed) {
+            close(_fd);
+            return;
+        }
+        reset();
         re_armFd();
-        return ;
+        return;
     }
 
     if (_httpResponse && !_httpResponse->isComplete()) {

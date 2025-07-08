@@ -13,6 +13,7 @@ HTTPRequest::HTTPRequest(){
     setStatusCode(413);
     setStatusMessage("Payload Too Large");
     setPath(getErrorPages(getStatusCode()));
+    setHeader("Content-Type", "text/html");
 }
 
 HTTPRequest::~HTTPRequest() {}

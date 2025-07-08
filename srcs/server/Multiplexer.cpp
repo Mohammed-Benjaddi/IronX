@@ -127,13 +127,12 @@ void    Multiplexer::handle_new_connection(int server_fd) {
 }
 
 void Multiplexer::handle_client_event(int fd, uint32_t event) {
+    Connection &conn = activeConnections.at(fd);
 	try {
         //! Disconnection Detection
 	    if (event & (EPOLLERR | EPOLLHUP | EPOLLRDHUP)) {
             throw Multiplexer::ClientDisconnectedException();
 	    }
-
-        Connection &conn = activeConnections.at(fd);
 
         if (event & EPOLLIN) {
             conn.handleRead();
@@ -141,9 +140,10 @@ void Multiplexer::handle_client_event(int fd, uint32_t event) {
         
         if (event & EPOLLOUT) {
             conn.handleWrite();
-
         }
+
 	} catch (const std::exception &e) {
+
         Multiplexer::close_connection(fd);
 	}
 }

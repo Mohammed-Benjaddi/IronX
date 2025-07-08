@@ -101,11 +101,7 @@ docker-build:
 	docker build -t $(IMAGE_NAME) .
 
 docker-run:
-	-docker rm -f $(CONTAINER_NAME)
-	docker run --name $(CONTAINER_NAME) -it --network=host  $(IMAGE_NAME) /bin/bash
-
-docker-run:
-	-docker rm -f $(CONTAINER_NAME)
+	docker rm -f $(CONTAINER_NAME)
 	docker run --name $(CONTAINER_NAME) -it --network=host  $(IMAGE_NAME) /bin/bash
 
 re: fclean all

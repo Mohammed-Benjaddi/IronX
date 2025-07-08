@@ -70,16 +70,17 @@ bool    fileExists(std::string fullPath) {
 
 void buildResponse(HTTPRequest* req, HTTPResponse* res) {
 
+
     const std::string connection = "keep-alive";
 
     const std::string contentType = "text/html";
 
-    // std::cout << "Path: " << req->getPath() << std::endl;
-    // std::cout << "Method: " << req->getMethod() << std::endl;
-    // std::cout << "Status Code: " << req->getStatusCode() << std::endl;
-    // std::cout << "Status Message: " << req->getStatusMessage() << std::endl;
-    // std::cout << "Connection: " << connection << std::endl;
-    // std::cout << "Content-Type: " << contentType << std::endl;
+    std::cout << "Path: " << req->getPath() << std::endl;
+    std::cout << "Method: " << req->getMethod() << std::endl;
+    std::cout << "Status Code: " << req->getStatusCode() << std::endl;
+    std::cout << "Status Message: " << req->getStatusMessage() << std::endl;
+    std::cout << "Connection: " << connection << std::endl;
+    std::cout << "Content-Type: " << contentType << std::endl;
 
     int status = req->getStatusCode();
     std::string path = req->getPath();
@@ -127,7 +128,6 @@ void buildResponse(HTTPRequest* req, HTTPResponse* res) {
                 res->setHeader("Content-Length", toString(html.size()));
             }
             return;
-
         default:
             break;
     }
@@ -137,6 +137,7 @@ void buildResponse(HTTPRequest* req, HTTPResponse* res) {
     res->setHeader("Content-Length", toString(errBody.size()));
     res->setHeader("Connection", "close");
     res->setBody(errBody);
+    std::cout << " I finished building the response" << std::endl;
 }
 
 void printResponse(HTTPResponse* res, HTTPRequest* req) {

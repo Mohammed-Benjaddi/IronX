@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Parser.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ael-maaz <ael-maaz@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nhayoun <nhayoun@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 17:38:54 by ael-maaz          #+#    #+#             */
-/*   Updated: 2025/07/07 22:54:50 by ael-maaz         ###   ########.fr       */
+/*   Updated: 2025/07/08 12:29:58 by nhayoun          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -528,6 +528,12 @@ void parseTOML(const std::string& filepath, WebServerConfig& config)
     config.setClusters(clusters);
 }
 
+
+
+
+
+
+
 void printConfigs(const WebServerConfig& conf)
 {
     std::cout << "=== GLOBAL CONFIGURATION ===" << std::endl;
@@ -635,6 +641,9 @@ void validateAndFixConfig(WebServerConfig& config)
 
     const std::vector<Cluster>& originalClusters = config.getClusters();
 
+	if (originalClusters.empty())
+    	throw std::runtime_error("Configuration error: No [[servers]] blocks declared.");
+
     for (size_t i = 0; i < originalClusters.size(); ++i)
     {
         const Cluster& cluster = originalClusters[i];
@@ -653,10 +662,18 @@ void validateAndFixConfig(WebServerConfig& config)
             std::cerr << "Duplicate host detected: " << host << " — skipping server #" << i + 1 << std::endl;
             continue; // skip duplicate
         }
+		if (cluster.getRoutes().empty())
+        {
+            std::cerr << "Server #" << i << " has no [[servers.routes]] defined — skipping.\n";
+            continue;
+        }
+
 
         seenHosts.insert(host);
         validClusters.push_back(cluster);
     }
+	if (validClusters.empty())
+        throw std::runtime_error("Configuration error: No valid servers with routes were declared.");
 
     // Replace clusters with the validated ones
     config.setClusters(validClusters);

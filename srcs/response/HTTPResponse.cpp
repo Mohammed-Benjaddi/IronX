@@ -7,6 +7,15 @@ HTTPResponse::HTTPResponse(HTTPRequest* request, std::string cookies)
     : _statusCode(200), _statusMessage("OK"), _connectionType("keep-alive"),
       _streamer(NULL), _request(request), _body("") ,_bodyPos(0), _headersSent(false), _complete(false) {
 
+        if (request->getStatusCode() == 413) {
+            setStatus(413, "Payload Too Large");
+            setHeader("Content-Type", "text/html");
+            setHeader("Connection", "keep-alive");
+            // std::string html = "<html><body><h1>413 Payload Too Large</h1></body></html>";
+            // setBody(html);
+            // setHeader("Content-Length", toString(html.size()));
+        }
+
     if (request->getStatusCode() == 0) {
         request->setStatusCode(200);
         request->setStatusMessage("OK");
@@ -16,6 +25,7 @@ HTTPResponse::HTTPResponse(HTTPRequest* request, std::string cookies)
         _hasCookie = true;
         setHeader("Set-Cookie", cookies);
     }
+        
     
     buildResponse(request, this);
 
