@@ -102,13 +102,13 @@ docker-build:
 
 docker-run:
 	docker rm -f $(CONTAINER_NAME) 2>/dev/null || true
-	docker run --name $(CONTAINER_NAME) -it --network=host $(IMAGE_NAME) /bin/bash
+	docker run --name $(CONTAINER_NAME) -it $(IMAGE_NAME) /bin/bash
 
 docker-up:
-	docker-compose up --build
+	docker compose up --build
 
 docker-down:
-	docker-compose down
+	docker compose down
 
 
 re: fclean all
