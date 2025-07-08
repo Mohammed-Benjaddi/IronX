@@ -27,8 +27,8 @@ void	ServerLauncher::launch(const WebServerConfig &config) {
 
 	// std::ofstream conf("/etc/hosts", std::ios::out | std::ios::trunc);
     // if (!conf) {
-    //     std::cerr << "Erreur : impossible d'ouvrir le fichier\n";
-    //     return;
+    //     std::cerr << "Error Opening File\n";
+	//     throw std::runtime_error("Failed to open /etc/hosts file");
     // }
 
 	// conf << "127.0.0.1 localhost\n";
