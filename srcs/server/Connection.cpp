@@ -112,6 +112,31 @@ void Connection::parseCookie() {
     }
 }
 
+void Connection::switchToWrite() {
+    _httpRequest = new HTTPRequest(); // builds a 413 response
+    _httpResponse = new HTTPResponse(_httpRequest, _cookieHeader);
+
+    _closed = true; // close after writing 413
+    _writeBuffer = _httpResponse->getNextChunk();
+
+    struct epoll_event ev;
+    ev.data.fd = _fd;
+    ev.events = EPOLLOUT | EPOLLRDHUP;
+    if (epoll_ctl(_epoll_fd, EPOLL_CTL_MOD, _fd, &ev) == -1) {
+        std::cerr << "epoll_ctl: switch to EPOLLOUT (Payload Too Large)\n";
+        _closed = true;
+    }
+}
+
+void Connection::printReqRes(HTTPRequest *req, HTTPResponse *res) {
+    std::cout << "\n\033[1;31m******************************\033[0m\n";            
+    std::cout << "\033[1;32m== HTTP REQUEST ==\n" << _headersPart << "\033[0m\n";         
+    printResponse(res, req);
+    std::cout << "\033[1;31m******************************\033[0m\n\n";
+
+}
+
+
 void Connection::handleRead() {
     char buffer[4096] = {0};
 
@@ -146,40 +171,23 @@ void Connection::handleRead() {
                 _hasCookie = true;
                 parseCookie();
             }
-        // If headers are parsed, check for complete body
+
         if (_headersParsed) {
-
             if (_expectedBodyLength > _config->getMaxBodySize()) {
-                std::cerr << "[+] Payload Too Large detected\n";
-    
-                _httpRequest = new HTTPRequest(); // builds a 413 response
-                _httpResponse = new HTTPResponse(_httpRequest, _cookieHeader);
-
-                _closed = true; // close after writing 413
-                _writeBuffer = _httpResponse->getNextChunk();
-
-                // Force switch to write-only mode
-                struct epoll_event ev;
-                ev.data.fd = _fd;
-                ev.events = EPOLLOUT | EPOLLRDHUP;
-                if (epoll_ctl(_epoll_fd, EPOLL_CTL_MOD, _fd, &ev) == -1) {
-                    std::cerr << "epoll_ctl: switch to EPOLLOUT (Payload Too Large)\n";
-                    _closed = true;
-                }
-                return;
+                switchToWrite();
+                printReqRes(_httpRequest, _httpResponse);
+                return ;
             }
 
             if ( _expectedBodyLength == 0 || (_readBuffer.size() >= (_headersPart.size() + _expectedBodyLength))) {
-                std::cout << "\n\033[1;31m******************************\033[0m\n";            
-                std::cout << "\033[1;32m== HTTP REQUEST ==\n" << _headersPart << "\033[0m\n";
                 _httpRequest = new HTTPRequest(_readBuffer, _config, _serverClusterId);
                 _httpResponse = new HTTPResponse(_httpRequest, _cookieHeader);
-                printResponse(_httpResponse, _httpRequest);
-                std::cout << "\033[1;31m******************************\033[0m\n\n";
                 re_armFd();
             } else {
                 return;
             }
+            printReqRes(_httpRequest, _httpResponse);
+            return ;
         }
     } else {
         _closed = true;
@@ -241,8 +249,6 @@ void Connection::handleWrite() {
 
 // ! leaks
 void	Connection::reset() {
-
-    std::cout << "location: " << _httpRequest->getLocation() << std::endl;
 
 	_writeBuffer.clear();
 	_readBuffer.clear();

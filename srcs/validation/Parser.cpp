@@ -6,7 +6,7 @@
 /*   By: nhayoun <nhayoun@student.1337.ma>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 17:38:54 by ael-maaz          #+#    #+#             */
-/*   Updated: 2025/07/08 12:29:58 by nhayoun          ###   ########.fr       */
+/*   Updated: 2025/07/08 18:58:42 by nhayoun          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -527,12 +527,6 @@ void parseTOML(const std::string& filepath, WebServerConfig& config)
     config.setErrorPages(errorPages);
     config.setClusters(clusters);
 }
-
-
-
-
-
-
 
 void printConfigs(const WebServerConfig& conf)
 {

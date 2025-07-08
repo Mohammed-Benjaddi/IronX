@@ -75,13 +75,6 @@ void buildResponse(HTTPRequest* req, HTTPResponse* res) {
 
     const std::string contentType = "text/html";
 
-    std::cout << "Path: " << req->getPath() << std::endl;
-    std::cout << "Method: " << req->getMethod() << std::endl;
-    std::cout << "Status Code: " << req->getStatusCode() << std::endl;
-    std::cout << "Status Message: " << req->getStatusMessage() << std::endl;
-    std::cout << "Connection: " << connection << std::endl;
-    std::cout << "Content-Type: " << contentType << std::endl;
-
     int status = req->getStatusCode();
     std::string path = req->getPath();
 
@@ -137,15 +130,9 @@ void buildResponse(HTTPRequest* req, HTTPResponse* res) {
     res->setHeader("Content-Length", toString(errBody.size()));
     res->setHeader("Connection", "close");
     res->setBody(errBody);
-    std::cout << " I finished building the response" << std::endl;
 }
 
 void printResponse(HTTPResponse* res, HTTPRequest* req) {
-    if (!res || !req) {
-        std::cerr << "printResponse: NULL pointer!\n";
-        return;
-    }
-    
     std::cout << "\033[1;33m== HTTP Response ==\033[0m\n";
     
     std::cout << "\033[1;33mHTTP/1.1 " << req->getStatusCode() << " " << req->getStatusMessage() << "\033[0m\n";

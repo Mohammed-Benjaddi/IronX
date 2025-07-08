@@ -36,6 +36,8 @@ class Connection {
         bool            isClosed() const;
         void	        reset();
         void            re_armFd();
+        void            switchToWrite();
+        void            printReqRes(HTTPRequest *req, HTTPResponse *res);
     private:
         int             _fd;
         int             _epoll_fd;

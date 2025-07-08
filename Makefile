@@ -101,9 +101,16 @@ docker-build:
 	docker build -t $(IMAGE_NAME) .
 
 docker-run:
-	docker rm -f $(CONTAINER_NAME)
-	docker run --name $(CONTAINER_NAME) -it --network=host  $(IMAGE_NAME) /bin/bash
+	docker rm -f $(CONTAINER_NAME) 2>/dev/null || true
+	docker run --name $(CONTAINER_NAME) -it --network=host $(IMAGE_NAME) /bin/bash
+
+docker-up:
+	docker-compose up --build
+
+docker-down:
+	docker-compose down
+
 
 re: fclean all
 
-.PHONY: all clean fclean re
+.PHONY: all clean fclean re docker-build docker-run docker-up docker-down

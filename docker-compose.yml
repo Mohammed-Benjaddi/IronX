@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  webserv:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: webserv_container
+    image: webserv_image
+    stdin_open: true
+    tty: true
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: bash

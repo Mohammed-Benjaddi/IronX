@@ -1,6 +1,7 @@
 [  global ]  
 
-max_body_size = 1
+# 100 MB
+max_body_size = 104857600 
 
 [default_error_pages]
 400 = "/errors/400.html"

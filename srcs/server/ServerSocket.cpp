@@ -118,7 +118,6 @@ void	ServerSocket::init_listen() {
 		close(this->_fd);
 		throw std::runtime_error("listen() failed");
 	}
-	////std::cout << "Socket is now listening on " << this->_host << ":" << this->_port << std::endl;
 }
 
 const char *ServerSocket::SocketCreationFailure::what() const throw() {

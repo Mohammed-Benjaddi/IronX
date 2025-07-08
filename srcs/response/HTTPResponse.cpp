@@ -11,9 +11,6 @@ HTTPResponse::HTTPResponse(HTTPRequest* request, std::string cookies)
             setStatus(413, "Payload Too Large");
             setHeader("Content-Type", "text/html");
             setHeader("Connection", "keep-alive");
-            // std::string html = "<html><body><h1>413 Payload Too Large</h1></body></html>";
-            // setBody(html);
-            // setHeader("Content-Length", toString(html.size()));
         }
 
     if (request->getStatusCode() == 0) {

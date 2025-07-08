@@ -115,9 +115,6 @@ void CGI::executeCGI()
     }
     else
     {
-        std::cout << "script_path: " << script_path << std::endl;
-        std::cout << "request_body: " << request_body << std::endl;
-        std::cout << "request_method: " << request_method << std::endl;
         close(pipe_fd[1]);
         close(stdin_pipe[0]);
 
