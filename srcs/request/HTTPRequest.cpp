@@ -1,7 +1,6 @@
 #include "HTTPRequest.hpp"
 
 HTTPRequest::HTTPRequest(std::vector<char> &raw_request, WebServerConfig *_config, int _clientId) : IHTTPMessage(), config(_config), clientId(_clientId), cgi(NULL) {
-    cgi = NULL;
     if (parse(*this, raw_request) == -1)
         return;      
     if (checkAllowedMethods(*this) == -1)
@@ -9,7 +8,8 @@ HTTPRequest::HTTPRequest(std::vector<char> &raw_request, WebServerConfig *_confi
     handleRequest();
 }
 
-HTTPRequest::HTTPRequest() {
+HTTPRequest::HTTPRequest(){
+    cgi = NULL;
     setStatusCode(413);
     setStatusMessage("Payload Too Large");
     setPath(getErrorPages(getStatusCode()));

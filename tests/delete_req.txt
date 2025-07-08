@@ -1,8 +1,0 @@
-DELETE /new-site HTTP/1.1
-User-Agent: PostmanRuntime/7.39.1
-Accept: */*
-Cache-Control: no-cache
-Postman-Token: 53fc53bc-f4e1-46df-915c-45f3dfa95f9a
-Host: 10.11.2.7:8088
-Accept-Encoding: gzip, deflate, br
-Connection: keep-alive

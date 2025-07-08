@@ -32,7 +32,6 @@ void	ServerLauncher::launch(const WebServerConfig &config) {
     // }
 
 	// conf << "127.0.0.1 localhost\n";
-
 	for (size_t i = 0; i < clusters.size(); i++) {
 		std::vector<std::string> hostnames = clusters.at(i).getHostnames();
 

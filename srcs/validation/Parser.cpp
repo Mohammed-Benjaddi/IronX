@@ -6,7 +6,7 @@
 /*   By: ael-maaz <ael-maaz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 17:38:54 by ael-maaz          #+#    #+#             */
-/*   Updated: 2025/07/06 22:33:19 by ael-maaz         ###   ########.fr       */
+/*   Updated: 2025/07/07 22:54:50 by ael-maaz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -287,44 +287,58 @@ void parseTOML(const std::string& filepath, WebServerConfig& config)
 					throw std::runtime_error("Unexpected '[' inside single‑bracket section: " + line);
     		}
 			
-            if (line.compare(0,2,"[[") == 0 && line.find("servers.routes") != std::string::npos)
+            // if (line.compare(0,2,"[[") == 0 && line.find("servers.routes") != std::string::npos)
+            // {
+			if (line.compare(0,2,"[[") == 0)
             {
+				std::string section = _trim(line.substr(2, line.size() - 4)); // strip [[ ]]
                 // commit the previous route (if we were already in one)
-				if (!currentCluster)
-        			throw std::runtime_error("Route block declared outside of [[servers]] block");
-                // if (inRoute)
-                //     commitRoute(currentCluster, currentRoutePath, currentRoute);
-				if (inRoute) {
-					if (!hasPathKey)
-						throw std::runtime_error("Missing required `path` key in [[servers.routes]] block");
-					if (currentRoutePath.empty())
-						throw std::runtime_error("Empty `path` value in [[servers.routes]] block");
+				if (section == "servers.routes")
+    			{
+					if (!currentCluster)
+						throw std::runtime_error("Route block declared outside of [[servers]] block");
+					// if (inRoute)
+					//     commitRoute(currentCluster, currentRoutePath, currentRoute);
+					if (inRoute) {
+						if (!hasPathKey)
+							throw std::runtime_error("Missing required `path` key in [[servers.routes]] block");
+						if (currentRoutePath.empty())
+							throw std::runtime_error("Empty `path` value in [[servers.routes]] block");
+						commitRoute(currentCluster, currentRoutePath, currentRoute);
+					}
+					// start a fresh route
+					currentRoute       = Route();
+					currentRoutePath.clear();
+					hasPathKey         = false; 
+					inRoute            = true;
+					currentSection.clear();      // keys now belong to the route
+					continue;
+					
+				}
+				else if(section == "servers")
+				{
+					if (inRoute)
+						commitRoute(currentCluster, currentRoutePath, currentRoute);
+					inRoute = false;
 
-					commitRoute(currentCluster, currentRoutePath, currentRoute);
-    			}
-                // start a fresh route
-                currentRoute       = Route();
-                currentRoutePath.clear();
-				hasPathKey         = false; 
-                inRoute            = true;
-                currentSection.clear();      // keys now belong to the route
-                continue;
-            }
-            //----------------------------------------------------------
-            // 2) starting a new [[servers]] block
-            //----------------------------------------------------------
-            if (line.compare(0,2,"[[") == 0 &&
-                line.find("servers") != std::string::npos)
-            {
+					if (currentCluster && currentCluster->getPorts().empty())
+						throw std::runtime_error("Missing required `port` key in [[servers]] block");
+					clusters.push_back(Cluster());        // create & select it
+					currentCluster   = &clusters.back();
+					currentSection.clear();               // keys now belong to server
+					continue;
+					
+				}
+				else
+					throw std::runtime_error("Invalid section Header");
+            // }
+            // //----------------------------------------------------------
+            // // 2) starting a new [[servers]] block
+            // //----------------------------------------------------------
+            // if (line.compare(0,2,"[[") == 0 &&
+            //     line.find("servers") != std::string::npos)
+            // {
                 // commit any route that was still open
-                if (inRoute)
-                    commitRoute(currentCluster, currentRoutePath, currentRoute);
-                inRoute = false;
-
-                clusters.push_back(Cluster());        // create & select it
-                currentCluster   = &clusters.back();
-                currentSection.clear();               // keys now belong to server
-                continue;
             }
             //----------------------------------------------------------
             // 3) single‑bracket section: [global] / [default_error_pages]
@@ -488,30 +502,31 @@ void parseTOML(const std::string& filepath, WebServerConfig& config)
 			else
 				throw std::runtime_error("Invalid key for [[server.routes]] block");	
         }
+		else
+		{
+			throw std::runtime_error("Key-value pair found outside of any valid section: " + key);
+		}
     }
 
     //------------------------------------------------------------------
     // commit the last open route / cluster after EOF
     //------------------------------------------------------------------
     if (inRoute) {
+		if (currentCluster && currentCluster->getPorts().empty())
+			throw std::runtime_error("Missing required `port` key in final [[servers]] block");
 		if (!hasPathKey)
 			throw std::runtime_error("Missing required `path` key in final [[servers.routes]] block");
 		if (currentRoutePath.empty())
 			throw std::runtime_error("Empty `path` value in final [[servers.routes]] block");
 		commitRoute(currentCluster, currentRoutePath, currentRoute);
 	}
-
+	if (currentCluster && currentCluster->getPorts().empty())
+		throw std::runtime_error("Missing required `port` key in final [[servers]] block");
     // move data into WebServerConfig
     config.setMaxBodySize(maxBodySize);
     config.setErrorPages(errorPages);
     config.setClusters(clusters);
 }
-
-
-
-
-
-
 
 void printConfigs(const WebServerConfig& conf)
 {
@@ -635,7 +650,7 @@ void validateAndFixConfig(WebServerConfig& config)
         // Test 2: Check for duplicate host
         if (seenHosts.find(host) != seenHosts.end())
         {
-            std::cerr << "Duplicate host detected: " << host << " — skipping server #" << i << std::endl;
+            std::cerr << "Duplicate host detected: " << host << " — skipping server #" << i + 1 << std::endl;
             continue; // skip duplicate
         }
 

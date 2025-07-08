@@ -73,6 +73,14 @@ void buildResponse(HTTPRequest* req, HTTPResponse* res) {
     const std::string connection = "keep-alive";
 
     const std::string contentType = "text/html";
+
+    // std::cout << "Path: " << req->getPath() << std::endl;
+    // std::cout << "Method: " << req->getMethod() << std::endl;
+    // std::cout << "Status Code: " << req->getStatusCode() << std::endl;
+    // std::cout << "Status Message: " << req->getStatusMessage() << std::endl;
+    // std::cout << "Connection: " << connection << std::endl;
+    // std::cout << "Content-Type: " << contentType << std::endl;
+
     int status = req->getStatusCode();
     std::string path = req->getPath();
 
@@ -106,6 +114,7 @@ void buildResponse(HTTPRequest* req, HTTPResponse* res) {
         case 400:
         case 204:
         case 201:
+        case 413:
             res->setStatus(status, req->getStatusMessage());
             res->setHeader("Content-Type", contentType);
             res->setHeader("Connection", connection);

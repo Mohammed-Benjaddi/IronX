@@ -1,6 +1,6 @@
 [  global ]  
 
-max_body_size = 1000000000000
+max_body_size = 1000000
 # 1048772
 # 1048766
 [default_error_pages]

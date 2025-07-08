@@ -48,7 +48,7 @@ void    Multiplexer::dispatch_event(const struct epoll_event &event) {
 void	Multiplexer::run() {
     this->poll_create();
     this->fds_register();
-    const int MAX_EVENTS = 10;
+    const int MAX_EVENTS = 126;
     struct epoll_event events[MAX_EVENTS];
     while (true) {
 		int num_events = wait_for_epoll(events, MAX_EVENTS);

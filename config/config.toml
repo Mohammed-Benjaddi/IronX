@@ -51,7 +51,7 @@ methods = ["GET", "POST", "DELETE"]
 
 [[servers]]
 host = "127.0.0.1"
-# port = [8090, 8091, 8092]
+port = [8090, 8091, 8092]
 
 hostnames = ["api.example.com", "beta.example.com"]
 
