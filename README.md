@@ -186,16 +186,19 @@ docker exec webserv ./webserv config_file.conf
 Make sure to expose the ports you want to use in the `docker-compose.yml` file.
 
 ### To Run Locally:
-```git clone https:  //github.com/NabilHY/webserv-42.git
+```git clone https://github.com/NabilHY/webserve-42.git
+
 cd webserv-42
+
 make
+
 ./webserv config_file.conf
 ```
 Make sure that the port numbers arent already in use.
 
 
 ## 🧪 Testing
-To test the server, you can use tools like `curl` or Postman to send HTTP requests to the server. You can also write unit tests for individual.
+To test the server, you can use tools like `curl` or Postman to send HTTP requests to the server. 
 
 ## 📚 Resources
 
