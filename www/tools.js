@@ -1,9 +1,11 @@
 const postJobButton = document.getElementById('post-job-button');
 const deleteJobButton = document.getElementById('delete-job-button');
 const getJobButton = document.getElementById('get-job-button');
+const cgiJobButton = document.getElementById('cgi-job-button');
 const fileInput = document.getElementById('file-upload');
 const bgSelect = document.getElementById('background-select');
 let postTargetPath = null;
+
 
 const baseUrl = `${window.location.protocol}//${window.location.hostname}:${window.location.port}`;
 
@@ -220,3 +222,7 @@ window.onload = () => {
         console.log('[BG] Loaded from cookie:', bg);
     }
 };
+
+cgiJobButton.addEventListener('click', function () {
+  window.location.href = '/new-site/cgi-bin/form.html';
+});

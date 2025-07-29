@@ -66,7 +66,7 @@
 </head>
 <body>
     <div class="form-container">
-        <h2>Contact Information</h2>
+        <h2>Forms to test CGI (Supports python and PHP)</h2>
         
         <!-- GET Method Form -->
         <form action="/cgi-bin/script.py" method="GET">
@@ -110,7 +110,7 @@
             <button type="submit" class="submit-btn">Submit python (POST)</button>
         </form>
 
-        <form action="/cgi-bin/php_script.php" method="GET">
+        <form style="margin-top: 30px;" action="/cgi-bin/php_script.php" method="GET">
             <div class="form-group">
                 <label for="firstName2">First Name <span class="required">*</span></label>
                 <input type="text" id="firstName2" name="firstName" required>
@@ -129,7 +129,7 @@
             <button type="submit" class="submit-btn">Submit php (GET)</button>
         </form>
 
-        <form action="/cgi-bin/php_script.php" method="POST">
+        <form style="margin-top: 30px;" action="/cgi-bin/php_script.php" method="POST">
             <div class="form-group">
                 <label for="firstName2">First Name <span class="required">*</span></label>
                 <input type="text" id="firstName2" name="firstName" required>
