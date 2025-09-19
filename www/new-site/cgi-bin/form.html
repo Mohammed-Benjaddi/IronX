@@ -1,152 +1,199 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Form</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .form-container {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        h2 {
-            color: #333;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #555;
-        }
-        input[type="text"], input[type="email"] {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-            box-sizing: border-box;
-        }
-        input[type="text"]:focus, input[type="email"]:focus {
-            outline: none;
-            border-color: #4CAF50;
-        }
-        .submit-btn {
-            background-color: #4CAF50;
-            color: white;
-            padding: 15px 30px;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            width: 100%;
-            transition: background-color 0.3s;
-        }
-        .submit-btn:hover {
-            background-color: #45a049;
-        }
-        .required {
-            color: red;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebServ CGI Forms</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/styles.css" />
+  <style>
+    @import url('https://fonts.cdnfonts.com/css/pricedown');
+
+    body {
+      font-family: 'Arial Black', sans-serif;
+      background: url('https://i.ibb.co/7xvLjxVW/team.png') no-repeat center center fixed;
+      background-size: cover;
+      color: #e2dfd2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 2rem;
+      position: relative;
+    }
+
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: linear-gradient(rgba(0,0,0,0.9), rgba(20,20,20,0.95));
+      z-index: 0;
+    }
+
+    h2 {
+      /* font-size: 4rem; */
+      font-family: 'Pricedown Bl', sans-serif;
+      color: #fff;
+      text-shadow: 3px 3px 0 #000, 6px 6px 0 #000;
+      text-align: center;
+      margin-bottom: 2rem;
+      animation: flicker 2.5s infinite;
+      position: relative;
+      z-index: 1;
+    }
+
+    @keyframes flicker {
+      0%, 18%, 22%, 25%, 55%, 100% { opacity: 1; }
+      19%, 21%, 24%, 56% { opacity: 0.4; }
+    }
+
+    .form-container {
+      position: relative;
+      z-index: 1;
+      background: rgba(26,26,26,0.95);
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 0 20px #000;
+      max-width: 500px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    label {
+      font-weight: bold;
+      color: #d0c97d;
+      text-align: left;
+      text-shadow: 1px 1px #000;
+      font-size: 1rem;
+    }
+
+    input[type="text"], input[type="email"] {
+      background-color: #1a1a1a;
+      border: 2px solid #555;
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      font-family: 'Arial Black', sans-serif;
+      color: #d0c97d;
+      font-size: 1rem;
+      box-shadow: 0 0 12px #000;
+      transition: all 0.3s ease;
+    }
+
+    input[type="text"]:focus, input[type="email"]:focus {
+      outline: none;
+      border-color: #ff4040;
+      box-shadow: 0 0 15px #ff4040, inset 0 0 10px #000;
+    }
+
+    .submit-btn {
+      padding: 0.75rem 1rem;
+      border: none;
+      border-radius: 10px;
+      background-color: #1a1a1a;
+      color: #d0c97d;
+      font-family: 'Arial Black', sans-serif;
+      font-size: 1rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 0 0 12px #000;
+      transition: all 0.3s ease;
+    }
+
+    .submit-btn:hover {
+      background-color: #333;
+      color: #ff4040;
+      border: 2px solid #ff4040;
+      box-shadow: 0 0 15px #ff4040, inset 0 0 10px #000;
+    }
+
+    hr {
+      border: 1px dashed #555;
+      margin: 2rem 0;
+    }
+
+    .required {
+      color: red;
+    }
+
+    .title {
+        font-size: 60px;
+    }
+  </style>
 </head>
 <body>
-    <div class="form-container">
-        <h2>Forms to test CGI (Supports python and PHP)</h2>
-        
-        <!-- GET Method Form -->
-        <form action="/cgi-bin/script.py" method="GET">
-            <div class="form-group">
-                <label for="firstName">First Name <span class="required">*</span></label>
-                <input type="text" id="firstName" name="firstName" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="lastName">Last Name <span class="required">*</span></label>
-                <input type="text" id="lastName" name="lastName" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="email">Email Address <span class="required">*</span></label>
-                <input type="email" id="email" name="email" required>
-            </div>
-            
-            <button type="submit" class="submit-btn">Submit python (GET)</button>
-        </form>
-        
-        <hr style="margin: 30px 0; border: 1px solid #eee;">
-        
-        <!-- POST Method Form -->
-        <form action="/cgi-bin/script.py" method="POST">
-            <div class="form-group">
-                <label for="firstName2">First Name <span class="required">*</span></label>
-                <input type="text" id="firstName2" name="firstName" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="lastName2">Last Name <span class="required">*</span></label>
-                <input type="text" id="lastName2" name="lastName" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="email2">Email Address <span class="required">*</span></label>
-                <input type="email" id="email2" name="email" required>
-            </div>
-            
-            <button type="submit" class="submit-btn">Submit python (POST)</button>
-        </form>
+  <h2 class="title">Forms to Test CGI (Python & PHP)</h2>
 
-        <form style="margin-top: 30px;" action="/cgi-bin/php_script.php" method="GET">
-            <div class="form-group">
-                <label for="firstName2">First Name <span class="required">*</span></label>
-                <input type="text" id="firstName2" name="firstName" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="lastName2">Last Name <span class="required">*</span></label>
-                <input type="text" id="lastName2" name="lastName" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="email2">Email Address <span class="required">*</span></label>
-                <input type="email" id="email2" name="email" required>
-            </div>
-            
-            <button type="submit" class="submit-btn">Submit php (GET)</button>
-        </form>
+  <div class="form-container">
+    <!-- GET Method Form -->
+    <form action="/cgi-bin/script.py" method="GET">
+      <label for="firstName">First Name <span class="required">*</span></label>
+      <input type="text" id="firstName" name="firstName" required>
 
-        <form style="margin-top: 30px;" action="/cgi-bin/php_script.php" method="POST">
-            <div class="form-group">
-                <label for="firstName2">First Name <span class="required">*</span></label>
-                <input type="text" id="firstName2" name="firstName" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="lastName2">Last Name <span class="required">*</span></label>
-                <input type="text" id="lastName2" name="lastName" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="email2">Email Address <span class="required">*</span></label>
-                <input type="email" id="email2" name="email" required>
-            </div>
-            
-            <button type="submit" class="submit-btn">Submit php (POST)</button>
-        </form>
-    </div>
+      <label for="lastName">Last Name <span class="required">*</span></label>
+      <input type="text" id="lastName" name="lastName" required>
+
+      <label for="email">Email <span class="required">*</span></label>
+      <input type="email" id="email" name="email" required>
+
+      <button type="submit" class="submit-btn">Submit Python (GET)</button>
+    </form>
+
+    <hr>
+
+    <!-- POST Method Form -->
+    <form action="/cgi-bin/script.py" method="POST">
+      <label for="firstName2">First Name <span class="required">*</span></label>
+      <input type="text" id="firstName2" name="firstName" required>
+
+      <label for="lastName2">Last Name <span class="required">*</span></label>
+      <input type="text" id="lastName2" name="lastName" required>
+
+      <label for="email2">Email <span class="required">*</span></label>
+      <input type="email" id="email2" name="email" required>
+
+      <button type="submit" class="submit-btn">Submit Python (POST)</button>
+    </form>
+
+    <hr>
+
+    <!-- PHP GET Form -->
+    <form action="/cgi-bin/php_script.php" method="GET">
+      <label for="firstName3">First Name <span class="required">*</span></label>
+      <input type="text" id="firstName3" name="firstName" required>
+
+      <label for="lastName3">Last Name <span class="required">*</span></label>
+      <input type="text" id="lastName3" name="lastName" required>
+
+      <label for="email3">Email <span class="required">*</span></label>
+      <input type="email" id="email3" name="email" required>
+
+      <button type="submit" class="submit-btn">Submit PHP (GET)</button>
+    </form>
+
+    <hr>
+
+    <!-- PHP POST Form -->
+    <form action="/cgi-bin/php_script.php" method="POST">
+      <label for="firstName4">First Name <span class="required">*</span></label>
+      <input type="text" id="firstName4" name="firstName" required>
+
+      <label for="lastName4">Last Name <span class="required">*</span></label>
+      <input type="text" id="lastName4" name="lastName" required>
+
+      <label for="email4">Email <span class="required">*</span></label>
+      <input type="email" id="email4" name="email" required>
+
+      <button type="submit" class="submit-btn">Submit PHP (POST)</button>
+    </form>
+  </div>
 </body>
 </html>
